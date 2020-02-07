@@ -1,0 +1,39 @@
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                 final twiss before sending to sixtrack
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ON_BB_CHARGE=1;
+
+LAGRF400.B1=0.5;
+LAGRF400.B2=0.;
+VRF400 := cp_vrf_total;
+
+
+print, text="========================================";
+print, text="======  OPTICS PARAMETERS: FINAL  ======";
+print, text="========================================";
+call, file="slhc/toolkit/get_optics_params.madx";
+
+
+call, file="slhc/toolkit/BetaBeating.madx";
+twiss, chrom;
+!sixtrack,cavall, mult_auto_off,radius=0.017;
+sixtrack,cavall, radius=0.017;
+if( ON_BB_SWITCH == 1){
+  !Fix bb lenses in sixtrack input
+  exec, SIXTRACK_INPUT_BB_LENSES;
+}
+
+select, flag=twiss, clear;
+
+twiss,file="last_twiss_temp";
+system,"gzip -f last_twiss_temp";
+
+
+! Rename last twiss
+RENAME_MACRO(nnnnn) : macro = {
+   system, "mv last_twiss_temp.gz last_twiss.nnnnn.gz";
+}
+
+exec, RENAME_MACRO($myseed);
+~                             

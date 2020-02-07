@@ -1,0 +1,156 @@
+
+print, text="Entering beam-beam block";
+
+on_bb_switch = cp_on_bb_switch;
+on_collision = cp_on_collision;
+b_t_dist = cp_b_t_dist; 
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!     Beam-beam encounters installation
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+
+if( on_bb_switch == 1){
+    call,file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
+};
+
+n_insideD1 = cp_n_inside_D1; 
+
+nho_IR1 = cp_nho_IR1;
+nho_IR2 = cp_nho_IR2;
+nho_IR5 = cp_nho_IR5;
+nho_IR8 = cp_nho_IR8;
+
+if( on_bb_switch == 1){
+    exec DEFINE_BB_PARAM;  !Define main beam-beam parameters
+};
+
+if (ON_COLLISION==1){
+  !Switch on Xscheme in precollision
+  on_disp:=0;
+  halo1=0;halo2=5;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
+ ! number of collision/turn at IP1/2/5/8 - BCMS https://espace.cern.ch/HiLumi/WP2/Wiki/HL-LHC%20Parameters.aspx
+  nco_IP1 = cp_nco_IP1;
+  nco_IP5 = cp_nco_IP5;
+  nco_IP2 = cp_nco_IP2;
+  nco_IP8 = cp_nco_IP8;
+  exec LEVEL_PARALLEL_OFFSET_FOR(cp_lumi_ip8, 8); value,halo8;
+  !Redefine the on_sep's accordingly
+  exec CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
+  ! Saving new crossing scheme with separation
+  on_disp=on_dispaux; ! reset on_disp before saving
+  exec, crossing_save;
+};
+
+on_disp=0; !more precise angles at IPs
+
+!Record the nominal IP position and crossing angle
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+twiss;
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+value,xnom1,xnom2,xnom5,xnom8;
+value,ynom1,ynom2,ynom5,ynom8;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+value,pynom1,pynom2,pynom5,pynom8;
+
+if( ON_BB_SWITCH == 1){
+  !Install b-b marker
+  exec INSTALL_BB_MARK(b1);exec INSTALL_BB_MARK(b2);
+
+  !Define bb lenses for both beams in all IR's and calculate # of encounters before D1
+  exec CALCULATE_BB_LENS;
+
+  !Install bb lenses
+  on_ho1 =1; on_lr1l = 1; on_lr1r = 1; npara_1 = npara0_1 + n_insideD1;
+  on_ho5 =1; on_lr5l = 1; on_lr5r = 1; npara_5 = npara0_5 + n_insideD1;
+  on_ho2 =1; on_lr2l = 1; on_lr2r = 1; npara_2 = npara0_2 + n_insideD1;
+  on_ho8 =1; on_lr8l = 1; on_lr8r = 1; npara_8 = npara0_8 + n_insideD1;
+  if(mylhcbeam==1) {exec INSTALL_BB_LENS(b1);};
+  if(mylhcbeam>1) {exec INSTALL_BB_LENS(b2);};
+
+  !Print the lenses in bb_lenses.dat
+  exec, PRINT_BB_LENSES;
+
+  ON_BB_CHARGE := 0; !Switch off the charge the bb lenses
+
+  !Install Crab Cavities for the weak beam
+  call,file="slhc/toolkit/enable_crabcavities.madx";
+
+!  /*
+!  !Plot b-b separation
+!  exec PLOT_BB_SEP(1,$npara_1);
+!  exec PLOT_BB_SEP(2,$npara_2);
+!  exec PLOT_BB_SEP(5,$npara_5);
+!  exec PLOT_BB_SEP(8,$npara_8);
+!  */
+
+  !/*
+  !if (mylhcbeam<3){ seqedit,sequence=lhcb1;flatten;cycle,start=IP1;endedit; };
+  !seqedit,sequence=lhcb2;flatten;cycle,start=IP1;endedit;
+
+  if (mylhcbeam<3){
+    use,sequence=lhcb1;
+    select,flag=twiss,clear;
+    select,flag=twiss,class=marker,pattern=PAR.*L1,range=mbxf.4l1..4/IP1.L1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+    select,flag=twiss,class=marker,pattern=PAR.*L5,range=mbxf.4l5..4/IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+    select,flag=twiss,class=marker,pattern=PAR.*R1,range=IP1/mbxf.4r1..1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+    select,flag=twiss,class=marker,pattern=PAR.*R5,range=IP5/mbxf.4r5..1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+    select,flag=twiss,class=marker,pattern=IP1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+    select,flag=twiss,class=marker,pattern=IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+    twiss,file=twiss_bb.b1;system,"cat twiss_bb.b1";
+  };
+
+  use,sequence=lhcb2;
+  select,flag=twiss,clear;
+  select,flag=twiss,class=marker,pattern=PAR.*L1,range=mbxf.4l1..4/IP1.L1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  select,flag=twiss,class=marker,pattern=PAR.*L5,range=mbxf.4l5..4/IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  select,flag=twiss,class=marker,pattern=PAR.*R1,range=IP1/mbxf.4r1..1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  select,flag=twiss,class=marker,pattern=PAR.*R5,range=IP5/mbxf.4r5..1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  select,flag=twiss,class=marker,pattern=IP1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  select,flag=twiss,class=marker,pattern=IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  twiss,file=twiss_bb.b2;system,"cat twiss_bb.b2";
+
+  if(mylhcbeam==1) {use,sequence=lhcb1;};
+  if(mylhcbeam>1) {use,sequence=lhcb2;};
+
+  select,flag=twiss,clear;
+  select,flag=twiss,pattern=HO,class=beambeam,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+  twiss,file=twiss_bb;system,"cat twiss_bb";
+
+  !if (mylhcbeam<3){ seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit; };
+  !seqedit,sequence=lhcb2;flatten;cycle,start=IP3;endedit;
+  !*/
+
+  !Remove bb markers
+  exec REMOVE_BB_MARKER;
+
+!  /*
+!  !Make and plot footprint (at 6 sigmas)
+!  ON_BB_CHARGE := 1;
+!
+!  !Switch on Xscheme
+!  exec, crossing_restore;
+!
+!  nsigmax=6;
+!
+!  if(qx0-qx00<0.3){
+!    if(mylhcbeam==1) {exec MAKEFOOTPRINT(b1);exec PLOTFOOTPRINT(b1,0.2795,0.2805,0.3095,0.3105);};
+!    if(mylhcbeam>1) {exec MAKEFOOTPRINT(b2);exec PLOTFOOTPRINT(b2,0.2795,0.2805,0.3095,0.3105);};
+!  };
+!  if(qx0-qx00>0.3){
+!    if(mylhcbeam==1) {exec MAKEFOOTPRINT(b1);exec PLOTFOOTPRINT(b1,0.300,0.315,0.310,0.325);};
+!    if(mylhcbeam>1) {exec MAKEFOOTPRINT(b2);exec PLOTFOOTPRINT(b2,0.300,0.315,0.310,0.325);};
+!  };
+!  ON_BB_CHARGE := 0;
+!  exec,crossing_disable;
+!  */
+
+  !Remove bb lens for both beams
+  !exec REMOVE_BB_LENS;
+};
+
+
