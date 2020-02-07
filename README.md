@@ -4,7 +4,7 @@ This tool does...
 
 ## Contributors:
 
-R. De Maria  <---! leave two spaces for new line --->
+R. De Maria  <!-- two spaces for new line -->
 S. Fartoukh  
 M. Giovannozzi  
 G. Iadarola  
