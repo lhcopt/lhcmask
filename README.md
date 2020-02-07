@@ -3,8 +3,8 @@
 This tool does...
 
 ## Contributors:
-
-R. De Maria  <!-- two spaces for new line -->
+<!-- use two spaces for new line -->
+R. De Maria  
 S. Fartoukh  
 M. Giovannozzi  
 G. Iadarola  
