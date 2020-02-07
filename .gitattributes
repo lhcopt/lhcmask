@@ -1,1 +1,2 @@
 mask_01_optics.madx linguist-language=fortran
+mask_02_lumilevel_and_bb.madx linguist-language=c
