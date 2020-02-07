@@ -4,8 +4,7 @@ This tool does...
 
 ## Contributors:
 
-R. De Maria
-
+R. De Maria  
 S. Fartoukh
 
 M. Giovannozzi
