@@ -6,7 +6,7 @@ def unmask(mask_filename, parameters,
         content = fid.read()
 
     for kk in parameters.keys():
-        content.replace(kk, str(parameters[kk]))
+        content = content.replace(kk, str(parameters[kk]))
 
     if output_filename is None:
         outfname = None
