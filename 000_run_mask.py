@@ -21,7 +21,7 @@ chromaticity = 15
 xing_angle_urad = 245.
 seedran = 1
 
-fname_mask = 'hl14_template_split.mask'
+fname_mask = 'hl14_collisions.mask'
 
 with open(fname_mask) as fid:
     mask_content = fid.read()
