@@ -20,7 +20,7 @@ system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
 
 ! Mask code folder
-system, "ln -fns ../../../ mask_code";
+system, "ln -fns ../../ mask_code";
 
 
 !*************************!
