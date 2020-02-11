@@ -6,17 +6,17 @@ mylhcbeam = cp_mylhcbeam;
 
 nrj = cp_beam_energy_tot; 
 
+off_all_errors = cp_off_all_errors;
 correct_for_D2 = cp_correct_for_D2;
 correct_for_MCBX = cp_correct_for_MCBX;
-off_all_errors = cp_off_all_errors;
 
 on_errors_LHC = cp_on_errors_LHC;
 on_errors_MBH = cp_on_errors_MBH;
-on_errors_Q5 = cp_on_errors_Q5;
-on_errors_Q4 = cp_on_errors_Q4;
-on_errors_D2 = cp_on_errors_D2;
-on_errors_D1 = cp_on_errors_D1;
 on_errors_IT = cp_on_errors_IT;
+on_errors_Q4 = cp_on_errors_Q4;
+on_errors_Q5 = cp_on_errors_Q5;
+on_errors_D1 = cp_on_errors_D1;
+on_errors_D2 = cp_on_errors_D2;
 on_errors_MCBRD = cp_on_errors_MCBRD;
 on_errors_MCBXF = cp_on_errors_MCBXF;
 
@@ -31,25 +31,25 @@ if (mylhcbeam==4){
 Option, -echo,warn,-info;
 !
 !!Install HL-LHC
-call,file="slhc/hllhc_sequence.madx";
+call, file="slhc/hllhc_sequence.madx";
 
 ! Slice nominal sequence
-exec,myslice;
+exec, myslice;
 
-call,file="slhc/errors/install_mqxf_fringenl.madx";    ! adding fringe place holder
-call,file="slhc/errors/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
-call,file="slhc/errors/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
+call, file="slhc/errors/install_mqxf_fringenl.madx";    ! adding fringe place holder
+call, file="slhc/errors/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
+call, file="slhc/errors/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
 
 !Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
 if (mylhcbeam<3){
-  seqedit,sequence=lhcb1;flatten;cycle,start=IP3;flatten;endedit;
+  seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
 };
-seqedit,sequence=lhcb2;flatten;cycle,start=IP3;flatten;endedit;
+seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
 
 !********************************************
 
 ! A Laundau octupole current 20A inj, -570A col
-I_MO=cp_oct_current;
+I_MO = cp_oct_current;
 
 
 emittance_norm := cp_emit_beam*1.0E-6;
