@@ -6,6 +6,10 @@ mylhcbeam = cp_mylhcbeam;
 
 nrj = cp_beam_energy_tot; 
 
+correct_for_D2 = cp_correct_for_D2;
+correct_for_MCBX = cp_correct_for_MCBX;
+off_all_errors = cp_off_all_errors;
+
 on_errors_LHC = cp_on_errors_LHC;
 on_errors_MBH = cp_on_errors_MBH;
 on_errors_Q5 = cp_on_errors_Q5;
@@ -16,9 +20,9 @@ on_errors_IT = cp_on_errors_IT;
 on_errors_MCBRD = cp_on_errors_MCBRD;
 on_errors_MCBXF = cp_on_errors_MCBXF;
 
-call,file="slhc/toolkit/macro.madx";        !Call some macro facilities
+call, file="slhc/toolkit/macro.madx";        !Call some macro facilities
 
-Option, -echo,-warn,-info;
+option, -echo,-warn,-info;
 if (mylhcbeam==4){
   call,file="lhc/lhcb4.seq";
 } else {
