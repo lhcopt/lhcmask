@@ -142,10 +142,10 @@ cp_on_errors_MCBXF=1;
 ! !!Run!! !
 !*********!
 
-call, file="mask_01_optics.madx";
-call, file="mask_02_lumilevel_and_bb.madx";
-call, file="mask_03_optics_and_err.madx";
-call, file="mask_04_lasttwiss_and_sixtrack.madx";
+call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_01_optics.madx";
+call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_02_lumilevel_and_bb.madx";
+call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_03_optics_and_err.madx";
+call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_04_lasttwiss_and_sixtrack.madx";
 
 stop;
 
