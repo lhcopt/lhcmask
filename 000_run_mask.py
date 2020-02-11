@@ -34,11 +34,16 @@ mask_content = mask_content.replace(r'%CHROM%', f'{chromaticity:e}')
 mask_content = mask_content.replace(r'%XING', f'{xing_angle_urad:e}')
 mask_content = mask_content.replace(r'%SEEDRAN', f'{seedran:d}')
 # %% Dump the unmasked mask on file
-unmask_fname = fname_mask.split('.mask')[0]+'_unmask.mask'
+unmask_fname = fname_mask.split('.mask')[0]+'.unmasked'
 with open(unmask_fname, 'w') as fid:
     fid.write(mask_content)
 
 #os.system('madx '+unmask_fname)
+import time
+start_time = time.time()
 mad = Madx()
 mad.call(unmask_fname)
+end_time= time.time()
+print("--- %s seconds ---" % (time.time() - start_time))
+
 # %%
