@@ -6,19 +6,23 @@ mylhcbeam = cp_mylhcbeam;
 
 nrj = cp_beam_energy_tot; 
 
+off_all_errors = cp_off_all_errors;
+correct_for_D2 = cp_correct_for_D2;
+correct_for_MCBX = cp_correct_for_MCBX;
+
 on_errors_LHC = cp_on_errors_LHC;
 on_errors_MBH = cp_on_errors_MBH;
-on_errors_Q5 = cp_on_errors_Q5;
-on_errors_Q4 = cp_on_errors_Q4;
-on_errors_D2 = cp_on_errors_D2;
-on_errors_D1 = cp_on_errors_D1;
 on_errors_IT = cp_on_errors_IT;
+on_errors_Q4 = cp_on_errors_Q4;
+on_errors_Q5 = cp_on_errors_Q5;
+on_errors_D1 = cp_on_errors_D1;
+on_errors_D2 = cp_on_errors_D2;
 on_errors_MCBRD = cp_on_errors_MCBRD;
 on_errors_MCBXF = cp_on_errors_MCBXF;
 
-call,file="slhc/toolkit/macro.madx";        !Call some macro facilities
+call, file="slhc/toolkit/macro.madx";        !Call some macro facilities
 
-Option, -echo,-warn,-info;
+option, -echo,-warn,-info;
 if (mylhcbeam==4){
   call,file="lhc/lhcb4.seq";
 } else {
@@ -27,25 +31,25 @@ if (mylhcbeam==4){
 Option, -echo,warn,-info;
 !
 !!Install HL-LHC
-call,file="slhc/hllhc_sequence.madx";
+call, file="slhc/hllhc_sequence.madx";
 
 ! Slice nominal sequence
-exec,myslice;
+exec, myslice;
 
-call,file="slhc/errors/install_mqxf_fringenl.madx";    ! adding fringe place holder
-call,file="slhc/errors/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
-call,file="slhc/errors/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
+call, file="slhc/errors/install_mqxf_fringenl.madx";    ! adding fringe place holder
+call, file="slhc/errors/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
+call, file="slhc/errors/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
 
 !Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
 if (mylhcbeam<3){
-  seqedit,sequence=lhcb1;flatten;cycle,start=IP3;flatten;endedit;
+  seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
 };
-seqedit,sequence=lhcb2;flatten;cycle,start=IP3;flatten;endedit;
+seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
 
 !********************************************
 
 ! A Laundau octupole current 20A inj, -570A col
-I_MO=cp_oct_current;
+I_MO = cp_oct_current;
 
 
 emittance_norm := cp_emit_beam*1.0E-6;
@@ -63,18 +67,18 @@ epsy := cp_beam_norm_emit / gamma_rel;
 bv_aux = -1;
 if (mylhcbeam<3){
   beam,particle=proton,sequence=lhcb1,energy=cp_beam_energy_tot,
-      sigt=cp_sigt,bv=1,
+      sigt=cp_beam_sigt,bv=1,
       npart=cp_beam_npart,sige=cp_beam_sige,ex=epsx,ey=epsy;
   bv_aux = 1;
 };
 beam,particle=proton,sequence=lhcb2,energy=cp_beam_energy_tot,
-    sigt=cp_sigt,bv=-bv_aux,
+    sigt=cp_beam_sigt,bv=-bv_aux,
     npart=cp_beam_npart,sige=cp_beam_sige,ex=epsx,ey=epsy;
 
 ! Tunes and chromaticity
-tsplit= cp_qx00;
-qx00  = cp_qy00;
-qy00  = cp_tsplit;
+tsplit= cp_tsplit;
+qx00  = cp_qx00;
+qy00  = cp_qy00;
 qx0 = cp_qx0;
 qy0 = cp_qy0;
 
@@ -111,14 +115,14 @@ value,mux_ip15_ref,muy_ip15_ref;
 
 
 ! Set IP knobs
-on_x1 = cp_on_x1 
-on_sep1 cp_on_sep1
-on_x5 = cp_on_x5 
-on_sep5 cp_on_sep5
-on_x2 = cp_on_x2 
-on_sep2 cp_on_sep2
-on_x8 = cp_on_x8
-on_sep8 cp_on_sep8
+on_x1 = cp_on_x1; 
+on_sep1 = cp_on_sep1;
+on_x5 = cp_on_x5;
+on_sep5 = cp_on_sep5;
+on_x2 = cp_on_x2; 
+on_sep2 = cp_on_sep2;
+on_x8 = cp_on_x8;
+on_sep8 =cp_on_sep8;
 on_a1 = cp_on_a1;
 on_o1 = cp_on_o1;           
 on_a5 = cp_on_a5;
