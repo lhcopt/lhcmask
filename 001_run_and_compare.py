@@ -38,7 +38,7 @@ seedran = 1,
         fid.write(mask_content)
 # %% Dump the unmasked mask on file
 #unmask_fname = fname_mask.split('.mask')[0]+'_unmask.mask'
-path='/afs/cern.ch/work/s/sterbini/lhcmask/tests/collision/'
+path='/afs/cern.ch/work/s/sterbini/lhcmask/tests/injection/'
 unmask_file(fname_mask=path+'new/hl14_collisions.mask',fname_unmasked=path+'new/hl14_collisions.madx')
 unmask_file(fname_mask=path+'old/old.mask',fname_unmasked=path+'old/old.madx')
 
