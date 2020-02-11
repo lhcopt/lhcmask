@@ -38,18 +38,33 @@ seedran = 1,
         fid.write(mask_content)
 # %% Dump the unmasked mask on file
 #unmask_fname = fname_mask.split('.mask')[0]+'_unmask.mask'
-path='/afs/cern.ch/work/s/sterbini/lhcmask/tests/injection/'
+path='./collision/'
 unmask_file(fname_mask=path+'new/hl14_collisions.mask',fname_unmasked=path+'new/hl14_collisions.madx')
 unmask_file(fname_mask=path+'old/old.mask',fname_unmasked=path+'old/old.madx')
 
 # %%
-mad = Madx()
-mad.chdir(path+'old') 
-mad.call('old.madx')
+def f_proc1():
+    mad = Madx()
+    mad.chdir(path+'old')
+    mad.call('old.madx')
 
 # %%
-mad = Madx()
-mad.chdir(path+'new') 
-mad.call('hl14_collisions.madx')
+def f_proc2():
+    mad = Madx()
+    mad.chdir(path+'new')
+    mad.call('hl14_collisions.madx')
+
+from multiprocessing import Process
+
+p1 = Process(target=f_proc1)
+p2 = Process(target=f_proc2)
+
+p1.start()
+p2.start()
+
+p1.join()
+p2.join()
+
+print('Mah!')
 
 # %%
