@@ -19,6 +19,9 @@ system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
 ! Beam-beam macros folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
 
+! Mask code folder
+system, "ln -fns ../../ mask_code";
+
 
 !*************************!
 !  General configuration  !
@@ -149,9 +152,9 @@ cp_on_errors_MCBXF = 1;
 
 option, -echo, -info;
 
-call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_01_optics.madx";
-call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_02_lumilevel_and_bb.madx";
-call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_03_optics_and_err.madx";
-call, file="/afs/cern.ch/work/s/sterbini/lhcmask/mask_04_lasttwiss_and_sixtrack.madx";
+call, file="mask_code/mask_01_optics.madx";
+call, file="mask_code/mask_02_lumilevel_and_bb.madx";
+call, file="mask_code/mask_03_optics_and_err.madx";
+call, file="mask_code/mask_04_lasttwiss_and_sixtrack.madx";
 
 stop;

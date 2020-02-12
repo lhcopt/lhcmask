@@ -1,5 +1,19 @@
 # Mask files for LHC and HL-LHC
 
+## To run an example:
+```bash
+cd tests/collision/
+python ../../unmask.py hl14_collisions.mask parameters.txt
+madx hl14_collisions.mask.unmasked
+```
+or equivalently:
+```bash
+cd tests/collision/
+python ../../unmask.py hl14_collisions.mask parameters.txt --run
+```
+
+## Description
+
 In this repository you can retrieve and contribute to improve the MADX code for LHC and HL-LHC.
 
 This work is based on the work of many colleagues  who shared with the community their contributions and effort for enriching this simulation framework.
