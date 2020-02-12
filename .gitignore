@@ -200,7 +200,6 @@ tests/injection/hl14_injection.mask.unmasked
 tests/injection/mask_code
 tests/injection/out
 tests/injection/old/old.mask.unmasked
-tests/injection/old/parameters.txt
 tests/injection/temp/MB_corr_setting.mad
 tests/injection/temp/MB.errors
 tests/injection/temp/optics0_inser.mad
