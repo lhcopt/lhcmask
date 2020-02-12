@@ -33,9 +33,6 @@ The separation of the configuration parameters of the mask with the MADX code ai
 - to improve the readability for the users that can focus on the input of the simulations,
 - to define better interfaces for the maintenance of the MADX code.
 
-In this repository you can find, as an example, the hl14_collision.mask.
-
-You can unmask and run it using the stript 000_run_mask.py.
 
 ## Contributors:
 <!-- use two spaces for new line -->

@@ -249,7 +249,7 @@ if (on_errors_LHC==1){
 };
 
 ! New IT/D1/D2/Q4/Q5
-myseed = cp_myseed;
+myseed = par_myseed;
 
 if (on_errors_IT==1){
   eoption,seed=myseed+101;
