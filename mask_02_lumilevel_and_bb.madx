@@ -1,9 +1,9 @@
 
 print, text="Entering beam-beam block";
 
-on_bb_switch = cp_on_bb_switch;
-on_collision = cp_on_collision;
-b_t_dist = cp_b_t_dist; 
+on_bb_switch = par_on_bb_switch;
+on_collision = par_on_collision;
+b_t_dist = par_b_t_dist; 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
 !     Beam-beam encounters installation
@@ -14,12 +14,12 @@ if( on_bb_switch == 1){
     call,file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
 };
 
-n_insideD1 = cp_n_inside_D1; 
+n_insideD1 = par_n_inside_D1; 
 
-nho_IR1 = cp_nho_IR1;
-nho_IR2 = cp_nho_IR2;
-nho_IR5 = cp_nho_IR5;
-nho_IR8 = cp_nho_IR8;
+nho_IR1 = par_nho_IR1;
+nho_IR2 = par_nho_IR2;
+nho_IR5 = par_nho_IR5;
+nho_IR8 = par_nho_IR8;
 
 if( on_bb_switch == 1){
     exec DEFINE_BB_PARAM;  !Define main beam-beam parameters
@@ -30,11 +30,11 @@ if (ON_COLLISION==1){
   on_disp:=0;
   halo1=0;halo2=5;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
  ! number of collision/turn at IP1/2/5/8 - BCMS https://espace.cern.ch/HiLumi/WP2/Wiki/HL-LHC%20Parameters.aspx
-  nco_IP1 = cp_nco_IP1;
-  nco_IP5 = cp_nco_IP5;
-  nco_IP2 = cp_nco_IP2;
-  nco_IP8 = cp_nco_IP8;
-  exec LEVEL_PARALLEL_OFFSET_FOR(cp_lumi_ip8, 8); value,halo8;
+  nco_IP1 = par_nco_IP1;
+  nco_IP5 = par_nco_IP5;
+  nco_IP2 = par_nco_IP2;
+  nco_IP8 = par_nco_IP8;
+  exec LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip8, 8); value,halo8;
   !Redefine the on_sep's accordingly
   exec CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
   ! Saving new crossing scheme with separation
