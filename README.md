@@ -1,5 +1,16 @@
 # Mask files for LHC and HL-LHC
 
+## Contributors:
+<!-- use two spaces for new line -->
+R. De Maria  
+S. Fartoukh  
+M. Giovannozzi  
+G. Iadarola  
+Y. Papaphilippou  
+D. Pellegrini  
+G. Sterbini  
+F. Van Der Veken  
+
 ## To run an example:
 ```bash
 cd tests/collision/
@@ -14,12 +25,11 @@ python ../../unmask.py hl14_collisions.mask parameters.txt --run
 
 ## Description
 
-In this repository you can retrieve and contribute to improve the MADX code for LHC and HL-LHC.
+In this repository you can retrieve and contribute to improve the MADX code used to setup tracking simulations for LHC and HL-LHC.
 
-This work is based on the work of many colleagues  who shared with the community their contributions and effort for enriching this simulation framework.
+This code is based on the work of many colleagues who shared their contributions and effort with the community for enriching this simulation framework.
 
 We refer as *mask* the MADX input code that is the starting code for tracking simulation, FMA analysis,... The *mask* file present *masked* parameters that can be *unmasked*. Once unmasked, the mask become a regular MADX input file and can be directly run.
-
 
 The proposed generic mask file has two main parts:
  1. the definition of the configuration parameters. Their value can be assigned explicitly or masked by a placeholder (to be used for SixTrack scans).
@@ -34,14 +44,4 @@ The separation of the configuration parameters of the mask with the MADX code ai
 - to define better interfaces for the maintenance of the MADX code.
 
 
-## Contributors:
-<!-- use two spaces for new line -->
-R. De Maria  
-S. Fartoukh  
-M. Giovannozzi  
-G. Iadarola  
-Y. Papaphilippou  
-D. Pellegrini  
-G. Sterbini  
-F. Van Der Veken  
 
