@@ -36,4 +36,3 @@ RENAME_MACRO(nnnnn) : macro = {
 }
 
 exec, RENAME_MACRO($myseed);
-~                             
