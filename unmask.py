@@ -22,7 +22,7 @@ def unmask(mask_filename, parameters,
     if not nocheck:
         if '%' in content:
             raise ValueError(
-              ('There is still a %% after unmasking!\n'
+              ('There is still a % after unmasking!\n'
                '--> Incompatible with nocheck=False\n'
                'from command line add --nocheck to skip the check.'))
 
