@@ -52,6 +52,7 @@ if __name__ == '__main__':
                     'or given inline as: %%PARAM1%%:value1, %%PARAM2:value2, ...'))
     parser.add_argument('--output_filename', help='Name of the output file', default='auto')
     parser.add_argument('--run', help='Execute in madx after unmasking', action='store_true')
+    parser.add_argument('--nocheck', help='Skip check that all %%s are removed', action='store_true')
     args = parser.parse_args()
 
     if ':' in args.parameters[0]:
@@ -63,7 +64,9 @@ if __name__ == '__main__':
     else:
         par_dict = parse_parameter_file(args.parameters[0])
 
-    unmask(args.mask_filename, par_dict, output_filename=args.output_filename)
+    unmask(args.mask_filename, par_dict, output_filename=args.output_filename,
+            strict=not(args.nocheck)
+strict)
 
     if args.run:
         import os
