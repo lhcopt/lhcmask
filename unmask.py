@@ -66,7 +66,6 @@ if __name__ == '__main__':
 
     unmask(args.mask_filename, par_dict, output_filename=args.output_filename,
             strict=not(args.nocheck)
-strict)
 
     if args.run:
         import os
