@@ -1,6 +1,6 @@
 
 def unmask(mask_filename, parameters,
-        output_filename=None, strict=False):
+        output_filename=None, nocheck=False):
 
     with open(mask_filename, 'r') as fid:
         content = fid.read()
@@ -19,11 +19,12 @@ def unmask(mask_filename, parameters,
         with open(outfname, 'w') as fid:
             fid.write(content)
 
-    if strict:
-        if '%%' in content:
+    if not nocheck:
+        if '%' in content:
             raise ValueError(
               ('There is still a %% after unmasking!\n'
-               '--> Incompatible with strict=True'))
+               '--> Incompatible with nocheck=False\n'
+               'from command line add --nocheck to skip the check.'))
 
     return content
 
@@ -64,8 +65,8 @@ if __name__ == '__main__':
     else:
         par_dict = parse_parameter_file(args.parameters[0])
 
-    unmask(args.mask_filename, par_dict, output_filename=args.output_filename,
-            strict=not(args.nocheck)
+    content = unmask(args.mask_filename, par_dict, output_filename=args.output_filename,
+            nocheck=args.nocheck)
 
     if args.run:
         import os
@@ -74,5 +75,5 @@ if __name__ == '__main__':
         else:
             outfname = args.output_filename
 
-        os.system('madx ' + outfname) 
+        os.system('madx ' + outfname)
 
