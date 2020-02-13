@@ -35,5 +35,4 @@ RENAME_MACRO(nnnnn) : macro = {
    system, "mv last_twiss_temp.gz last_twiss.nnnnn.gz";
 }
 
-exec, RENAME_MACRO($myseed);
-~                             
+exec, RENAME_MACRO($myseed);                          
