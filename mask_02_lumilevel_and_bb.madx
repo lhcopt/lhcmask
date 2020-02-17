@@ -146,7 +146,9 @@ if( ON_BB_SWITCH == 1){
 };
 
 if (par_on_compute_train_input==1){
-	if (ON_BB_SWITCH==1){
+	! from Michi Hostettler
+	
+if (ON_BB_SWITCH==1){
 		print, text='ERROR: if you need to compute the TRAIN input the ON_BB_SWITCH has to be 0.';
 		stop;
 	}
@@ -161,66 +163,64 @@ if (par_on_compute_train_input==1){
 	endedit;
   use,sequence=lhcb2;
 	
-	! from Michi Hostettler
 
   use,sequence=lhcb1;
-  kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
- 	ksf=ksf.b1;ksd=ksd.b1;ksf.b1:=ksf;ksd.b1:=ksd;
+  !kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
+ 	!ksf=ksf.b1;ksd=ksd.b1;ksf.b1:=ksf;ksd.b1:=ksd;
 
  	match;
  		global, q1=qx0, q2=qy0;
- 		vary,   name=kqtf, step=1.0E-7 ;
- 		vary,   name=kqtd, step=1.0E-7 ;
+ 		vary,   name=kqtf.b1, step=1.0E-7 ;
+ 		vary,   name=kqtd.b1, step=1.0E-7 ;
  		lmdif,  calls=100, tolerance=1.0E-21;
  	endmatch;
 
- 	match,chrom;
+ 	match;
  		global, dq1=qprime, dq2=qprime;
- 		vary,   name=ksf;
- 		vary,   name=ksd;
+ 		vary,   name=ksf.b1;
+ 		vary,   name=ksd.b1;
  		lmdif,  calls=100, tolerance=1.0E-21;
  	endmatch;
 
- 	match,chrom;
+ 	match;
  		global, dq1=qprime, dq2=qprime;
  		global, q1=qx0, q2=qy0;
- 		vary,   name=ksf;
- 		vary,   name=ksd;
- 		vary,   name=kqtf, step=1.0E-7 ;
- 		vary,   name=kqtd, step=1.0E-7 ;
+ 		vary,   name=ksf.b1;
+ 		vary,   name=ksd.b1;
+ 		vary,   name=kqtf.b1, step=1.0E-7 ;
+ 		vary,   name=kqtd.b1, step=1.0E-7 ;
  		lmdif,  calls=500, tolerance=1.0E-21;
  	endmatch;
 
 	use,sequence=lhcb2;
 
-	kqtf=kqtf.b2;kqtd=kqtd.b2;kqtf.b2:=kqtf;kqtd.b2:=kqtd;
- 	ksf=ksf.b2;ksd=ksd.b2;ksf.b2:=ksf;ksd.b2:=ksd;
+	!kqtf=kqtf.b2;kqtd=kqtd.b2;kqtf.b2:=kqtf;kqtd.b2:=kqtd;
+ 	!ksf=ksf.b2;ksd=ksd.b2;ksf.b2:=ksf;ksd.b2:=ksd;
 
 	match;
  		global, q1=qx0, q2=qy0;
- 		vary,   name=kqtf, step=1.0E-7 ;
- 		vary,   name=kqtd, step=1.0E-7 ;
+ 		vary,   name=kqtf.b2, step=1.0E-7 ;
+ 		vary,   name=kqtd.b2, step=1.0E-7 ;
  		lmdif,  calls=100, tolerance=1.0E-21;
  	endmatch;
 
- 	match,chrom;
+ 	match;
  		global, dq1=qprime, dq2=qprime;
- 		vary,   name=ksf;
- 		vary,   name=ksd;
+ 		vary,   name=ksf.b2;
+ 		vary,   name=ksd.b2;
  		lmdif,  calls=100, tolerance=1.0E-21;
  	endmatch;
 
- 	match,chrom;
+ 	match;
  		global, dq1=qprime, dq2=qprime;
  		global, q1=qx0, q2=qy0;
- 		vary,   name=ksf;
- 		vary,   name=ksd;
- 		vary,   name=kqtf, step=1.0E-7 ;
- 		vary,   name=kqtd, step=1.0E-7 ;
+ 		vary,   name=ksf.b2;
+ 		vary,   name=ksd.b2;
+ 		vary,   name=kqtf.b2, step=1.0E-7 ;
+ 		vary,   name=kqtd.b2, step=1.0E-7 ;
  		lmdif,  calls=500, tolerance=1.0E-21;
  	endmatch;
 
-  use,sequence=lhcb1;
 
   select,flag=sectormap,clear;
   select,flag=sectormap,range=#e;
@@ -245,11 +245,11 @@ if (par_on_compute_train_input==1){
 
   set, format="22.18e";
 
-  set, sequence=lhcb1;
+  use, sequence=lhcb1;
   twiss,sequence=lhcb1,sectormap,sectorfile=train.mapf,file=train.optf;
   survey,sequence=lhcb1,file=train.surf;
 
-  set, sequence=lhcb2;
+  use, sequence=lhcb2;
   twiss,sequence=lhcb2,sectormap,sectorfile=train.mapb,file=train.optb;
   survey,sequence=lhcb2,file=train.surb;
 
