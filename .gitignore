@@ -209,3 +209,17 @@ tests/injection/temp/sliceho.madx
 tests/injection/temp/sliceho.res
 tests/injection/temp/surveyaux.tfs
 tests/injection/temp/twiss.tfs
+tests/make_train_input/hl14_collisions.mask.unmasked
+tests/make_train_input/last_twiss.1
+tests/make_train_input/mask_code
+tests/make_train_input/out
+tests/make_train_input/temp/sliceho.input
+tests/make_train_input/temp/sliceho.madx
+tests/make_train_input/temp/sliceho.res
+tests/make_train_input/temp/twiss.tfs
+tests/make_train_input/train-output/train.manb
+tests/make_train_input/train-output/train.manf
+tests/make_train_input/train-output/train.optb
+tests/make_train_input/train-output/train.optf
+tests/make_train_input/train-output/train.surb
+tests/make_train_input/train-output/train.surf
