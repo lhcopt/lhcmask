@@ -223,3 +223,4 @@ tests/make_train_input/train-output/train.optb
 tests/make_train_input/train-output/train.optf
 tests/make_train_input/train-output/train.surb
 tests/make_train_input/train-output/train.surf
+tests/make_train_input/.out.swp
