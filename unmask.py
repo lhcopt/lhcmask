@@ -15,16 +15,21 @@ def unmask(mask_filename, parameters,
     else:
         outfname = output_filename
 
-    if outfname is not None:
-        with open(outfname, 'w') as fid:
-            fid.write(content)
 
     if not nocheck:
+        if '\%' in content:
+            content = content.replace('\%', 'escapedpercentsymbol')
         if '%' in content:
             raise ValueError(
               ('There is still a % after unmasking!\n'
                '--> Incompatible with nocheck=False\n'
                'from command line add --nocheck to skip the check.'))
+    content = content.replace('escapedpercentsymbol', '%')
+    content = content.replace('/%', '%')
+    
+    if outfname is not None:
+        with open(outfname, 'w') as fid:
+            fid.write(content)
 
     return content
 

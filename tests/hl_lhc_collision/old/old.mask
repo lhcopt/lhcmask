@@ -294,7 +294,7 @@ if (ON_COLLISION==1){
   !Switch on Xscheme in precollision
   on_disp:=0;
   halo1=0;halo2=5;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
- ! number of collision/turn at IP1/2/5/8 - BCMS https://espace.cern.ch/HiLumi/WP2/Wiki/HL-LHC%20Parameters.aspx
+ ! number of collision/turn at IP1/2/5/8 - BCMS https://espace.cern.ch/HiLumi/WP2/Wiki/HL-LHC\%20Parameters.aspx
   nco_IP1= 2592;
   nco_IP5= nco_IP1;
   nco_IP2= 2288;
