@@ -10,9 +10,6 @@ b_t_dist = par_b_t_dist;
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
 
 
-if( on_bb_switch == 1){
-    call,file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
-};
 
 n_insideD1 = par_n_inside_D1; 
 
@@ -21,9 +18,11 @@ nho_IR2 = par_nho_IR2;
 nho_IR5 = par_nho_IR5;
 nho_IR8 = par_nho_IR8;
 
-if( on_bb_switch == 1){
-    exec DEFINE_BB_PARAM;  !Define main beam-beam parameters
+if( on_bb_switch == 1 || par_on_compute_train_input==1){
+     call,file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
+     exec DEFINE_BB_PARAM;  !Define main beam-beam parameters
 };
+
 
 if (ON_COLLISION==1){
   !Switch on Xscheme in precollision
@@ -88,9 +87,6 @@ if( ON_BB_SWITCH == 1){
 !  exec PLOT_BB_SEP(8,$npara_8);
 !  */
 
-  !/*
-  !if (mylhcbeam<3){ seqedit,sequence=lhcb1;flatten;cycle,start=IP1;endedit; };
-  !seqedit,sequence=lhcb2;flatten;cycle,start=IP1;endedit;
 
   if (mylhcbeam<3){
     use,sequence=lhcb1;
@@ -121,14 +117,11 @@ if( ON_BB_SWITCH == 1){
   select,flag=twiss,pattern=HO,class=beambeam,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
   twiss,file=twiss_bb;system,"cat twiss_bb";
 
-  !if (mylhcbeam<3){ seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit; };
-  !seqedit,sequence=lhcb2;flatten;cycle,start=IP3;endedit;
-  !*/
 
   !Remove bb markers
-  exec REMOVE_BB_MARKER;
+	exec REMOVE_BB_MARKER;
 
-!  /*
+
 !  !Make and plot footprint (at 6 sigmas)
 !  ON_BB_CHARGE := 1;
 !
@@ -147,10 +140,129 @@ if( ON_BB_SWITCH == 1){
 !  };
 !  ON_BB_CHARGE := 0;
 !  exec,crossing_disable;
-!  */
 
   !Remove bb lens for both beams
   !exec REMOVE_BB_LENS;
 };
 
+if (par_on_compute_train_input==1){
+	! from Michi Hostettler
+	
+if (ON_BB_SWITCH==1){
+		print, text='ERROR: if you need to compute the TRAIN input the ON_BB_SWITCH has to be 0.';
+		stop;
+	}
+	
+	exec INSTALL_BB_MARK(b1);
+	exec INSTALL_BB_MARK(b2);
+	
+	use,sequence=lhcb2;
+	seqedit,sequence=lhcb2;
+	flatten;
+	reflect;
+	endedit;
+  use,sequence=lhcb2;
+	
 
+  use,sequence=lhcb1;
+  !kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
+ 	!ksf=ksf.b1;ksd=ksd.b1;ksf.b1:=ksf;ksd.b1:=ksd;
+
+ 	match;
+ 		global, q1=qx0, q2=qy0;
+ 		vary,   name=kqtf.b1, step=1.0E-7 ;
+ 		vary,   name=kqtd.b1, step=1.0E-7 ;
+ 		lmdif,  calls=100, tolerance=1.0E-21;
+ 	endmatch;
+
+ 	match;
+ 		global, dq1=qprime, dq2=qprime;
+ 		vary,   name=ksf.b1;
+ 		vary,   name=ksd.b1;
+ 		lmdif,  calls=100, tolerance=1.0E-21;
+ 	endmatch;
+
+ 	match;
+ 		global, dq1=qprime, dq2=qprime;
+ 		global, q1=qx0, q2=qy0;
+ 		vary,   name=ksf.b1;
+ 		vary,   name=ksd.b1;
+ 		vary,   name=kqtf.b1, step=1.0E-7 ;
+ 		vary,   name=kqtd.b1, step=1.0E-7 ;
+ 		lmdif,  calls=500, tolerance=1.0E-21;
+ 	endmatch;
+
+	use,sequence=lhcb2;
+
+	!kqtf=kqtf.b2;kqtd=kqtd.b2;kqtf.b2:=kqtf;kqtd.b2:=kqtd;
+ 	!ksf=ksf.b2;ksd=ksd.b2;ksf.b2:=ksf;ksd.b2:=ksd;
+
+	match;
+ 		global, q1=qx0, q2=qy0;
+ 		vary,   name=kqtf.b2, step=1.0E-7 ;
+ 		vary,   name=kqtd.b2, step=1.0E-7 ;
+ 		lmdif,  calls=100, tolerance=1.0E-21;
+ 	endmatch;
+
+ 	match;
+ 		global, dq1=qprime, dq2=qprime;
+ 		vary,   name=ksf.b2;
+ 		vary,   name=ksd.b2;
+ 		lmdif,  calls=100, tolerance=1.0E-21;
+ 	endmatch;
+
+ 	match;
+ 		global, dq1=qprime, dq2=qprime;
+ 		global, q1=qx0, q2=qy0;
+ 		vary,   name=ksf.b2;
+ 		vary,   name=ksd.b2;
+ 		vary,   name=kqtf.b2, step=1.0E-7 ;
+ 		vary,   name=kqtd.b2, step=1.0E-7 ;
+ 		lmdif,  calls=500, tolerance=1.0E-21;
+ 	endmatch;
+
+
+  select,flag=sectormap,clear;
+  select,flag=sectormap,range=#e;
+  select,flag=sectormap,class=marker,pattern=^BBMK_PAR.*;
+  select,flag=sectormap,class=marker,pattern=^bbmk_ho.*_0;
+
+  select,flag=twiss,clear;
+  select,flag=twiss,class=marker,pattern=^ip.*,
+       column=name,s,x,betx,alfx,dx,y,bety,alfy,dy;
+  select,flag=twiss,class=marker,pattern=^BBMK_PAR.*,
+       column=name,s,x,betx,alfx,dx,y,bety,alfy,dy;
+  select,flag=twiss,class=marker,pattern=^bbmk_ho.*_0,
+       column=name,s,x,betx,alfx,dx,y,bety,alfy,dy;
+
+  select,flag=survey,clear;
+  select,flag=survey,class=marker,pattern=^ip.*,
+       column=name,x,y,z;
+  select,flag=survey,class=marker,pattern=^BBMK_PAR.*,
+       column=name,x,y,z;
+  select,flag=survey,class=marker,pattern=^bbmk_ho.*_0,
+       column=name,x,y,z;
+
+  set, format="22.18e";
+
+  use, sequence=lhcb1;
+  twiss,sequence=lhcb1,sectormap,sectorfile=train.mapf,file=train.optf;
+  survey,sequence=lhcb1,file=train.surf;
+
+  use, sequence=lhcb2;
+  twiss,sequence=lhcb2,sectormap,sectorfile=train.mapb,file=train.optb;
+  survey,sequence=lhcb2,file=train.surb;
+
+  system, "rm -rf train-output";
+  system, "mkdir train-output";
+  system, "cat train.mapf | sed -E 's/BBMK_PAR.([LR])([0-9])B[12]_([0-9]+)/MKIP\2P\1\3/ig' | sed -E 's/BBMK_HO([0-9])B[12]_0/MKIP\1/ig' | tail -n +9 > train-output/train.manf";
+  system, "cat train.mapb | sed -E 's/BBMK_PAR.([LR])([0-9])B[12]_([0-9]+)/MKIP\2P\1\3/ig' | sed -E 's/BBMK_HO([0-9])B[12]_0/MKIP\1/ig' | tail -n +9 > train-output/train.manb";
+  system, "cat train.optf | sed -E 's/BBMK_PAR.([LR])([0-9])B[12]_([0-9]+)/MKIP\2P\1\3/ig' | sed -E 's/BBMK_HO([0-9])B[12]_0/MKIP\1/ig' > train-output/train.optf";
+  system, "cat train.optb | sed -E 's/BBMK_PAR.([LR])([0-9])B[12]_([0-9]+)/MKIP\2P\1\3/ig' | sed -E 's/BBMK_HO([0-9])B[12]_0/MKIP\1/ig' > train-output/train.optb";
+  system, "cat train.surf | sed -E 's/BBMK_PAR.([LR])([0-9])B[12]_([0-9]+)/MKIP\2P\1\3/ig' | sed -E 's/BBMK_HO([0-9])B[12]_0/MKIP\1/ig' > train-output/train.surf";
+  system, "cat train.surb | sed -E 's/BBMK_PAR.([LR])([0-9])B[12]_([0-9]+)/MKIP\2P\1\3/ig' | sed -E 's/BBMK_HO([0-9])B[12]_0/MKIP\1/ig' > train-output/train.surb";
+  system, "rm train*b";
+  system, "rm train*f";
+	
+	stop;
+}
