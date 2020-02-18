@@ -27,6 +27,9 @@ system, "ln -fns ../../ mask_code";
 !  General configuration  !
 !*************************!
 
+! Choose build sequence script
+system, "ln -fns build_hl14_sequance.madx buildsequence.madx";
+
 ! Define the optics
 system, "ln -fns slhc/round/opt_round_150_1500_thin.madx myoptics.madx";
 
