@@ -150,7 +150,7 @@ par_on_errors_MCBXF = 1;
 !  Compute TRAIN input    !
 !*************************!
 
-par_on_compute_train_input=1;
+par_on_compute_train_input=0;
 
 
 !*************************!
