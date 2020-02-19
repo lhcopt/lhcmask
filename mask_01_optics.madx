@@ -45,7 +45,7 @@ seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
 I_MO = par_oct_current;
 
 
-emittance_norm := par_emit_beam*1.0E-6;
+! emittance_norm := par_beam_norm_emit*1.0E-6;
 Nb_0:=par_beam_npart; 
 
 ! Optics
