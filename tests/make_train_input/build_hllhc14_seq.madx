@@ -10,10 +10,3 @@ option, -echo,warn,-info;
 
 !Install HL-LHC
 call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/hllhc_sequence.madx";
-
-! Slice nominal sequence
-exec, myslice;
-
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/errors/install_mqxf_fringenl.madx";    ! adding fringe place holder
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/errors/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/errors/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
