@@ -1,7 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
 !               Prepare nominal twiss tables
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
-if (mylhcbeam==1) { use,sequence=lhcb1; } else { use,sequence=lhcb2; };
+if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
 
 ! /*
 !  twiss;
@@ -80,18 +80,18 @@ exec, crossing_disable;
 !  call, file = "db5/measured_errors/align_D4_slices.b2.madx";
 !};
 
-call,file="slhc/toolkit/align_sepdip.madx";
+call, file="slhc/toolkit/align_sepdip.madx";
 !exec,align_mbxw;  ! V6.503  D1
 !exec,align_mbrc15;! V6.503 D2 in IR15
-exec,align_mbx15; ! HL-LHC D1
-exec,align_mbrd15;! HL-LHC D2 in IR15
+exec, align_mbx15; ! HL-LHC D1
+exec, align_mbrd15;! HL-LHC D2 in IR15
 
-exec,align_mbx28; ! V6.503 D1 in IR28
-exec,align_mbrc28;! V6.503 D2 in IR28
-exec,align_mbrs;  ! V6.503 D3 in IR4
-exec,align_mbrb;  ! V6.503 D4 in IR4
+exec, align_mbx28; ! V6.503 D1 in IR28
+exec, align_mbrc28;! V6.503 D2 in IR28
+exec, align_mbrs;  ! V6.503 D3 in IR4
+exec, align_mbrb;  ! V6.503 D4 in IR4
 
-call,file="slhc/toolkit/align_mbh.madx"; ! align 11T dipoles
+call, file="slhc/toolkit/align_mbh.madx"; ! align 11T dipoles
 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -101,46 +101,46 @@ call,file="slhc/toolkit/align_mbh.madx"; ! align 11T dipoles
 
 ! Error routine and measured error table for nominal LHC
 if (on_errors_LHC==1){
-  call,file="db5/measured_errors/Msubroutines_new.madx";
-  call,file="db5/measured_errors/Msubroutines_MS_MSS_MO_new.madx";
-  call,file="db5/toolkit/Orbit_Routines.madx";
-  call,file="slhc/errors/SelectLHCMonCor.madx";
+  call, file="db5/measured_errors/Msubroutines_new.madx";
+  call, file="db5/measured_errors/Msubroutines_MS_MSS_MO_new.madx";
+  call, file="db5/toolkit/Orbit_Routines.madx";
+  call, file="slhc/errors/SelectLHCMonCor.madx";
   readtable, file="db5/measured_errors/rotations_Q2_integral.tab";
 };
 
 ! Error routine and error table for new IT/D1/D2/Q4/Q5
 useMQXFAB=0;
 
-call,file="slhc/errors/macro_error.madx";   ! macros for error generation in the new IT/D1's
+call, file="slhc/errors/macro_error.madx";   ! macros for error generation in the new IT/D1's
 
 if (on_errors_IT==1){
   if (useMQXFAB==1) {
-    call,file="slhc/errors/ITa_errortable_v5"; ! target error table for the new IT
-    call,file="slhc/errors/ITb_errortable_v5"; ! target error table for the new IT
+    call, file="slhc/errors/ITa_errortable_v5"; ! target error table for the new IT
+    call, file="slhc/errors/ITb_errortable_v5"; ! target error table for the new IT
   } else {
-    call,file="slhc/errors/ITbody_errortable_v5"; ! target error table for the new IT
-    call,file="slhc/errors/ITnc_errortable_v5"; ! target error table for the new IT
-    call,file="slhc/errors/ITcs_errortable_v5"; ! target error table for the new IT
+    call, file="slhc/errors/ITbody_errortable_v5"; ! target error table for the new IT
+    call, file="slhc/errors/ITnc_errortable_v5"; ! target error table for the new IT
+    call, file="slhc/errors/ITcs_errortable_v5"; ! target error table for the new IT
   };
 };
 if (on_errors_D1==1){
-  call,file="slhc/errors/D1_errortable_v1"; ! target error table for the new D1
+  call, file="slhc/errors/D1_errortable_v1"; ! target error table for the new D1
 };
 if (on_errors_D2==1){
-  call,file="slhc/errors/D2_errortable_v5"; ! target error table for the new D2
+  call, file="slhc/errors/D2_errortable_v5"; ! target error table for the new D2
   if (correct_for_D2==1){
-    call,file="slhc/errors/D2_empty_errortable"; ! We are only correcting the b3 errors, put the other errors to zero
+    call, file="slhc/errors/D2_empty_errortable"; ! We are only correcting the b3 errors, put the other errors to zero
   };
 };
 
 if (on_errors_MCBXF==1){
-  call,file="slhc/errors/MCBXFAB_errortable_v1";
+  call, file="slhc/errors/MCBXFAB_errortable_v1";
 };
 if (on_errors_MBH==1){
-  call,file="slhc/errors/MBH_errortable_v3";
+  call, file="slhc/errors/MBH_errortable_v3";
 };
 if (on_errors_MCBRD==1){
-  call,file="slhc/errors/MCBRD_errortable_v1";
+  call, file="slhc/errors/MCBRD_errortable_v1";
 };
 
 
@@ -148,7 +148,7 @@ if (on_errors_MCBRD==1){
 !                Switch ON/OFF some multipole
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-exec ON_ALL_MULT;
+exec, ON_ALL_MULT;
 if (off_all_errors==1){
   ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
   ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
@@ -196,7 +196,7 @@ if (on_errors_LHC==1){
 !             apply field errors to MB magnets
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 if (on_errors_LHC==1){
-  call,   file="db5/measured_errors/Efcomp_MB.madx"  ;
+  call, file="db5/measured_errors/Efcomp_MB.madx"  ;
 };
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -213,35 +213,35 @@ if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
 ! Nominal LHC magnets
 ! Separation Dipoles
 if (on_errors_LHC==1){
-  call,   file="db5/measured_errors/Efcomp_MBRB.madx";
-  call,   file="db5/measured_errors/Efcomp_MBRC.madx";
-  call,   file="db5/measured_errors/Efcomp_MBRS.madx";
-  call,   file="db5/measured_errors/Efcomp_MBX.madx" ;
-  call,   file="db5/measured_errors/Efcomp_MBW.madx" ;
+  call, file="db5/measured_errors/Efcomp_MBRB.madx";
+  call, file="db5/measured_errors/Efcomp_MBRC.madx";
+  call, file="db5/measured_errors/Efcomp_MBRS.madx";
+  call, file="db5/measured_errors/Efcomp_MBX.madx" ;
+  call, file="db5/measured_errors/Efcomp_MBW.madx" ;
 };
 
 ! Quadrupoles
 if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQW.madx" ; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQTL.madx"; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQMC.madx"; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQX.madx" ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQW.madx" ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQTL.madx"; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQMC.madx"; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQX.madx" ; on_B2S=ON_B2Saux;
 };
 if (on_errors_Q4==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQY.madx" ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQY.madx" ; on_B2S=ON_B2Saux;
 } else {
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="fre/Q4Q5/Efcomp_MQY_noIP15.madx" ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="fre/Q4Q5/Efcomp_MQY_noIP15.madx" ; on_B2S=ON_B2Saux;
 };
 if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQM.madx" ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQM.madx" ; on_B2S=ON_B2Saux;
 };
 if (on_errors_Q5==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQML.madx"; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQML.madx"; on_B2S=ON_B2Saux;
 } else {
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="fre/Q4Q5/Efcomp_MQML_noIP15.madx"; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="fre/Q4Q5/Efcomp_MQML_noIP15.madx"; on_B2S=ON_B2Saux;
 };
 if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call,file="db5/measured_errors/Efcomp_MQ.madx"  ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="db5/measured_errors/Efcomp_MQ.madx"  ; on_B2S=ON_B2Saux;
 };
 
 if (on_errors_LHC==1){
@@ -285,7 +285,7 @@ if (on_errors_MCBRD==1){
   eoption,seed=myseed+108;call, file="slhc/errors/Efcomp_MCBRD.madx";
 };
 
-!exec show_error_newHLmagnet;
+!exec, show_error_newHLmagnet;
 
 !select, flag=error, clear;
 !select, flag=error, pattern=".";
@@ -335,7 +335,7 @@ if (mylhcbeam>1){
  esave,  file="temp/MB.errors";
  system, "slhc/errors/corr_MB_ats_v4";
  call,   file="temp/MB_corr_setting.mad";
-!exec reset_MB_corr;
+!exec, reset_MB_corr;
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ! correction of triplet and D1 (only in collision, not compatible V6.503)
@@ -372,13 +372,13 @@ if (NRJ>5000.0000){
   kcssx3.l2:=0;kcssx3.r2:=0;kcssx3.l8:=0;kcssx3.r8:=0; !switch off a3  correction in IR2 and IR8
   kcosx3.l2:=0;kcosx3.r2:=0;kcosx3.l8:=0;kcosx3.r8:=0; !switch off a4  correction in IR2 and IR8
 
-  option, -echo; !exec reset_MQX_corr;                             !switch off all IT multipole correction in all IR's
+  option, -echo; !exec, reset_MQX_corr;                             !switch off all IT multipole correction in all IR's
 };
 
 if (correct_for_D2==1){
   ! Remove the average errors and assign the real errors of D2
   use_average_errors_MBRD=0;
-  call,file="slhc/errors/D2_errortable_v5";
+  call, file="slhc/errors/D2_errortable_v5";
   eoption,add=false;
   eoption,seed=myseed+103;
   call, file="slhc/errors/Efcomp_MBRD.madx";
@@ -424,7 +424,7 @@ call,file="slhc/errors/FineCouplingCorrectionSimplex.madx";
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 Limit corrector strength
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-call,file="slhc/errors/corr_limit.madx";
+call, file="slhc/errors/corr_limit.madx";
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 matching of orbit, tune and chromaticity
@@ -432,9 +432,9 @@ call,file="slhc/errors/corr_limit.madx";
 if(ON_COLLISION==0) {ON_BB_CHARGE:=1;};    ! W/o head-on Q and Q' are matched with bb
 
 !Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
-call,file="slhc/toolkit/rematchCOIP.madx";
+call, file="slhc/toolkit/rematchCOIP.madx";
 !Rematch the CO in the arc for dispersion correction
-if(ON_DISP<>0) {call,file="slhc/toolkit/rematchCOarc.madx";};
+if(ON_DISP<>0) {call, file="slhc/toolkit/rematchCOarc.madx";};
 
 if(mylhcbeam==1){
   kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;

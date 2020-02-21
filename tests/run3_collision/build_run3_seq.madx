@@ -1,0 +1,31 @@
+option, -echo,-warn,-info;
+
+if (mylhcbeam==4){
+  call,file="/afs/cern.ch/eng/lhc/optics/runII/2018/lhcb4_as-built.seq";
+} else {
+  call,file="/afs/cern.ch/eng/lhc/optics/runII/2018/lhc_as-built.seq";
+};
+
+option, -echo,warn,-info;
+
+call,file="/afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/IR7-Run3seqedit.madx";  ! New IR7 MQW layout and cabling
+
+call, file="myoptics.madx";
+
+
+slicefactor=4;
+option rbarc=true;
+call, file = "/afs/cern.ch/eng/lhc/optics/runII/2018/toolkit/myslice.madx";
+
+
+beam; // a generic beam definitions 
+use, sequence=lhcb1;
+makethin, sequence=lhcb1, style=teapot, makedipedge=false ;
+use, sequence=lhcb2;
+makethin, sequence=lhcb2, style=teapot, makedipedge=false;
+
+!Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+if (mylhcbeam<3){
+  seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
+};
+seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
