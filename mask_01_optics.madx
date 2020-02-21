@@ -25,19 +25,6 @@ call, file="slhc/toolkit/macro.madx";        !Call some macro facilities
 ! Build sequence
 call, file="buildsequence.madx";
 
-! Slice nominal sequence
-exec, myslice;
-
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/errors/install_mqxf_fringenl.madx";    ! adding fringe place holder
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/errors/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/errors/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
-
-
-!Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
-if (mylhcbeam<3){
-  seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
-};
-seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
 
 !********************************************
 
@@ -92,15 +79,15 @@ on_qpp = par_on_qpp;
 !mux_ip15 = 31.21038468;
 !muy_ip15 = 31.19538482;
 
-!call,file="slhc/toolkit/make_ip15phase.madx";
-!call,file=slhc/toolkit/make_ip15phase_tm.madx; ! use phase-trombone instead
-!call,file=slhc/toolkit/delete_ip15phase_tm.madx; ! remove phase trombone
+!call, file="slhc/toolkit/make_ip15phase.madx";
+!call, file=slhc/toolkit/make_ip15phase_tm.madx; ! use phase-trombone instead
+!call, file=slhc/toolkit/delete_ip15phase_tm.madx; ! remove phase trombone
 
 ! test new optics
 if (mylhcbeam==1){
-  exec,check_ip(b1);
+  exec, check_ip(b1);
 } else {
-  exec,check_ip(b2);
+  exec, check_ip(b2);
 };
 mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
 muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
@@ -176,7 +163,7 @@ twiss, sequence=lhcb2,file=twiss.b2;system,"cat twiss.b2";
 
 system,"rm -f twiss.b1";system,"rm -f twiss.b2";
 !Switch on Xscheme
-exec,crossing_restore;
+exec, crossing_restore;
 
 if (mylhcbeam<3){
   Use, sequence=lhcb1;

@@ -25,10 +25,10 @@ system, "ln -fns ../../ mask_code";
 !*************************!
 
 ! Choose build sequence script
-system, "ln -fns build_hllhc14_seq.madx buildsequence.madx";
+system, "ln -fns build_run3_seq.madx buildsequence.madx";
 
 ! Define the optics
-system, "ln -fns slhc/round/opt_round_150_1500_thin.madx myoptics.madx";
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.30 myoptics.madx";
 
 par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
@@ -56,9 +56,9 @@ par_qy0 = 60.32;
 
 !IP specific orbit settings 
 par_on_x1 = par_xing_ang_ip15;
-par_on_sep1 = -0.75;  
+par_on_sep1 = 0;  
 par_on_x5 = par_xing_ang_ip15;
-par_on_sep5 = 0.75;  
+par_on_sep5 = 0;  
 par_on_x2 = 170;
 par_on_sep2 = 1;
 par_on_x8 = -200;
@@ -71,8 +71,8 @@ par_on_a2 = 0;
 par_on_o2 = 0;
 par_on_a8 = 0;
 par_on_o8 = 0;
-par_on_crab1 = -190;
-par_on_crab5 = -190;           
+par_on_crab1 = 0;
+par_on_crab5 = 0;           
 
 ! Dispersion correction knob
 par_on_disp = 1;
@@ -94,7 +94,7 @@ par_on_sol_alice = 0;
 !*************************!
 
 par_on_collision = 1;                ! If 1 lumi leveling in ip8 is applied and q/q' match is done with bb off 
-par_on_bb_switch = 0;
+par_on_bb_switch = 1;
 
 par_b_t_dist = 25.;                  ! bunch separation [ns]
 
@@ -119,8 +119,6 @@ par_nco_IP5 = par_nco_IP1;
 par_nco_IP2 = 2288;
 par_nco_IP8 = 2396;
 
-par_install_crabcavities=1;
-
 
 !*************************!
 !  Errors and corrections !
@@ -128,7 +126,7 @@ par_install_crabcavities=1;
 
 ! Select error table (decide if injection or collisions
 par_myseed = %SEEDRAN;
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705/collision_errors-emfqcs-%SEEDRAN.tfs error_table.tfs" ;
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705/collision_errors-emfqcs-%SEEDRAN.tfs error_table.tfs";
 
 ! Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
 par_correct_for_D2 = 0;
@@ -137,22 +135,22 @@ par_correct_for_MCBX = 0;
 
 par_off_all_errors = 0;
 
-par_on_errors_LHC = 1;
-par_on_errors_MBH = 1;
-par_on_errors_Q5 = 1;
-par_on_errors_Q4 = 1;
-par_on_errors_D2 = 1;
-par_on_errors_D1 = 1;
-par_on_errors_IT = 1;
-par_on_errors_MCBRD = 1;
-par_on_errors_MCBXF = 1;
+par_on_errors_LHC = 0;
+par_on_errors_MBH = 0;
+par_on_errors_Q5 = 0;
+par_on_errors_Q4 = 0;
+par_on_errors_D2 = 0;
+par_on_errors_D1 = 0;
+par_on_errors_IT = 0;
+par_on_errors_MCBRD = 0;
+par_on_errors_MCBXF = 0;
 
 
 !*************************!
 !  Compute TRAIN input    !
 !*************************!
 
-par_on_compute_train_input=1;
+par_on_compute_train_input=0;
 
 
 !*************************!
@@ -163,5 +161,7 @@ option, -echo, -info;
 
 call, file="mask_code/mask_01_optics.madx";
 call, file="mask_code/mask_02_lumilevel_and_bb.madx";
+!call, file="mask_code/mask_03_optics_and_err.madx";
+!call, file="mask_code/mask_04_lasttwiss_and_sixtrack.madx";
 
 stop;

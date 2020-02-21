@@ -19,8 +19,8 @@ nho_IR5 = par_nho_IR5;
 nho_IR8 = par_nho_IR8;
 
 if( on_bb_switch == 1 || par_on_compute_train_input==1){
-     call,file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
-     exec DEFINE_BB_PARAM;  !Define main beam-beam parameters
+     call, file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
+     exec, DEFINE_BB_PARAM;  !Define main beam-beam parameters
 };
 
 
@@ -33,9 +33,9 @@ if (ON_COLLISION==1){
   nco_IP5 = par_nco_IP5;
   nco_IP2 = par_nco_IP2;
   nco_IP8 = par_nco_IP8;
-  exec LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip8, 8); value,halo8;
+  exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip8, 8); value,halo8;
   !Redefine the on_sep's accordingly
-  exec CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
+  exec, CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
   ! Saving new crossing scheme with separation
   on_disp=on_dispaux; ! reset on_disp before saving
   exec, crossing_save;
@@ -58,18 +58,19 @@ value,pynom1,pynom2,pynom5,pynom8;
 
 if( ON_BB_SWITCH == 1){
   !Install b-b marker
-  exec INSTALL_BB_MARK(b1);exec INSTALL_BB_MARK(b2);
+  exec, INSTALL_BB_MARK(b1);
+  exec, INSTALL_BB_MARK(b2);
 
   !Define bb lenses for both beams in all IR's and calculate # of encounters before D1
-  exec CALCULATE_BB_LENS;
+  exec, CALCULATE_BB_LENS;
 
   !Install bb lenses
   on_ho1 =1; on_lr1l = 1; on_lr1r = 1; npara_1 = npara0_1 + n_insideD1;
   on_ho5 =1; on_lr5l = 1; on_lr5r = 1; npara_5 = npara0_5 + n_insideD1;
   on_ho2 =1; on_lr2l = 1; on_lr2r = 1; npara_2 = npara0_2 + n_insideD1;
   on_ho8 =1; on_lr8l = 1; on_lr8r = 1; npara_8 = npara0_8 + n_insideD1;
-  if(mylhcbeam==1) {exec INSTALL_BB_LENS(b1);};
-  if(mylhcbeam>1) {exec INSTALL_BB_LENS(b2);};
+  if(mylhcbeam==1) {exec, INSTALL_BB_LENS(b1);};
+  if(mylhcbeam>1) {exec, INSTALL_BB_LENS(b2);};
 
   !Print the lenses in bb_lenses.dat
   exec, PRINT_BB_LENSES;
@@ -77,19 +78,12 @@ if( ON_BB_SWITCH == 1){
   ON_BB_CHARGE := 0; !Switch off the charge the bb lenses
 
   !Install Crab Cavities for the weak beam
-  call,file="slhc/toolkit/enable_crabcavities.madx";
-
-!  /*
-!  !Plot b-b separation
-!  exec PLOT_BB_SEP(1,$npara_1);
-!  exec PLOT_BB_SEP(2,$npara_2);
-!  exec PLOT_BB_SEP(5,$npara_5);
-!  exec PLOT_BB_SEP(8,$npara_8);
-!  */
-
+  if (par_install_crabcavities==1){
+     call, file="slhc/toolkit/enable_crabcavities.madx";
+  }
 
   if (mylhcbeam<3){
-    use,sequence=lhcb1;
+    use, sequence=lhcb1;
     select,flag=twiss,clear;
     select,flag=twiss,class=marker,pattern=PAR.*L1,range=mbxf.4l1..4/IP1.L1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
     select,flag=twiss,class=marker,pattern=PAR.*L5,range=mbxf.4l5..4/IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
@@ -100,7 +94,7 @@ if( ON_BB_SWITCH == 1){
     twiss,file=twiss_bb.b1;system,"cat twiss_bb.b1";
   };
 
-  use,sequence=lhcb2;
+  use, sequence=lhcb2;
   select,flag=twiss,clear;
   select,flag=twiss,class=marker,pattern=PAR.*L1,range=mbxf.4l1..4/IP1.L1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
   select,flag=twiss,class=marker,pattern=PAR.*L5,range=mbxf.4l5..4/IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
@@ -110,8 +104,8 @@ if( ON_BB_SWITCH == 1){
   select,flag=twiss,class=marker,pattern=IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
   twiss,file=twiss_bb.b2;system,"cat twiss_bb.b2";
 
-  if(mylhcbeam==1) {use,sequence=lhcb1;};
-  if(mylhcbeam>1) {use,sequence=lhcb2;};
+  if(mylhcbeam==1) {use, sequence=lhcb1;};
+  if(mylhcbeam>1) {use, sequence=lhcb2;};
 
   select,flag=twiss,clear;
   select,flag=twiss,pattern=HO,class=beambeam,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
@@ -119,30 +113,8 @@ if( ON_BB_SWITCH == 1){
 
 
   !Remove bb markers
-	exec REMOVE_BB_MARKER;
+	exec, REMOVE_BB_MARKER;
 
-
-!  !Make and plot footprint (at 6 sigmas)
-!  ON_BB_CHARGE := 1;
-!
-!  !Switch on Xscheme
-!  exec, crossing_restore;
-!
-!  nsigmax=6;
-!
-!  if(qx0-qx00<0.3){
-!    if(mylhcbeam==1) {exec MAKEFOOTPRINT(b1);exec PLOTFOOTPRINT(b1,0.2795,0.2805,0.3095,0.3105);};
-!    if(mylhcbeam>1) {exec MAKEFOOTPRINT(b2);exec PLOTFOOTPRINT(b2,0.2795,0.2805,0.3095,0.3105);};
-!  };
-!  if(qx0-qx00>0.3){
-!    if(mylhcbeam==1) {exec MAKEFOOTPRINT(b1);exec PLOTFOOTPRINT(b1,0.300,0.315,0.310,0.325);};
-!    if(mylhcbeam>1) {exec MAKEFOOTPRINT(b2);exec PLOTFOOTPRINT(b2,0.300,0.315,0.310,0.325);};
-!  };
-!  ON_BB_CHARGE := 0;
-!  exec,crossing_disable;
-
-  !Remove bb lens for both beams
-  !exec REMOVE_BB_LENS;
 };
 
 if (par_on_compute_train_input==1){
@@ -153,18 +125,18 @@ if (ON_BB_SWITCH==1){
 		stop;
 	}
 	
-	exec INSTALL_BB_MARK(b1);
-	exec INSTALL_BB_MARK(b2);
+	exec, INSTALL_BB_MARK(b1);
+	exec, INSTALL_BB_MARK(b2);
 	
-	use,sequence=lhcb2;
+	use, sequence=lhcb2;
 	seqedit,sequence=lhcb2;
 	flatten;
 	reflect;
 	endedit;
-  use,sequence=lhcb2;
+  use, sequence=lhcb2;
 	
 
-  use,sequence=lhcb1;
+  use, sequence=lhcb1;
   !kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
  	!ksf=ksf.b1;ksd=ksd.b1;ksf.b1:=ksf;ksd.b1:=ksd;
 
@@ -192,7 +164,7 @@ if (ON_BB_SWITCH==1){
  		lmdif,  calls=500, tolerance=1.0E-21;
  	endmatch;
 
-	use,sequence=lhcb2;
+	use, sequence=lhcb2;
 
 	!kqtf=kqtf.b2;kqtd=kqtd.b2;kqtf.b2:=kqtf;kqtd.b2:=kqtd;
  	!ksf=ksf.b2;ksd=ksd.b2;ksf.b2:=ksf;ksd.b2:=ksd;
