@@ -30,6 +30,8 @@ system, "ln -fns build_hllhc14_seq.madx buildsequence.madx";
 ! Define the optics
 system, "ln -fns slhc/round/opt_round_150_1500_thin.madx myoptics.madx";
 
+par_verbose=1;
+
 par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters
@@ -105,6 +107,8 @@ par_nho_IR2 = 11;                    ! number of slices for head-on in IR2 (betw
 par_nho_IR5 = 11;                    ! number of slices for head-on in IR5 (between 0 and 201)
 par_nho_IR8 = 11;                    ! number of slices for head-on in IR8 (between 0 and 201)
 
+par_install_crabcavities=1;
+
 
 !*************************!
 !     Leveling in IP8     !
@@ -118,8 +122,6 @@ par_nco_IP1 = 2592;
 par_nco_IP5 = par_nco_IP1;
 par_nco_IP2 = 2288;
 par_nco_IP8 = 2396;
-
-par_install_crabcavities=1;
 
 
 !*************************!
@@ -163,5 +165,7 @@ option, -echo, -info;
 
 call, file="mask_code/mask_01_optics.madx";
 call, file="mask_code/mask_02_lumilevel_and_bb.madx";
+
+
 
 stop;

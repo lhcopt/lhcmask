@@ -30,6 +30,8 @@ system, "ln -fns build_run3_seq.madx buildsequence.madx";
 ! Define the optics
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.30 myoptics.madx";
 
+par_verbose=1;
+
 par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters
@@ -104,6 +106,8 @@ par_nho_IR1 = 11;                    ! number of slices for head-on in IR1 (betw
 par_nho_IR2 = 11;                    ! number of slices for head-on in IR2 (between 0 and 201)
 par_nho_IR5 = 11;                    ! number of slices for head-on in IR5 (between 0 and 201)
 par_nho_IR8 = 11;                    ! number of slices for head-on in IR8 (between 0 and 201)
+
+par_install_crabcavities=0;
 
 
 !*************************!

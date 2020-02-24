@@ -30,6 +30,8 @@ system, "ln -fns build_hllhc14_seq.madx buildsequence.madx";
 ! Define the optics
 system, "ln -fns slhc/round/opt_round_150_1500_thin.madx myoptics.madx";
 
+par_verbose=1;
+
 par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters

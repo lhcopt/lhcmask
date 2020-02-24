@@ -30,6 +30,8 @@ system, "ln -fns build_hllhc14_seq.madx buildsequence.madx";
 ! Define the optics
 system, "ln -fns slhc/ramp/opt_inj_6000_thin.madx myoptics.madx";
 
+par_verbose=1;
+
 par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters
@@ -120,8 +122,6 @@ par_nco_IP1 = 2592;
 par_nco_IP5 = par_nco_IP1;
 par_nco_IP2 = 2288;
 par_nco_IP8 = 2396;
-
-par_install_crabcavities=1;
 
 
 !*************************!
