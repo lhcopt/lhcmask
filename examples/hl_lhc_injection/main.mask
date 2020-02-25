@@ -164,8 +164,9 @@ par_on_compute_train_input=0;
 option, -echo, -info;
 
 call, file="mask_code/mask_01_optics.madx";
-call, file="mask_code/mask_02_lumilevel_and_bb.madx";
-call, file="mask_code/mask_03_optics_and_err.madx";
-call, file="mask_code/mask_04_lasttwiss_and_sixtrack.madx";
+call, file="mask_code/mask_02_lumilevel.madx";
+call, file="mask_code/mask_03_beambeam.madx";
+call, file="mask_code/mask_04_optics_and_err.madx";
+call, file="mask_code/mask_05_lasttwiss_and_sixtrack.madx";
 
 stop;
