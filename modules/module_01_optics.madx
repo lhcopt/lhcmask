@@ -3,10 +3,8 @@
 !!********************************************************************
 call, file="slhc/toolkit/macro.madx";        !Call some macro facilities
 
-! Build sequence
-call, file="buildsequence.madx";
-! Load optics strenght
-call, file="myoptics.madx";
+! Build optics
+call, file="build_optics.madx";
 
 
 mylhcbeam = par_mylhcbeam;
