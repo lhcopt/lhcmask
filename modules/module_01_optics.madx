@@ -1,9 +1,8 @@
-!!********************************************************************
-!!Manual Sequence building
-!!********************************************************************
+
+
 call, file="slhc/toolkit/macro.madx";        !Call some macro facilities
 
-! Build optics
+! Build machine (sequence, optics, etc.)
 call, file="build_optics.madx";
 
 
@@ -26,7 +25,6 @@ on_errors_MCBRD = par_on_errors_MCBRD;
 on_errors_MCBXF = par_on_errors_MCBXF;
 
 !********************************************
-
 ! A Laundau octupole current 20A inj, -570A col
 I_MO = par_oct_current;
 

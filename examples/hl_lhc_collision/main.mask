@@ -7,17 +7,11 @@ option, warn, info;
 system, "rm -rf temp";
 system, "mkdir temp";
 
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.4 slhc";
-
-! TODO: To be put in the optics repository
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
-
 ! Beam-beam macros folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
 
 ! Mask code folder
-system, "ln -fns ../../ modules";
+system, "ln -fns ../../modules modules";
 
 
 !*************************!

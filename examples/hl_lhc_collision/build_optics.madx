@@ -1,3 +1,10 @@
+
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.4 slhc";
+
+! TODO: To be put in the optics repository
+system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
+
 option, -echo,-warn,-info;
 
 if (mylhcbeam==4){
