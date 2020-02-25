@@ -2,7 +2,6 @@
 print, text="Entering beam-beam block";
 
 on_bb_switch = par_on_bb_switch;
-on_collision = par_on_collision;
 b_t_dist = par_b_t_dist; 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;

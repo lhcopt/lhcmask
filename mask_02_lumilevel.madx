@@ -1,3 +1,6 @@
+
+on_collision = par_on_collision;
+
 call, file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
 
 if (ON_COLLISION==1){
