@@ -393,7 +393,6 @@ if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
 
 ! end of orbit correction, now switch ON crossing scheme
 ! restoring crossing angle
-exec, crossing_restore;
 
 ! coguess,x=x.ip1,px=px.ip1,y=y.ip1,py=py.ip1;
 
