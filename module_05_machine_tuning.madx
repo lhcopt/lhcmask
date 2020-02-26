@@ -2,6 +2,9 @@
 ! MO settings
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+I_MO = par_oct_current;
+
+
 brho:=NRJ*1e9/clight;
 if (mylhcbeam==1){
   KOF.A12B1:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A23B1:=Kmax_MO*I_MO/Imax_MO/brho;

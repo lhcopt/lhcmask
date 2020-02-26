@@ -17,9 +17,6 @@ on_errors_D2 = par_on_errors_D2;
 on_errors_MCBRD = par_on_errors_MCBRD;
 on_errors_MCBXF = par_on_errors_MCBXF;
 
-!********************************************
-! A Laundau octupole current 20A inj, -570A col
-I_MO = par_oct_current;
 
 
 ! emittance_norm := par_beam_norm_emit*1.0E-6;
