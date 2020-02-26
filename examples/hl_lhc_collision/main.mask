@@ -4,14 +4,20 @@
 
 option, warn, info;
 
-system, "rm -rf temp";
-system, "mkdir temp";
+! Mask code folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules modules";
+
+! Machine folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines machines"; 
+
+! Toolkit folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
 
 ! Beam-beam macros folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
 
-! Mask code folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules/ modules";
+! Errors folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
 
 
 !*************************!
@@ -19,7 +25,7 @@ system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules/ modules";
 !*************************!
 
 ! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines/hl14_collision_thin.madx build_machine.madx" ;
+system, "ln -fns machines/hl14_collision_thin.madx build_machine.madx" ;
 
 par_verbose=1;
 
