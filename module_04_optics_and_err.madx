@@ -1,7 +1,6 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
 !               Prepare nominal twiss tables
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
-if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
 
 ! /*
 !  twiss;

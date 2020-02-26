@@ -177,3 +177,5 @@ if (par_verbose==1){
   value, pynom1,pynom2,pynom5,pynom8;
 }
 value, bv_aux;
+
+if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };

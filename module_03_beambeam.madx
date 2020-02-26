@@ -220,3 +220,6 @@ if (ON_BB_SWITCH==1){
 	
 	stop;
 }
+
+if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
+

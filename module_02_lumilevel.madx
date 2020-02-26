@@ -21,3 +21,5 @@ if (ON_COLLISION==1){
   on_disp=on_dispaux; ! reset on_disp before saving
   exec, crossing_save;
 };
+
+if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
