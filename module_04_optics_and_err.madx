@@ -56,7 +56,7 @@
  };
  twiss,  file='temp/optics0_inser.mad';
 
-call, file="slhc/toolkit/BetaBeating.madx";
+call, file="toolkit/BetaBeating.madx";
 ! disable crossing bumps
 exec, crossing_disable;
 
