@@ -8,21 +8,18 @@ system, "rm -rf temp";
 system, "mkdir temp";
 
 ! Beam-beam macros folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
 
 ! Mask code folder
-system, "ln -fns ../../modules modules";
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules/ modules";
 
 
 !*************************!
 !  General configuration  !
 !*************************!
 
-! Choose build sequence script
-system, "ln -fns build_hllhc14_seq.madx buildsequence.madx";
-
-! Define the optics
-system, "ln -fns slhc/round/opt_round_150_1500_thin.madx myoptics.madx";
+! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines/hl14_collision_thin.madx build_machine.madx" ;
 
 par_verbose=1;
 
@@ -157,6 +154,7 @@ par_on_compute_train_input=0;
 
 option, -echo, -info;
 
+call, file="build_machine.madx" ;
 call, file="modules/module_01_optics.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";

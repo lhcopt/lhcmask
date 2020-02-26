@@ -1,11 +1,4 @@
 
-
-call, file="slhc/toolkit/macro.madx";        !Call some macro facilities
-
-! Build machine (sequence, optics, etc.)
-call, file="build_optics.madx";
-
-
 mylhcbeam = par_mylhcbeam;
 
 nrj = par_beam_energy_tot; 
