@@ -89,3 +89,9 @@ if(mylhcbeam>1){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 call, file="slhc/errors/corr_value_limit.madx";
 
+ON_BB_CHARGE=1;
+
+LAGRF400.B1=0.5;
+LAGRF400.B2=0.;
+VRF400 := par_vrf_total;
+

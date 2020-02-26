@@ -2,13 +2,6 @@
 !                 final twiss before sending to sixtrack
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-ON_BB_CHARGE=1;
-
-LAGRF400.B1=0.5;
-LAGRF400.B2=0.;
-VRF400 := par_vrf_total;
-
-
 print, text="========================================";
 print, text="======  OPTICS PARAMETERS: FINAL  ======";
 print, text="========================================";
@@ -24,16 +17,3 @@ if( ON_BB_SWITCH == 1){
   exec, SIXTRACK_INPUT_BB_LENSES;
 }
 
-select, flag=twiss, clear;
-
-twiss,file="last_twiss_temp";
-system,"gzip -f last_twiss_temp";
-
-
-! Rename last twiss
-RENAME_MACRO(nnnnn) : macro = {
-   system, "mv last_twiss_temp.gz last_twiss.nnnnn.gz";
-}
-
-
-exec, RENAME_MACRO($myseed);                          
