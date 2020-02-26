@@ -14,14 +14,14 @@ F. Van Der Veken
 
 ## To run an example:
 ```bash
-cd tests/collision/
-python ../../unmask.py hl14_collisions.mask parameters.txt
-madx hl14_collisions.mask.unmasked
+cd examples/hl_lhc_collision/
+python ../../unmask.py main.mask parameters_for_unmask.txt
+madx main.mask.unmasked
 ```
 or equivalently:
 ```bash
-cd tests/collision/
-python ../../unmask.py hl14_collisions.mask parameters.txt --run
+cd examples/hl_lhc_collision/
+python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
 ## Description
