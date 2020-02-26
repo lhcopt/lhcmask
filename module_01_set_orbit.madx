@@ -1,3 +1,5 @@
+system, "rm -rf temp";
+system, "mkdir temp";
 
 mylhcbeam = par_mylhcbeam;
 
