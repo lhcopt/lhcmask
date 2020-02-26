@@ -1,6 +1,11 @@
-!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!                 final twiss before sending to sixtrack
-!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+print, text="";
+print, text="";
+print, text="++++++++++++++++++++++++++++++";
+print, text="++ START MODULE 6: SIXTRACK ++";
+print, text="++++++++++++++++++++++++++++++";
+print, text="";
+print, text="";
+
 
 ON_BB_CHARGE=1;
 

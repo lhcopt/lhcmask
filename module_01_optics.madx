@@ -1,3 +1,20 @@
+print, text="";
+print, text="";
+print, text="++++++++++++++++++++++++++++";
+print, text="++ START MODULE 1: OPTICS ++";
+print, text="++++++++++++++++++++++++++++";
+print, text="";
+print, text="";
+
+! Verify if build flags are set correctly
+if ( ver_lhc_run == 0 && ver_hllhc_optics == 0 ) {
+  print, text="Fatal error: Machine version flag not set! Check build_machine file.";
+  stop;
+};
+if ( ver_lhc_run <> 0 && ver_hllhc_optics <> 0 ) {
+  print, text="Fatal error: Machine version flag set for LHC and HL-LHC simultaneously! Check build_machine file.";
+  stop;
+};
 
 mylhcbeam = par_mylhcbeam;
 
