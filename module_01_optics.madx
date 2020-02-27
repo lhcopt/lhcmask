@@ -16,6 +16,9 @@ if ( ver_lhc_run <> 0 && ver_hllhc_optics <> 0 ) {
   stop;
 };
 
+System,"if [ -d temp ]; then rm -r temp; fi";
+System,"mkdir temp";
+
 mylhcbeam = par_mylhcbeam;
 
 nrj = par_beam_energy_tot; 

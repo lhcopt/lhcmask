@@ -17,10 +17,10 @@ VRF400 := par_vrf_total;
 print, text="========================================";
 print, text="======  OPTICS PARAMETERS: FINAL  ======";
 print, text="========================================";
-call, file="slhc/toolkit/get_optics_params.madx";
+call, file="toolkit/get_optics_params.madx";
 
 
-call, file="slhc/toolkit/BetaBeating.madx";
+call, file="toolkit/BetaBeating.madx";
 twiss, chrom;
 !sixtrack,cavall, mult_auto_off,radius=0.017;
 sixtrack,cavall, radius=0.017;

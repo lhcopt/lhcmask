@@ -1,23 +1,27 @@
+option, -echo;
+
 !*************************!
 !   Prepare environment   !
 !*************************!
 
-option, warn, info;
-
 ! Mask code folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules modules";
+!system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules modules";
+system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/modules modules";
 
 ! Machine folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines machines"; 
+!system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines machines"; 
+system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/machines machines"; 
 
 ! Toolkit folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
+!system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
+system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/toolkit toolkit"; 
 
 ! Beam-beam macros folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
 
 ! Errors folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
+!system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
+system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/errors errors"; 
 
 
 !*************************!
@@ -25,7 +29,8 @@ system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors";
 !*************************!
 
 ! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
-system, "ln -fns machines/hl14_collision_thin.madx build_machine.madx" ;
+system, "ln -fns machines/sequences/hl14_thin.madx   make_sequence.madx";
+system, "ln -fns machines/optics/hl14_collision.madx load_optics.madx"  ;
 
 par_verbose=1;
 
@@ -125,9 +130,8 @@ par_nco_IP8 = 2396;
 !  Errors and corrections !
 !*************************!
 
-! Select error table (decide if injection or collisions
+! Select seed for errors
 par_myseed = %SEEDRAN;
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705/collision_errors-emfqcs-%SEEDRAN.tfs error_table.tfs";
 
 ! Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
 par_correct_for_D2 = 0;
@@ -158,9 +162,8 @@ par_on_compute_train_input=0;
 !           RUN           !
 !*************************!
 
-option, -echo, -info;
-
-call, file="build_machine.madx" ;
+call, file="make_sequence.madx" ;
+call, file="load_optics.madx";
 call, file="modules/module_01_optics.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";

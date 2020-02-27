@@ -42,12 +42,12 @@ if (mylhcbeam>1){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !   Fine tuning of coupling after CO correction and with Xscheme
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-call,file="slhc/errors/FineCouplingCorrectionSimplex.madx";
+call,file="toolkit/FineCouplingCorrectionSimplex.madx";
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 Limit corrector strength
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-call, file="slhc/errors/corr_limit.madx";
+call, file="errors/HL-LHC/corr_limit.madx";
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 matching of orbit, tune and chromaticity
@@ -55,9 +55,9 @@ call, file="slhc/errors/corr_limit.madx";
 if(par_on_collision==0) {ON_BB_CHARGE:=1;};    ! W/o head-on Q and Q' are matched with bb
 
 !Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
-call, file="slhc/toolkit/rematchCOIP.madx";
+call, file="toolkit/rematchCOIP.madx";
 !Rematch the CO in the arc for dispersion correction
-if(ON_DISP<>0) {call, file="slhc/toolkit/rematchCOarc.madx";};
+if(ON_DISP<>0) {call, file="toolkit/rematchCOarc.madx";};
 
 if(mylhcbeam==1){
   kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
@@ -96,5 +96,5 @@ if(mylhcbeam>1){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 Check corrector strength
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-call, file="slhc/errors/corr_value_limit.madx";
+call, file="errors/HL-LHC/corr_value_limit.madx";
 
