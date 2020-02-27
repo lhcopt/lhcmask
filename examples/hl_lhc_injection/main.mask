@@ -10,14 +10,14 @@ system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules modules";
 ! Machine folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines machines"; 
 
-! Toolkit folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
-
 ! Beam-beam macros folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
 
-! Errors folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
+! Toolkit folder (to be included)
+! system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
+
+! Errors folder (to be included)
+! system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
 
 
 !*************************!
