@@ -2,9 +2,6 @@
 !   Prepare environment   !
 !*************************!
 
-option, warn, info;
-
-
 system, "ln -fns /home/giadarol/Desktop/20200227_merge_mask simulation_tools";
 
 ! Mask code folder
@@ -13,25 +10,25 @@ system, "ln -fns simulation_tools/modules modules";
 ! Machine folder
 system, "ln -fns simulation_tools/machines machines"; 
 
+! Toolkit folder
+system, "ln -fns simulation_tools/tools tools"; 
+
 ! Beam-beam macros folder
 system, "ln -fns simulation_tools/beambeam_macros beambeam_macros"; 
 
-! Toolkit folder (to be included)
-! system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
-
-! Errors folder (to be included)
-! system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
+! Errors folder
+system, "ln -fns simulation_tools/errors errors";  
 
 
 !*************************!
 !  General configuration  !
 !*************************!
 
-! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
-system, "ln -fns machines/hl14_thin.madx build_machine.madx" ;
+! Choose build machine script (sequence, makethin, optics, optics toolkit, cycle)
+system, "ln -fns machines/sequences/hl14_thin.madx   make_sequence.madx";
 
 ! Choose optics (magnet strengths)
-system, "ln -fns slhc/round/opt_round_150_1500_thin.madx optics.madx";
+system, "ln -fns machines/optics/hl14_collision.madx optics.madx";
 
 par_verbose=1;
 
@@ -131,9 +128,8 @@ par_nco_IP8 = 2396;
 !  Errors and corrections !
 !*************************!
 
-! Select error table (decide if injection or collisions
+! Select seed for errors
 par_myseed = %SEEDRAN;
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705/collision_errors-emfqcs-%SEEDRAN.tfs error_table.tfs";
 
 ! Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
 par_correct_for_D2 = 0;
@@ -157,12 +153,10 @@ par_on_errors_MCBXF = 1;
 !           RUN           !
 !*************************!
 
-option, -echo, -info;
-
 ! Build machine and optics
 ! (the user can intruduce in this section additional custom code 
 ! to edit machine and/or optics)
-call, file="build_machine.madx";
+call, file="make_sequence.madx";
 call, file="optics.madx";    
 
 ! Call mask modules
