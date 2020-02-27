@@ -19,6 +19,10 @@ nho_IR8 = par_nho_IR8;
 
 call, file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
 
+if( on_bb_switch == 1 || par_on_compute_train_input==1){
+     exec, DEFINE_BB_PARAM;  !Define main beam-beam parameters
+};
+
 on_disp=0; !more precise angles at IPs
 
 !Record the nominal IP position and crossing angle
