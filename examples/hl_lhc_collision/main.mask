@@ -25,7 +25,10 @@ system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors";
 !*************************!
 
 ! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
-system, "ln -fns machines/hl14_collision_thin.madx build_machine.madx" ;
+system, "ln -fns machines/hl14_thin.madx build_machine.madx" ;
+
+! Choose optics (magnet strengths)
+system, "ln -fns slhc/round/opt_round_150_1500_thin.madx optics.madx";
 
 par_verbose=1;
 
@@ -148,19 +151,18 @@ par_on_errors_MCBXF = 1;
 
 
 !*************************!
-!  Compute TRAIN input    !
-!*************************!
-
-par_on_compute_train_input=0;
-
-
-!*************************!
 !           RUN           !
 !*************************!
 
 option, -echo, -info;
 
-call, file="build_machine.madx" ;
+! Build machine and optics
+! (the user can intruduce in this section additional custom code 
+! to edit machine and/or optics)
+call, file="build_machine.madx";
+call, file="optics.madx";    
+
+! Call mask modules
 call, file="modules/module_01_set_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";

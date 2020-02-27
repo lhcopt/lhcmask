@@ -4,31 +4,31 @@
 
 option, warn, info;
 
-system, "rm -rf temp";
-system, "mkdir temp";
+! Mask code folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/modules modules";
 
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.4 slhc";
+! Machine folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines machines"; 
 
-! TODO: To be put in the optics repository
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
+! Toolkit folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
 
 ! Beam-beam macros folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
 
-! Mask code folder
-system, "ln -fns ../../ mask_code";
+! Errors folder
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/errors errors"; 
 
 
 !*************************!
 !  General configuration  !
 !*************************!
 
-! Choose build sequence script
-system, "ln -fns build_hllhc14_seq.madx buildsequence.madx";
+! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
+system, "ln -fns machines/hl14_thin.madx build_machine.madx" ;
 
-! Define the optics
-system, "ln -fns slhc/ramp/opt_inj_6000_thin.madx myoptics.madx";
+! Choose optics (magnet strengths)
+system, "ln -fns slhc/ramp/opt_inj_6000_thin.madx optics.madx";
 
 par_verbose=1;
 
@@ -151,22 +151,24 @@ par_on_errors_MCBXF = 1;
 
 
 !*************************!
-!  Compute TRAIN input    !
-!*************************!
-
-par_on_compute_train_input=0;
-
-
-!*************************!
 !           RUN           !
 !*************************!
 
 option, -echo, -info;
 
-call, file="mask_code/mask_01_optics.madx";
-call, file="mask_code/mask_02_lumilevel.madx";
-call, file="mask_code/mask_03_beambeam.madx";
-call, file="mask_code/mask_04_optics_and_err.madx";
-call, file="mask_code/mask_05_lasttwiss_and_sixtrack.madx";
+! Build machine and optics
+! (the user can intruduce in this section additional custom code 
+! to edit machine and/or optics)
+call, file="build_machine.madx";
+call, file="optics.madx";    
+
+! Call mask modules
+call, file="modules/module_01_set_orbit.madx";
+call, file="modules/module_02_lumilevel.madx";
+call, file="modules/module_03_beambeam.madx";
+call, file="modules/module_04_install_and_correct_errors.madx";
+call, file="modules/module_05_machine_tuning.madx";
+call, file="modules/module_06_make_sixtrack_input.madx";
+call, file="modules/module_07_last_twiss.madx";
 
 stop;

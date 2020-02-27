@@ -14,7 +14,7 @@ system,"ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705 wise";
 system,"ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE/After_sector_3-4_repair fidel";
 option,-echo,-info;
-system,"ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
 
 !---------------------------------------------------------------;
 !           CALL IN SELECTION, MACRO's, SEQUENCE, BEAM, NRJ and OPTICS FILES;
