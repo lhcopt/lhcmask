@@ -12,9 +12,9 @@ system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/modules m
 !system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/machines machines"; 
 system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/machines machines"; 
 
-! Toolkit folder
-!system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/toolkit toolkit"; 
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/toolkit toolkit"; 
+! Tools folder
+!system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/tools tools"; 
+system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/tools tools"; 
 
 ! Beam-beam macros folder
 system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools/beambeam_macros beambeam_macros"; 
@@ -28,7 +28,7 @@ system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment/errors er
 !  General configuration  !
 !*************************!
 
-! Choose build machine script (sequence, makethin, optics, toolkit, cycle)
+! Choose build machine script (sequence, makethin, optics, optics toolkit, cycle)
 system, "ln -fns machines/sequences/hl14_thin.madx   make_sequence.madx";
 system, "ln -fns machines/optics/hl14_collision.madx load_optics.madx"  ;
 

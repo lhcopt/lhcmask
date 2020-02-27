@@ -74,7 +74,7 @@ beam, particle=proton,sequence=lhcb2,energy=par_beam_energy_tot,
 
 
 ! set the options for the format
-exec, twiss_opt; ! toolkit/macros
+exec, twiss_opt;
 
 if (par_verbose==1){
   if (mylhcbeam==1){

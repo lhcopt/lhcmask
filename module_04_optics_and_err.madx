@@ -59,7 +59,7 @@ if (correct_for_MCBX==1){
 };
 twiss,  file='temp/optics0_inser.mad';
 
-call, file="toolkit/BetaBeating.madx";
+call, file="tools/BetaBeating.madx";
 
 ! disable crossing bumps
 exec, crossing_disable;
@@ -68,7 +68,7 @@ exec, crossing_disable;
 !                   Align separation magnets
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-call, file="toolkit/align_sepdip.madx";
+call, file="tools/align_sepdip.madx";
 if (ver_lhc_run > 0) {
   exec,align_mbxw;  ! V6.503  D1
   exec,align_mbrc15;! V6.503 D2 in IR15
@@ -82,10 +82,10 @@ exec, align_mbrc28;! V6.503 D2 in IR28
 exec, align_mbrs;  ! V6.503 D3 in IR4
 exec, align_mbrb;  ! V6.503 D4 in IR4
 if (ver_hllhc_optics > 0 && ver_hllhc_optics < 1.3) {
-  call, file="toolkit/align_mbh_v1.madx"; ! align 11T dipoles
+  call, file="tools/align_mbh_v1.madx"; ! align 11T dipoles
 };
 if (ver_lhc_run > 2 || ver_hllhc_optics > 1.2) {
-  call, file="toolkit/align_mbh_v2.madx"; ! align 11T dipoles
+  call, file="tools/align_mbh_v2.madx"; ! align 11T dipoles
 };
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -96,9 +96,9 @@ if (ver_lhc_run > 2 || ver_hllhc_optics > 1.2) {
 ! Error routine and measured error table for nominal LHC
 call, file="errors/LHC/Msubroutines.madx";
 call, file="errors/LHC/Msubroutines_MS_MSS_MO.madx";
-call, file="toolkit/Orbit_Routines.madx";
-if (ver_lhc_run > 0)      { call, file="toolkit/SelectLHCMonCor_v1.madx"; };
-if (ver_hllhc_optics > 0) { call, file="toolkit/SelectLHCMonCor_v2.madx"; };
+call, file="tools/Orbit_Routines.madx";
+if (ver_lhc_run > 0)      { call, file="tools/SelectLHCMonCor_v1.madx"; };
+if (ver_hllhc_optics > 0) { call, file="tools/SelectLHCMonCor_v2.madx"; };
 if (on_errors_LHC==1){
   readtable, file="errors/LHC/rotations_Q2_integral.tab";
 };
@@ -350,7 +350,7 @@ esave,  file="error_all.tfs";
 print, text="===============================================";
 print, text="======  OPTICS PARAMETERS: AFTER ERRORS  ======";
 print, text="===============================================";
-call, file="toolkit/get_optics_params.madx";
+call, file="tools/get_optics_params.madx";
 
 
 
@@ -426,7 +426,7 @@ if (correct_for_D2==1){
 print, text="==================================================";
 print, text="======  OPTICS PARAMETERS: BEFORE MATCHING  ======";
 print, text="==================================================";
-call, file="toolkit/get_optics_params.madx";
+call, file="tools/get_optics_params.madx";
 
 
 

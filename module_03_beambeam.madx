@@ -69,7 +69,7 @@ if( ON_BB_SWITCH == 1){
 
   !Install Crab Cavities for the weak beam
   if (par_install_crabcavities==1){
-     call, file="slhc/toolkit/enable_crabcavities.madx";
+     call, file="tools/enable_crabcavities.madx";
   }
 
   if (mylhcbeam<3){
