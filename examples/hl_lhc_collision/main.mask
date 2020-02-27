@@ -2,7 +2,7 @@
 !   Prepare environment   !
 !*************************!
 
-system, "ln -fns /home/giadarol/Desktop/20200227_merge_mask simulation_tools";
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools simulation_tools";
 
 ! Mask code folder
 system, "ln -fns simulation_tools/modules modules";
