@@ -10,10 +10,10 @@ print, text="";
 print, text="========================================";
 print, text="======  OPTICS PARAMETERS: FINAL  ======";
 print, text="========================================";
-call, file="tools/get_optics_params.madx";
+!call, file="tools/get_optics_params.madx";
 
 
-call, file="tools/BetaBeating.madx";
+!call, file="tools/BetaBeating.madx";
 twiss, chrom;
 !sixtrack,cavall, mult_auto_off,radius=0.017;
 sixtrack,cavall, radius=0.017;

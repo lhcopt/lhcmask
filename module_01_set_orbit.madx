@@ -124,9 +124,9 @@ on_sol_atlas = par_on_sol_atlas;
 on_sol_cms = par_on_sol_cms;
 on_sol_alice = par_on_sol_alice;
 
-if (par_verbose==1){
-exec, print_crossing_knobs;
-}
+! if (par_verbose==1){
+! exec, print_crossing_knobs;
+! }
 exec, crossing_save;
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
