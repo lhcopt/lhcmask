@@ -60,7 +60,7 @@ if (correct_for_MCBX==1){
 };
 twiss,  file='temp/optics0_inser.mad';
 
-call, file="tools/BetaBeating.madx";
+!call, file="tools/BetaBeating.madx";
 
 ! disable crossing bumps
 exec, crossing_disable;
@@ -85,7 +85,7 @@ exec, align_mbrb;  ! V6.503 D4 in IR4
 if (ver_hllhc_optics > 0 && ver_hllhc_optics < 1.3) {
   call, file="tools/align_mbh_v1.madx"; ! align 11T dipoles
 };
-if (ver_lhc_run > 2 || ver_hllhc_optics > 1.2) {
+if (ver_hllhc_optics >= 1.3) {
   call, file="tools/align_mbh_v2.madx"; ! align 11T dipoles
 };
 
@@ -148,39 +148,21 @@ if (on_errors_MCBRD==1){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 exec, ON_ALL_MULT;
-if (off_all_errors==1){
-  ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
-  ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
-  ON_A3s =  0 ; ON_A3r =  0 ; ON_B3s =  0 ; ON_B3r =  0 ;
-  ON_A4s =  0 ; ON_A4r =  0 ; ON_B4s =  0 ; ON_B4r =  0 ;
-  ON_A5s =  0 ; ON_A5r =  0 ; ON_B5s =  0 ; ON_B5r =  0 ;
-  ON_A6s =  0 ; ON_A6r =  0 ; ON_B6s =  0 ; ON_B6r =  0 ;
-  ON_A7s =  0 ; ON_A7r =  0 ; ON_B7s =  0 ; ON_B7r =  0 ;
-  ON_A8s =  0 ; ON_A8r =  0 ; ON_B8s =  0 ; ON_B8r =  0 ;
-  ON_A9s =  0 ; ON_A9r =  0 ; ON_B9s =  0 ; ON_B9r =  0 ;
-  ON_A10s = 0 ; ON_A10r = 0 ; ON_B10s = 0 ; ON_B10r = 0 ;
-  ON_A11s = 0 ; ON_A11r = 0 ; ON_B11s = 0 ; ON_B11r = 0 ;
-  ON_A12s = 0 ; ON_A12r = 0 ; ON_B12s = 0 ; ON_B12r = 0 ;
-  ON_A13s = 0 ; ON_A13r = 0 ; ON_B13s = 0 ; ON_B13r = 0 ;
-  ON_A14s = 0 ; ON_A14r = 0 ; ON_B14s = 0 ; ON_B14r = 0 ;
-  ON_A15s = 0 ; ON_A15r = 0 ; ON_B15s = 0 ; ON_B15r = 0 ;
-} else {
-  ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
-  ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
-  ON_A3s =  1 ; ON_A3r =  1 ; ON_B3s =  1 ; ON_B3r =  1 ;
-  ON_A4s =  1 ; ON_A4r =  1 ; ON_B4s =  1 ; ON_B4r =  1 ;
-  ON_A5s =  1 ; ON_A5r =  1 ; ON_B5s =  1 ; ON_B5r =  1 ;
-  ON_A6s =  1 ; ON_A6r =  1 ; ON_B6s =  1 ; ON_B6r =  1 ;
-  ON_A7s =  1 ; ON_A7r =  1 ; ON_B7s =  1 ; ON_B7r =  1 ;
-  ON_A8s =  1 ; ON_A8r =  1 ; ON_B8s =  1 ; ON_B8r =  1 ;
-  ON_A9s =  1 ; ON_A9r =  1 ; ON_B9s =  1 ; ON_B9r =  1 ;
-  ON_A10s = 1 ; ON_A10r = 1 ; ON_B10s = 1 ; ON_B10r = 1 ;
-  ON_A11s = 1 ; ON_A11r = 1 ; ON_B11s = 1 ; ON_B11r = 1 ;
-  ON_A12s = 1 ; ON_A12r = 1 ; ON_B12s = 1 ; ON_B12r = 1 ;
-  ON_A13s = 1 ; ON_A13r = 1 ; ON_B13s = 1 ; ON_B13r = 1 ;
-  ON_A14s = 1 ; ON_A14r = 1 ; ON_B14s = 1 ; ON_B14r = 1 ;
-  ON_A15s = 1 ; ON_A15r = 1 ; ON_B15s = 1 ; ON_B15r = 1 ;
-}
+ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
+ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
+ON_A3s =  1 ; ON_A3r =  1 ; ON_B3s =  1 ; ON_B3r =  1 ;
+ON_A4s =  1 ; ON_A4r =  1 ; ON_B4s =  1 ; ON_B4r =  1 ;
+ON_A5s =  1 ; ON_A5r =  1 ; ON_B5s =  1 ; ON_B5r =  1 ;
+ON_A6s =  1 ; ON_A6r =  1 ; ON_B6s =  1 ; ON_B6r =  1 ;
+ON_A7s =  1 ; ON_A7r =  1 ; ON_B7s =  1 ; ON_B7r =  1 ;
+ON_A8s =  1 ; ON_A8r =  1 ; ON_B8s =  1 ; ON_B8r =  1 ;
+ON_A9s =  1 ; ON_A9r =  1 ; ON_B9s =  1 ; ON_B9r =  1 ;
+ON_A10s = 1 ; ON_A10r = 1 ; ON_B10s = 1 ; ON_B10r = 1 ;
+ON_A11s = 1 ; ON_A11r = 1 ; ON_B11s = 1 ; ON_B11r = 1 ;
+ON_A12s = 1 ; ON_A12r = 1 ; ON_B12s = 1 ; ON_B12r = 1 ;
+ON_A13s = 1 ; ON_A13r = 1 ; ON_B13s = 1 ; ON_B13r = 1 ;
+ON_A14s = 1 ; ON_A14r = 1 ; ON_B14s = 1 ; ON_B14r = 1 ;
+ON_A15s = 1 ; ON_A15r = 1 ; ON_B15s = 1 ; ON_B15r = 1 ;
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ! Define the seed number (for statistical error assignment in the new IT/D1)
@@ -253,9 +235,9 @@ if (on_errors_LHC==1){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !             apply field errors to MB magnets
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if (on_errors_LHC==1){
-  call, file="errors/LHC/Efcomp_MB.madx"  ;
-};
+ON_B2s =  1 ; ON_B2r =  1;    ! temporary !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+call, file="errors/LHC/Efcomp_MB.madx"  ;
+ON_B2s =  0 ; ON_B2r =  0;
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !     correct orbit distortion resulting from MB magnets
@@ -270,41 +252,32 @@ if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ! Nominal LHC magnets
 ! Separation Dipoles
-if (on_errors_LHC==1){
-  call, file="errors/LHC/Efcomp_MBRB.madx";
-  call, file="errors/LHC/Efcomp_MBRC.madx";
-  call, file="errors/LHC/Efcomp_MBRS.madx";
-  call, file="errors/LHC/Efcomp_MBX.madx" ;
-  call, file="errors/LHC/Efcomp_MBW.madx" ;
-};
+call, file="errors/LHC/Efcomp_MBRB.madx";
+call, file="errors/LHC/Efcomp_MBRC.madx";
+call, file="errors/LHC/Efcomp_MBRS.madx";
+call, file="errors/LHC/Efcomp_MBX.madx" ;
+call, file="errors/LHC/Efcomp_MBW.madx" ;
 
 ! Quadrupoles
-if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQW.madx" ; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQTL.madx"; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQMC.madx"; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQX.madx" ; on_B2S=ON_B2Saux;
-};
-if (on_errors_Q4==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQY.madx" ; on_B2S=ON_B2Saux;
-} else {
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQY_noIP15.madx" ; on_B2S=ON_B2Saux;
-};
-if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQM.madx" ; on_B2S=ON_B2Saux;
-};
-if (on_errors_Q5==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQML.madx"; on_B2S=ON_B2Saux;
-} else {
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQML_noIP15.madx"; on_B2S=ON_B2Saux;
-};
-if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQ.madx"  ; on_B2S=ON_B2Saux;
-};
+ON_B2Saux=on_B2S;on_B2S=1; call, file="errors/LHC/Efcomp_MQW.madx" ; on_B2S=ON_B2Saux;
+ON_B2Saux=on_B2S;on_B2S=1; call, file="errors/LHC/Efcomp_MQTL.madx"; on_B2S=ON_B2Saux;
+ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQMC.madx"; on_B2S=ON_B2Saux;
+ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQX.madx" ; on_B2S=ON_B2Saux;
 
-if (on_errors_LHC==1){
-  call, file="errors/LHC/Set_alignment_errors.madx";
+if (on_errors_Q4==1 || ver_lhc_run > 0){
+  ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQY.madx" ; on_B2S=ON_B2Saux;
+} else {
+    ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQY_noIP15.madx" ; on_B2S=ON_B2Saux;
 };
+ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQM.madx" ; on_B2S=ON_B2Saux;
+if (on_errors_Q5==1 || ver_lhc_run > 0){
+  ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQML.madx"; on_B2S=ON_B2Saux;
+} else {
+  ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQML_noIP15.madx"; on_B2S=ON_B2Saux;
+};
+ON_B2Saux=on_B2S;on_B2S=0; call, file="errors/LHC/Efcomp_MQ.madx"  ; on_B2S=ON_B2Saux;
+
+! call, file="errors/LHC/Set_alignment_errors.madx";    ! temporary !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! New IT/D1/D2/Q4/Q5
 myseed = par_myseed;

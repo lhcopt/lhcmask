@@ -136,8 +136,6 @@ par_correct_for_D2 = 0;
 ! Set this flag to correct the errors of MCBXF in the NLC (warning: this might be less reproducable in reality, use with care)
 par_correct_for_MCBX = 0;
 
-par_off_all_errors = 0;
-
 par_on_errors_LHC = 1;
 par_on_errors_MBH = 1;
 par_on_errors_Q5 = 1;
