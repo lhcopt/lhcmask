@@ -2,33 +2,33 @@
 !   Prepare environment   !
 !*************************!
 
-option, warn, info;
-
-system, "rm -rf temp";
-system, "mkdir temp";
-
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.4 slhc";
-
-! TODO: To be put in the optics repository
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/HL14errors/ fre";
-
-! Beam-beam macros folder
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/beambeam_macros beambeam_macros"; 
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools simulation_tools";
 
 ! Mask code folder
-system, "ln -fns ../../ mask_code";
+system, "ln -fns simulation_tools/modules modules";
+
+! Machine folder
+system, "ln -fns simulation_tools/machines machines"; 
+
+! Toolkit folder
+system, "ln -fns simulation_tools/tools tools"; 
+
+! Beam-beam macros folder
+system, "ln -fns simulation_tools/beambeam_macros beambeam_macros"; 
+
+! Errors folder
+system, "ln -fns simulation_tools/errors errors";  
 
 
 !*************************!
 !  General configuration  !
 !*************************!
 
-! Choose build sequence script
-system, "ln -fns build_run3_seq.madx buildsequence.madx";
+! Choose build machine script (sequence, makethin, optics, optics toolkit, cycle)
+system, "ln -fns machines/sequences/lhcRun3_thin.madx make_sequence.madx";
 
-! Define the optics
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.30 myoptics.madx";
+! Choose optics (magnet strengths)
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.30 optics.madx";
 
 par_verbose=1;
 
@@ -128,9 +128,8 @@ par_nco_IP8 = 2396;
 !  Errors and corrections !
 !*************************!
 
-! Select error table (decide if injection or collisions
-par_myseed = %SEEDRAN;
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705/collision_errors-emfqcs-%SEEDRAN.tfs error_table.tfs";
+! Select seed for errors
+par_myseed = 0;
 
 ! Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
 par_correct_for_D2 = 0;
@@ -151,22 +150,22 @@ par_on_errors_MCBXF = 0;
 
 
 !*************************!
-!  Compute TRAIN input    !
-!*************************!
-
-par_on_compute_train_input=0;
-
-
-!*************************!
 !           RUN           !
 !*************************!
 
-option, -echo, -info;
+! Build machine and optics
+! (the user can intruduce in this section additional custom code 
+! to edit machine and/or optics)
+call, file="make_sequence.madx";
+call, file="optics.madx";    
 
-call, file="mask_code/mask_01_optics.madx";
-call, file="mask_code/mask_02_lumilevel.madx";
-call, file="mask_code/mask_03_beambeam.madx";
-!call, file="mask_code/mask_04_optics_and_err.madx";
-!call, file="mask_code/mask_05_lasttwiss_and_sixtrack.madx";
+! Call mask modules
+call, file="modules/module_01_set_orbit.madx";
+call, file="modules/module_02_lumilevel.madx";
+call, file="modules/module_03_beambeam.madx";
+! call, file="modules/module_04_install_and_correct_errors.madx";
+call, file="modules/module_05_machine_tuning.madx";
+call, file="modules/module_06_make_sixtrack_input.madx";
+call, file="modules/module_07_last_twiss.madx";
 
 stop;
