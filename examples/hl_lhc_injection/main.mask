@@ -2,22 +2,22 @@
 !   Prepare environment   !
 !*************************!
 
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/simulation_tools simulation_tools";
+system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
 ! Mask code folder
-system, "ln -fns simulation_tools/modules modules";
+system, "ln -fns tracking_tools/modules modules";
 
 ! Machine folder
-system, "ln -fns simulation_tools/machines machines"; 
+system, "ln -fns tracking_tools/machines machines"; 
 
 ! Toolkit folder
-system, "ln -fns simulation_tools/tools tools"; 
+system, "ln -fns tracking_tools/tools tools"; 
 
 ! Beam-beam macros folder
-system, "ln -fns simulation_tools/beambeam_macros beambeam_macros"; 
+system, "ln -fns tracking_tools/beambeam_macros beambeam_macros"; 
 
 ! Errors folder
-system, "ln -fns simulation_tools/errors errors";  
+system, "ln -fns tracking_tools/errors errors";  
 
 
 !*************************!

@@ -16,12 +16,12 @@ F. Van Der Veken
 ```bash
 cd examples/hl_lhc_collision/
 python ../../unmask.py main.mask parameters_for_unmask.txt
-madx main.mask.unmasked
+madx main.mask.unmasked | tee out
 ```
 or equivalently:
 ```bash
 cd examples/hl_lhc_collision/
-python ../../unmask.py main.mask parameters_for_unmask.txt --run
+python ../../unmask.py main.mask parameters_for_unmask.txt --run | tee out
 ```
 
 ## Description

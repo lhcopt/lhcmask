@@ -2,8 +2,6 @@
 !   Prepare environment   !
 !*************************!
 
-! Check documentation at http://lhcmaskdoc.web.cern.ch/mainmask/
-
 system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
 ! Mask code folder
@@ -27,25 +25,25 @@ system, "ln -fns tracking_tools/errors errors";
 !*************************!
 
 ! Choose build machine script (sequence, makethin, optics, optics toolkit, cycle)
-system, "ln -fns machines/sequences/hl14_thin.madx make_sequence.madx";
+system, "ln -fns machines/sequences/lhcRun3_thin.madx make_sequence.madx";
 
 ! Choose optics (magnet strengths)
-system, "ln -fns machines/optics/hl14_collision.madx optics.madx";
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.30 optics.madx";
 
 par_verbose=1;
 
-par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
+par_mylhcbeam = 1;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters
-par_beam_norm_emit = %EMIT_BEAM;     ! [m]
+par_beam_norm_emit = 2.3e-6;     ! [m]
 par_beam_sigt = 0.075;               ! [m]
 par_beam_sige = 1.1e-4;              ! [-]
-par_beam_npart = %NPART;             ! [-]
+par_beam_npart = 2.25e11;             ! [-]
 par_beam_energy_tot = 7000;          ! [GeV]
 
 ! Settings
-par_oct_current = %OCT%;             ! [A]
-par_chromaticity = %CHROM%;          ! [-] This is the Q' 
+par_oct_current = 100;             ! [A]
+par_chromaticity = 15;          ! [-] This is the Q' 
 par_vrf_total = 16.;                 ! [MV]
 
 ! Integer tunes and tune split
@@ -58,11 +56,11 @@ par_qx0 = 62.31;
 par_qy0 = 60.32;
 
 !IP specific orbit settings 
-par_xing_ang_ip15 = %XING;           ! [urad]
+par_xing_ang_ip15 = 245;           ! [urad]
 par_on_x1 = par_xing_ang_ip15;
-par_on_sep1 = -0.75;  
+par_on_sep1 = 0;  
 par_on_x5 = par_xing_ang_ip15;
-par_on_sep5 = 0.75;  
+par_on_sep5 = 0;  
 par_on_x2 = 170;
 par_on_sep2 = 1;
 par_on_x8 = -200;
@@ -75,8 +73,8 @@ par_on_a2 = 0;
 par_on_o2 = 0;
 par_on_a8 = 0;
 par_on_o8 = 0;
-par_on_crab1 = -190;
-par_on_crab5 = -190;           
+par_on_crab1 = 0;
+par_on_crab5 = 0;           
 
 ! Dispersion correction knob
 par_on_disp = 1;
@@ -109,7 +107,7 @@ par_nho_IR2 = 11;                    ! number of slices for head-on in IR2 (betw
 par_nho_IR5 = 11;                    ! number of slices for head-on in IR5 (between 0 and 201)
 par_nho_IR8 = 11;                    ! number of slices for head-on in IR8 (between 0 and 201)
 
-par_install_crabcavities=1;
+par_install_crabcavities=0;
 
 
 !*************************!
@@ -131,7 +129,7 @@ par_nco_IP8 = 2396;
 !*************************!
 
 ! Select seed for errors
-par_myseed = %SEEDRAN;
+par_myseed = 0;
 
 ! Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
 par_correct_for_D2 = 0;
@@ -140,15 +138,15 @@ par_correct_for_MCBX = 0;
 
 par_off_all_errors = 0;
 
-par_on_errors_LHC = 1;
-par_on_errors_MBH = 1;
-par_on_errors_Q5 = 1;
-par_on_errors_Q4 = 1;
-par_on_errors_D2 = 1;
-par_on_errors_D1 = 1;
-par_on_errors_IT = 1;
-par_on_errors_MCBRD = 1;
-par_on_errors_MCBXF = 1;
+par_on_errors_LHC = 0;
+par_on_errors_MBH = 0;
+par_on_errors_Q5 = 0;
+par_on_errors_Q4 = 0;
+par_on_errors_D2 = 0;
+par_on_errors_D1 = 0;
+par_on_errors_IT = 0;
+par_on_errors_MCBRD = 0;
+par_on_errors_MCBXF = 0;
 
 
 !*************************!
@@ -165,7 +163,7 @@ call, file="optics.madx";
 call, file="modules/module_01_set_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";
-call, file="modules/module_04_install_and_correct_errors.madx";
+! call, file="modules/module_04_install_and_correct_errors.madx";
 call, file="modules/module_05_machine_tuning.madx";
 call, file="modules/module_06_make_sixtrack_input.madx";
 call, file="modules/module_07_last_twiss.madx";
