@@ -32,18 +32,18 @@ system, "ln -fns /afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/op
 
 par_verbose=1;
 
-par_mylhcbeam = %BEAM%;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
+par_mylhcbeam = 1;              ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters
-par_beam_norm_emit = %EMIT_BEAM;     ! [m]
+par_beam_norm_emit = 2.3e-6;     ! [m]
 par_beam_sigt = 0.075;               ! [m]
 par_beam_sige = 1.1e-4;              ! [-]
-par_beam_npart = %NPART;             ! [-]
+par_beam_npart = 2.25e11;             ! [-]
 par_beam_energy_tot = 7000;          ! [GeV]
 
 ! Settings
-par_oct_current = %OCT%;             ! [A]
-par_chromaticity = %CHROM%;          ! [-] This is the Q' 
+par_oct_current = 100;             ! [A]
+par_chromaticity = 15;          ! [-] This is the Q' 
 par_vrf_total = 16.;                 ! [MV]
 
 ! Integer tunes and tune split
@@ -56,7 +56,7 @@ par_qx0 = 62.31;
 par_qy0 = 60.32;
 
 !IP specific orbit settings 
-par_xing_ang_ip15 = %XING;           ! [urad]
+par_xing_ang_ip15 = 245;           ! [urad]
 par_on_x1 = par_xing_ang_ip15;
 par_on_sep1 = 0;  
 par_on_x5 = par_xing_ang_ip15;
