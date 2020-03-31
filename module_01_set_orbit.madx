@@ -26,47 +26,42 @@ nrj = par_beam_energy_tot;
 correct_for_D2 = par_correct_for_D2;
 correct_for_MCBX = par_correct_for_MCBX;
 
-on_errors_LHC = par_on_errors_LHC;
-on_errors_MBH = par_on_errors_MBH;
-on_errors_IT = par_on_errors_IT;
-on_errors_Q4 = par_on_errors_Q4;
-on_errors_Q5 = par_on_errors_Q5;
-on_errors_D1 = par_on_errors_D1;
-on_errors_D2 = par_on_errors_D2;
+on_errors_LHC   = par_on_errors_LHC;
+on_errors_MBH   = par_on_errors_MBH;
+on_errors_IT    = par_on_errors_IT;
+on_errors_Q4    = par_on_errors_Q4;
+on_errors_Q5    = par_on_errors_Q5;
+on_errors_D1    = par_on_errors_D1;
+on_errors_D2    = par_on_errors_D2;
 on_errors_MCBRD = par_on_errors_MCBRD;
 on_errors_MCBXF = par_on_errors_MCBXF;
 
 
-
-! emittance_norm := par_beam_norm_emit*1.0E-6;
 Nb_0=par_beam_npart; 
 
 ! Tunes and chromaticity
-tsplit= par_tsplit;
-qx00  = par_qx00;
-qy00  = par_qy00;
 qx0 = par_qx0;
 qy0 = par_qy0;
+qx00 = FLOOR(qx0);
+qy00 = FLOOR(qy0);
+tsplit = qx00 - qy00;
 
 qprime = par_chromaticity;
 
-on_qpp = par_on_qpp; 
-
-
 ! Beam
-gamma_rel := par_beam_energy_tot / pmass;
-epsx := par_beam_norm_emit / gamma_rel;
-epsy := par_beam_norm_emit / gamma_rel;
+gamma_rel := nrj / pmass;
+epsx := par_beam_norm_emit*1.0e-6 / gamma_rel;
+epsy := par_beam_norm_emit*1.0e-6 / gamma_rel;
 
 
 bv_aux = -1;
 if (mylhcbeam<3){
-  beam, particle=proton,sequence=lhcb1,energy=par_beam_energy_tot,
+  beam, particle=proton,sequence=lhcb1,energy=nrj,
       sigt=par_beam_sigt,bv=1,
       npart=par_beam_npart,sige=par_beam_sige,ex=epsx,ey=epsy;
   bv_aux = 1;
 };
-beam, particle=proton,sequence=lhcb2,energy=par_beam_energy_tot,
+beam, particle=proton,sequence=lhcb2,energy=nrj,
     sigt=par_beam_sigt,bv=-bv_aux,
     npart=par_beam_npart,sige=par_beam_sige,ex=epsx,ey=epsy;
 
@@ -87,31 +82,35 @@ if (par_verbose==1){
 }
 
 ! Set IP knobs
-on_x1 = par_on_x1; 
-on_sep1 = par_on_sep1;
-on_x5 = par_on_x5;
-on_sep5 = par_on_sep5;
-on_x2 = par_on_x2; 
-on_sep2 = par_on_sep2;
-on_x8 = par_on_x8;
-on_sep8 =par_on_sep8;
-on_a1 = par_on_a1;
-on_o1 = par_on_o1;           
-on_a5 = par_on_a5;
-on_o5 = par_on_o5;
-on_a2 = par_on_a2;
-on_o2 = par_on_o2;
-on_a8 = par_on_a8;
-on_o8 = par_on_o8;
-on_crab1 = par_on_crab1;
-on_crab5 = par_on_crab5;           
+on_x1 = par_x1;
+on_sep1 = par_sep1;
+on_x2 = par_x2;
+on_sep2 = par_sep2;
+on_x5 = par_x5;
+on_sep5 = par_sep5;
+on_x8 = par_x8;
+on_sep8 = par_sep8;
+on_a1 = par_a1;
+on_o1 = par_o1;
+on_a2 = par_a2;
+on_o2 = par_o2;
+on_a5 = par_a5;
+on_o5 = par_o5;
+on_a8 = par_a8;
+on_o8 = par_o8;
+on_crab1 = par_crab1;
+on_crab5 = par_crab5;           
 
 ! Set dispersion correction knob
 on_disp = par_on_disp ;
 
 ! spectrometers in experiments
-on_alice = par_on_alice;
-on_lhcb  = par_on_lhcb ;
+if (par_on_alice==1){
+  on_alice = 7000/nrj;
+};
+if (par_on_lhcb==1){
+  on_lhcb  = p7000/nrj;
+};
 
 !Avoid crabbing more than the crossing angle
 if ( abs(on_crab1)>abs(par_xing_ang_ip15) && on_crab1 <> 0) {on_crab1 = abs(on_crab1)/on_crab1 * abs(par_xing_ang_ip15);}
@@ -194,5 +193,6 @@ if (par_verbose==1){
   value, pxnom1,pxnom2,pxnom5,pxnom8;
   value, pynom1,pynom2,pynom5,pynom8;
 }
+value, bv_aux;
 
 if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
