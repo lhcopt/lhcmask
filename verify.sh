@@ -2,29 +2,46 @@
 trap "exit 1" TERM
 export TOP_PID=$$
 
-extra_files_to_copy_to_reference="main.mask main.mask.unmasked parameters_for_unmask.txt out error_all.tfs"   # all fc.* files are copied by default
+extra_files_to_copy_to_reference="main.mask main.mask.unmasked parameters_for_unmask.txt out error_all.tfs bb_lenses.dat"   # all fc.* files are copied by default
 files_to_keep_in_main="main.mask parameters_for_unmask.txt"
 
 # ===================================================================================================
 # ============================================ Functions ============================================
 # ===================================================================================================
+if [ $# -gt 0 ]
+then
+  if [ "$1" == "--force" ]
+  then
+    force_yes=true
+  else
+    echo "This script does not take arguments, except potentially the flag --force (which should be used with caution)."
+    kill -s TERM $TOP_PID
+  fi
+else
+  force_yes=false
+fi
 
 prompt(){
-  YN=""
-  while [[ $YN != "y" && $YN != "Y" && $YN != "n" && $YN != "N" ]]
-  do
-    read -p "Continue? (y/N): " YN
-    YN=${YN:-N}
-  done
-  if [ "$YN" == "y" ] || [ "$YN" == "Y" ] 
+  if [ "$force_yes" == "true" ]
   then
     return 0
-  elif [ "$YN" == "n" ] || [ "$YN" == "N" ] 
-  then
-    return 1
   else
-    echo "Error in the script verify.sh! Aborting..."
-    return 1
+    YN=""
+    while [[ $YN != "y" && $YN != "Y" && $YN != "n" && $YN != "N" ]]
+    do
+      read -p "Continue? (y/N): " YN
+      YN=${YN:-N}
+    done
+    if [ "$YN" == "y" ] || [ "$YN" == "Y" ] 
+    then
+      return 0
+    elif [ "$YN" == "n" ] || [ "$YN" == "N" ] 
+    then
+      return 1
+    else
+      echo "Error in the script verify.sh! Aborting..."
+      return 1
+    fi
   fi
 }
 
@@ -62,7 +79,9 @@ generate_mad(){
 # ===================================================================================================
 # =========================================== Main script ===========================================
 # ===================================================================================================
-
+echo "==================================================================================================="
+echo "====================================== Verify Tracking Tools ======================================"
+echo "==================================================================================================="
 echo "This script verifies whether the current state of the modules reproduces the same output for the"
 echo "example studies. If successful, it will overwrite the reference folders, rename the old reference"
 echo "folders into reference_OLD (overwriting the latter if it already exists), and clean the output."
@@ -112,12 +131,11 @@ then
       echo "No verification will hence be done for this study..."
       stop_q
     else
-      # Finally: verify the generated result for this study by comparing it to its reference results
+      # Verify the generated result for this study by comparing it to its reference results
       echo ""
       echo "Verifying study "${study%/}"..."
       echo ""
-
-      declare -a six_input_files
+      six_input_files=()
       for f in fc.*
       do
         if [ -f reference/$f ]
@@ -150,52 +168,50 @@ then
     fi
   fi
 
-  # # Make backup of old reference folder, and create new one
-  # mv reference reference_OLD
-  # mkdir reference
-  # mv fc.* reference/ 2> /dev/null
-  # for f in $( eval echo $extra_files_to_copy_to_reference )
-  # do
-  #   if [ -f $f ]
-  #   then
-  #     mv $f reference/
-  #   fi
-  # done
-  # # Delete everything except reference folders and files_to_keep_in_main
-  # find . -type l -maxdepth 1 -delete
-  # mkdir ../${study%/}_TEMP
-  # mv reference*/ ../${study%/}_TEMP
-  # cd ..
-  # rm -r $study
-  # mkdir ${study%/}
-  # cd $study
-  # mv ../${study%/}_TEMP/reference*/ ./
-  # rmdir ../${study%/}_TEMP
-  # for f in $( eval echo $files_to_keep_in_main )
-  # do
-  #   if [ -f reference/$f ]
-  #   then
-  #     cp reference/$f .
-  #   fi
-  # done
+  # Make backup of old reference folder, and create new one
+  mv reference reference_OLD
+  mkdir reference
+  mv fc.* reference/ 2> /dev/null
+  for f in $( eval echo $extra_files_to_copy_to_reference )
+  do
+    if [ -f $f ]
+    then
+      mv $f reference/
+    fi
+  done
+  # Delete everything except reference folders and files_to_keep_in_main
+  find . -type l -maxdepth 1 -delete
+  mkdir ../${study%/}_TEMP
+  mv reference*/ ../${study%/}_TEMP
+  cd ..
+  rm -r $study
+  mkdir ${study%/}
+  cd $study
+  mv ../${study%/}_TEMP/reference*/ ./
+  rmdir ../${study%/}_TEMP
+  for f in $( eval echo $files_to_keep_in_main )
+  do
+    if [ -f reference/$f ]
+    then
+      cp reference/$f .
+    fi
+  done
 
-  # touch verified
+  touch verified
   cd ..
 fi
 done
+
+rm */verified
+rm */mad_generated
 cd ..
-
-# end of loop: remove all verified mad_generated files
-
-# if ! cmp test1 test2 > /dev/null 2>&1 ; then echo "shit"; fi
-
-
-
 
 echo ""
 echo "Finished!"
 echo "All studies have been successfully verified."
 echo ""
-echo "Please check and compare the reference and reference_OLD folders."
+echo "Please check and compare the reference and reference_OLD folders (MAD-X output, errortables, ...)."
 echo "If all is fine, the reference_OLD folders can be deleted."
+echo ""
+echo "All the best in this Corona-crisis. Stay home, stay safe, stay healthy."
 

@@ -109,7 +109,7 @@ if (par_on_alice==1){
   on_alice = 7000/nrj;
 };
 if (par_on_lhcb==1){
-  on_lhcb  = p7000/nrj;
+  on_lhcb  = 7000/nrj;
 };
 
 !Avoid crabbing more than the crossing angle
