@@ -3,8 +3,7 @@
 !*************************!
 
 ! Check documentation at http://lhcmaskdoc.web.cern.ch/mainmask/
-!system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment tracking_tools";
+system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
 ! Mask code folder
 system, "ln -fns tracking_tools/modules modules";

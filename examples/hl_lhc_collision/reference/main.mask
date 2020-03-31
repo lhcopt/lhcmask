@@ -3,8 +3,7 @@
 !*************************!
 
 ! Check documentation at http://lhcmaskdoc.web.cern.ch/mainmask/
-!system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment tracking_tools";
+system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
 ! Mask code folder
 system, "ln -fns tracking_tools/modules modules";
@@ -45,7 +44,7 @@ par_beam_energy_tot      = 7000;         ! [GeV]
 
 ! Settings
 par_oct_current          = -235;         ! [A]
-par_chromaticity         = 15;            ! [-] (Q'=5 for colliding bunches, Q'=15 for non-colliding bunches)
+par_chromaticity         = 5;            ! [-] (Q'=5 for colliding bunches, Q'=15 for non-colliding bunches)
 par_vrf_total            = 16.;          ! [MV]
 
 ! Tunes
@@ -134,8 +133,8 @@ par_on_errors_Q4         = 1;
 par_on_errors_D2         = 1;
 par_on_errors_D1         = 1;
 par_on_errors_IT         = 1;
-par_on_errors_MCBRD      = 1;
-par_on_errors_MCBXF      = 1;
+par_on_errors_MCBRD      = 0;
+par_on_errors_MCBXF      = 0;
 
 
 !*************************!
@@ -146,7 +145,7 @@ par_on_errors_MCBXF      = 1;
 ! (the user can intruduce in this section additional custom code 
 ! to edit machine and/or optics)
 call, file="make_sequence.madx";
-call, file="optics.madx";    
+call, file="optics.madx";
 
 ! Call mask modules
 call, file="modules/module_01_set_orbit.madx";

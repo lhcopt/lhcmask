@@ -180,7 +180,7 @@ then
     fi
   done
   # Delete everything except reference folders and files_to_keep_in_main
-  find . -type l -maxdepth 1 -delete
+  find . -maxdepth 1 -type l -delete
   mkdir ../${study%/}_TEMP
   mv reference*/ ../${study%/}_TEMP
   cd ..
