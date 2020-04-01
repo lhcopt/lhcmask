@@ -97,12 +97,12 @@ if [ -d $study ]
 then
   cd $study
   # Check if study is already verified
-  if [ -f verified ]
+  if [ -f verified ] || [ -f ignore_verification ]
   then
     echo ""
     echo "Study "${study%/}" has been verified in a previous run of this script."
     echo "If you are sure nothing has changed since, you can skip this study by continuing."
-    if prompt
+    if [ -f ignore_verification ] || prompt
     then
       cd ..
       continue
