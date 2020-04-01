@@ -1,13 +1,6 @@
-bb_lenses.dat
 beambeam_macros
 db5
 error_table.tfs
-fc.2
-fc.3
-fc.3.aux
-fc.8
-fc.16
-fc.34
 fidel
 fre
 hl14_collisions_unmask.mask
@@ -82,7 +75,6 @@ examples/machine_analysis/twiss_crossing_disable.b2
 examples/machine_analysis/twiss_crossing_enable.b1
 examples/machine_analysis/twiss_crossing_enable.b2
 examples/hl_lhc_collision/last_twiss_temp
-examples/hl_lhc_collision/reference/out
 examples/hl_lhc_collision/reference/temp/MB_corr_setting.mad
 examples/hl_lhc_collision/reference/temp/MB.errors
 examples/hl_lhc_collision/reference/temp/MCX_setting.mad
@@ -115,7 +107,6 @@ examples/hl_lhc_injection/temp/sliceho.res
 examples/hl_lhc_injection/temp/surveyaux.tfs
 examples/hl_lhc_injection/temp/twiss.tfs
 examples/hl_lhc_injection/error_all.tfs
-examples/hl_lhc_injection/reference/out
 examples/hl_lhc_injection/reference/twiss_bpm_unperturbed.tfs
 examples/hl_lhc_injection/reference/temp/MB_corr_setting.mad
 examples/hl_lhc_injection/reference/temp/MB.errors
