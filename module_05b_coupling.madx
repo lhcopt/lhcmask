@@ -1,0 +1,13 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 5b: coupling";
+print, text="  --------------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!   Fine tuning of coupling after CO correction and with Xscheme
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+call,file="tools/FineCouplingCorrectionSimplex.madx";
