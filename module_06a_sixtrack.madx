@@ -1,0 +1,17 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 6a: sixtrack";
+print, text="  --------------------------";
+print, text="";
+print, text="";
+
+
+
+twiss, chrom;
+!sixtrack,cavall, mult_auto_off,radius=0.017;
+sixtrack,cavall, radius=0.017;
+if( ON_BB_SWITCH == 1){
+  !Fix bb lenses in sixtrack input
+  exec, SIXTRACK_INPUT_BB_LENSES;
+}
+

@@ -1,0 +1,54 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1c: phase";
+print, text="  -----------------------";
+print, text="";
+print, text="";
+
+
+
+if (par_verbose==1){
+  if (mylhcbeam==1){
+    exec, check_ip(b1);
+  } else {
+    exec, check_ip(b2);
+  };
+  mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+  muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+
+  value, mux_ip15_ref, muy_ip15_ref;
+};
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!   Rematch IP1 IP5 phase
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+! nominal round: mux_ip15 = 31.21038468 ; muy_ip15 = 30.37288037 ;
+! nominal injection: mux_ip15 = 31.19538482 ; muy_ip15 = 30.36788031 ;
+! nominal collision: mux_ip15 = 31.3059319612901 ; muy_ip15 = 30.3703668748639 ;
+
+!mux_ip15 = %MUX%;
+!muy_ip15 = %MUY%;
+
+
+!if (mylhcbeam<3){
+!  call,file="slhc/toolkit/make_ip15phase.madx";
+!} else {
+!  call,file="slhc/toolkit/make_ip15phase_b4.madx";
+!};
+!call,file=slhc/toolkit/make_ip15phase_tm.madx; ! use phase-trombone instead
+!call,file=slhc/toolkit/delete_ip15phase_tm.madx; ! remove phase trombone
+
+! test new optics
+!if (mylhcbeam==1){
+! exec,check_ip(b1);
+!} else {
+!  exec,check_ip(b2);
+!};
+!if (mylhcbeam<3){
+!  mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+!  muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+!} else {
+!  mux_ip15_ref=table(twiss,IP5,mux)-table(twiss,IP1,mux);
+!  muy_ip15_ref=table(twiss,IP5,muy)-table(twiss,IP1,muy);
+!};
+!value,mux_ip15_ref,muy_ip15_ref;

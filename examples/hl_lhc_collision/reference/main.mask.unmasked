@@ -34,7 +34,7 @@ system, "ln -fns machines/optics/hl14_collision.madx optics.madx";
 
 par_verbose              = 1;
 
-par_mylhcbeam            = 1;            ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
+mylhcbeam                = 1;            ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 ! Beam parameters
 par_beam_norm_emit       = 2.5;   ! [um]
@@ -149,12 +149,11 @@ call, file="make_sequence.madx";
 call, file="optics.madx";
 
 ! Call mask modules
-call, file="modules/module_01_set_orbit.madx";
+call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";
-call, file="modules/module_04_install_and_correct_errors.madx";
-call, file="modules/module_05_machine_tuning.madx";
-call, file="modules/module_06_make_sixtrack_input.madx";
-call, file="modules/module_07_last_twiss.madx";
+call, file="modules/module_04_errors.madx";
+call, file="modules/module_05_tuning.madx";
+call, file="modules/module_06_generate.madx";
 
 stop;

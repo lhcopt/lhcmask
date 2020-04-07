@@ -202,8 +202,8 @@ then
 fi
 done
 
-rm */verified
-rm */mad_generated
+rm */verified > /dev/null 2>&1
+rm */mad_generated > /dev/null 2>&1
 cd ..
 
 echo ""

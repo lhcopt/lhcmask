@@ -1,0 +1,14 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1f: use";
+print, text="  ---------------------";
+print, text="";
+print, text="";
+
+
+
+if (mylhcbeam==1) {
+	use, sequence=lhcb1;
+} else {
+	use, sequence=lhcb2;
+};

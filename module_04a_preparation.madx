@@ -1,0 +1,108 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 4b: errortables";
+print, text="  -----------------------------";
+print, text="";
+print, text="";
+
+
+
+on_disp = 0;
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!         Call error macros
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+! Error routine and measured error table for nominal LHC
+call, file="errors/LHC/Msubroutines.madx";
+call, file="errors/LHC/Msubroutines_MS_MSS_MO.madx";
+call, file="tools/Orbit_Routines.madx";
+if (ver_lhc_run > 0)      { call, file="tools/SelectLHCMonCor_v1.madx"; };
+if (ver_hllhc_optics > 0) { call, file="tools/SelectLHCMonCor_v2.madx"; };
+
+if (ver_hllhc_optics < 1.3) {
+  call, file="errors/HL-LHC/macro_error_v1.madx";   ! macros for error generation in the new IT/D1's
+};
+if (ver_hllhc_optics > 1.2) {
+  call, file="errors/HL-LHC/macro_error_v3.madx";   ! macros for error generation in the new IT/D1's
+};
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                Switch ON/OFF some multipole
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+exec, ON_ALL_MULT;
+ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
+ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
+ON_A3s =  1 ; ON_A3r =  1 ; ON_B3s =  1 ; ON_B3r =  1 ;
+ON_A4s =  1 ; ON_A4r =  1 ; ON_B4s =  1 ; ON_B4r =  1 ;
+ON_A5s =  1 ; ON_A5r =  1 ; ON_B5s =  1 ; ON_B5r =  1 ;
+ON_A6s =  1 ; ON_A6r =  1 ; ON_B6s =  1 ; ON_B6r =  1 ;
+ON_A7s =  1 ; ON_A7r =  1 ; ON_B7s =  1 ; ON_B7r =  1 ;
+ON_A8s =  1 ; ON_A8r =  1 ; ON_B8s =  1 ; ON_B8r =  1 ;
+ON_A9s =  1 ; ON_A9r =  1 ; ON_B9s =  1 ; ON_B9r =  1 ;
+ON_A10s = 1 ; ON_A10r = 1 ; ON_B10s = 1 ; ON_B10r = 1 ;
+ON_A11s = 1 ; ON_A11r = 1 ; ON_B11s = 1 ; ON_B11r = 1 ;
+ON_A12s = 1 ; ON_A12r = 1 ; ON_B12s = 1 ; ON_B12r = 1 ;
+ON_A13s = 1 ; ON_A13r = 1 ; ON_B13s = 1 ; ON_B13r = 1 ;
+ON_A14s = 1 ; ON_A14r = 1 ; ON_B14s = 1 ; ON_B14r = 1 ;
+ON_A15s = 1 ; ON_A15r = 1 ; ON_B15s = 1 ; ON_B15r = 1 ;
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!               Prepare nominal twiss tables
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+twiss, table=nominal;   // used by orbit correction
+beta.ip1=table(twiss,IP1,betx);value,beta.ip1;
+
+! print nominal optics parameter at the MB, MQS and MSS for
+! b2, b3, b4, b5, a2 and a3 correction
+select, flag=twiss, clear;
+select, flag=twiss,pattern=MB\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MBH\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.14,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.15,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.16,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.17,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.18,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.19,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.20,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.21,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MQS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MSS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MCO                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MCD                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MCS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+twiss,  file='temp/optics0_MB.mad';
+
+! print nominal optics parameter at the D1, MQX and triplet corrector
+! for triplet correction
+select, flag=twiss, clear;
+select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
+if (correct_for_D2==1){
+  select, flag=twiss, pattern=MBRD , class=multipole, column=name,betx,bety,x,y;
+};
+select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCQSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCDX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCDSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCTSX                 , column=name,betx,bety,x,y;
+if (correct_for_MCBX==1){
+  select, flag=twiss, pattern=MCBXF, class=multipole, column=name,betx,bety,x,y;
+};
+twiss,  file='temp/optics0_inser.mad';
+
+! disable crossing bumps
+exec, crossing_disable;

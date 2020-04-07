@@ -1,0 +1,13 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 5c: limit";
+print, text="  -----------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                 Limit corrector strength
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+call, file="errors/HL-LHC/corr_limit.madx";

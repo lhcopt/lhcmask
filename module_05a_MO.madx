@@ -1,0 +1,38 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 5a: MO";
+print, text="  --------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! MO settings
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+I_MO = par_oct_current;
+
+brho:=NRJ*1e9/clight;
+if (mylhcbeam==1){
+  KOF.A12B1:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A23B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOF.A34B1:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A45B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOF.A56B1:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A67B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOF.A78B1:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A81B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A12B1:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A23B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A34B1:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A45B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A56B1:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A67B1:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A78B1:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A81B1:=Kmax_MO*I_MO/Imax_MO/brho;
+};
+
+if (mylhcbeam>1){
+  KOF.A12B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A23B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOF.A34B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A45B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOF.A56B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A67B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOF.A78B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A81B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A12B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A23B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A34B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A45B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A56B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A67B2:=Kmax_MO*I_MO/Imax_MO/brho;
+  KOD.A78B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A81B2:=Kmax_MO*I_MO/Imax_MO/brho;
+};
+
