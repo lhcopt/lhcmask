@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.04.08 10:10:19      +
+  + Execution date: 2020.04.08 14:19:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !*************************!
 
@@ -17,7 +17,7 @@
 
 !system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment tracking_tools";
+system, "ln -fns /afs/cern.ch/user/f/fvanderv/work/projects/MaskDevelopment tracking_tools";
 
 
 
@@ -802,7 +802,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.10.38"
+@ TIME             %08s "14.20.05"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 0.149996302527279 0.15000000000046 1.17760891579066e-05 -1.07049057070886e-10 -2.99888660386826e-07 1.94790446703831e-07 14.9811594801404 14.5385899354396
@@ -909,7 +909,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.10.41"
+@ TIME             %08s "14.20.09"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 0.150002007841804 0.149999999999131 2.67109227695354e-05 2.66751256571773e-11 2.28645938476521e-08 -1.77181171587336e-06 15.188943262805 14.444160457993
@@ -1022,7 +1022,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.10.45"
+@ TIME             %08s "14.20.12"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 -2.1330670117939e-08 4.02926164753004e-09 4.37244344607397e-08 0.000250083896041488
@@ -1135,7 +1135,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.10.48"
+@ TIME             %08s "14.20.15"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 2.64252217541337e-08 6.9929932404629e-09 -1.40695825349679e-07 -0.000250090747703299
@@ -1545,7 +1545,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.11.06"
+@ TIME             %08s "14.20.33"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  7622.47612223701 18877.5724146387 -27.9633991651762 -123.74560690561 14.7313590766041 14.2885165243712 -5.69738059307037e-12 -0.0131487077437351 -2.46574432543137e-14 -0.000180335335365814
@@ -1703,7 +1703,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.11.08"
+@ TIME             %08s "14.20.35"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  18877.3193261693 7622.28800741496 -123.74397456739 -27.9626973432705 14.9388741020126 14.1943581853563 3.2572028234731e-11 0.00831615144711999 2.15716724419882e-13 0.000110634872470403
@@ -1861,7 +1861,7 @@ nflips
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "08/04/20"
-@ TIME             %08s "10.11.09"
+@ TIME             %08s "14.20.37"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.5000327563 "BB_HO.L5B1_5"      0.181189082649196 0.181190400417746 0.456023012204678 0.455999998312642 14.913066694854 14.4704983082809 -1.38499138679552e-13 -1.70999999147774e-05 1.67442849047862e-13 0.000250000000497881
