@@ -67,11 +67,6 @@ if( ON_BB_SWITCH == 1){
 
   ON_BB_CHARGE := 0; !Switch off the charge the bb lenses
 
-  !Install Crab Cavities for the weak beam
-  if (par_install_crabcavities==1){
-     call, file="tools/enable_crabcavities.madx";
-  }
-
   if (mylhcbeam<3){
     use, sequence=lhcb1;
     select,flag=twiss,clear;
