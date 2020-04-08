@@ -14,5 +14,5 @@ print, text="";
 !print, text="========================================";
 !call, file="tools/get_optics_params.madx";
 
-call, file="modules/module_06a_sixtrack.madx";
-call, file="modules/module_06b_lasttwiss.madx";
+call, file="modules/submodule_06a_sixtrack.madx";
+call, file="modules/submodule_06b_lasttwiss.madx";
