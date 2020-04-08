@@ -1,0 +1,32 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 4b: align sep";
+print, text="  ---------------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                   Align separation magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+call, file="tools/align_sepdip.madx";
+if (ver_lhc_run > 0) {
+  exec,align_mbxw;  ! V6.503  D1
+  exec,align_mbrc15;! V6.503 D2 in IR15
+};
+if (ver_hllhc_optics > 0) {
+  exec, align_mbx15; ! HL-LHC D1
+  exec, align_mbrd15;! HL-LHC D2 in IR15
+};
+exec, align_mbx28; ! V6.503 D1 in IR28
+exec, align_mbrc28;! V6.503 D2 in IR28
+exec, align_mbrs;  ! V6.503 D3 in IR4
+exec, align_mbrb;  ! V6.503 D4 in IR4
+if (ver_hllhc_optics > 0 && ver_hllhc_optics < 1.3) {
+  call, file="tools/align_mbh_v1.madx"; ! align 11T dipoles
+};
+if (ver_lhc_run > 2 || ver_hllhc_optics > 1.2) {
+  call, file="tools/align_mbh_v2.madx"; ! align 11T dipoles
+};

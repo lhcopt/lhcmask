@@ -1,0 +1,13 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 5e: corrvalue";
+print, text="  ---------------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                 Show corrector strength
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+call, file="errors/HL-LHC/corr_value_limit.madx";

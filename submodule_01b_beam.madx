@@ -1,0 +1,23 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1b: beam";
+print, text="  ----------------------";
+print, text="";
+print, text="";
+
+
+
+bv_aux = -1;							! bv_aux automatically set by machine  => is this for backward compatibility with LHC?
+if (mylhcbeam<3){
+  beam, particle=proton,sequence=lhcb1,energy=nrj,
+      sigt=par_beam_sigt,bv=1,
+      npart=par_beam_npart,sige=par_beam_sige,ex=epsx,ey=epsy;
+  bv_aux = 1;							! bv_aux automatically set by machine  => is this for backward compatibility with LHC?
+};
+beam, particle=proton,sequence=lhcb2,energy=nrj,
+    sigt=par_beam_sigt,bv=-bv_aux,
+    npart=par_beam_npart,sige=par_beam_sige,ex=epsx,ey=epsy;
+
+
+! set the options for the format
+exec, twiss_opt;

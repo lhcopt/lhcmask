@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.03.31 22:32:37      +
+  + Execution date: 2020.04.08 14:28:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !*************************!
 
@@ -17,7 +17,7 @@
 
 !system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
-system, "ln -fns /afs/cern.ch/work/f/fvanderv/projects/MaskDevelopment tracking_tools";
+system, "ln -fns /afs/cern.ch/user/f/fvanderv/work/projects/MaskDevelopment tracking_tools";
 
 
 
@@ -77,7 +77,7 @@ par_verbose              = 1;
 
 
 
-par_mylhcbeam            = 1;            ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
+mylhcbeam                = 1;            ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
 
 
 
@@ -612,8 +612,26 @@ installing mcbrdv.4r5..r
 
 
 ++++++++++++++++++++++++++++
-++ START MODULE 1: OPTICS ++
+++ START MODULE 1: ORBIT +++
 ++++++++++++++++++++++++++++
+
+
+
+
+  --- Submodule 1a: preparation
+  -----------------------------
+
+
+
+
+  --- Submodule 1b: beam
+  ----------------------
+
+
+
+
+  --- Submodule 1c: phase
+  -----------------------
 
 
 enter Twiss module
@@ -673,6 +691,18 @@ refpxip8b1         = 0 ;
 refpyip8b1         = 0 ;
 mux_ip15_ref       = 31.3144970736521 ;
 muy_ip15_ref       = 30.351055953112 ;
+
+
+  --- Submodule 1d: crossing
+  --------------------------
+
+
+
+
+  --- Submodule 1e: test
+  ----------------------
+
+
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -771,8 +801,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.32.57"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.00"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 5.9999999999299 6.00000000016667 -3.46785866254675e-11 6.24724433248691e-13 2.44182783689259e-12 7.28992083877181e-13 15.0947908845532 14.5350080164374
@@ -878,8 +908,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.33.01"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.03"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 5.99999999999238 5.9999999999861 3.84694513380016e-12 1.10672992022741e-11 1.72601880901248e-12 -2.59828251247421e-13 15.1361075944395 14.5331331610362
@@ -985,8 +1015,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.33.05"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.06"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 -2.36917690327187e-14 -0.0020000000000053 0.000295000000002541 1.54415461537175e-15
@@ -1092,8 +1122,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.33.09"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.10"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 2.06865774510234e-16 0.0019999999999988 -0.000294999999999558 2.78343496797236e-17
@@ -1117,7 +1147,12 @@ pynom1             = 0.000295000000002334 ;
 pynom2             = 0.000918879419877505 ;
 pynom5             = 1.54415461537175e-15 ;
 pynom8             = -1.18485476801258e-05 ;
-bv_aux             = 1 ;
+
+
+  --- Submodule 1f: use
+  ---------------------
+
+
 
 
 +++++++++++++++++++++++++++++++
@@ -1340,8 +1375,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.33.21"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.21"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  232.153020277272 444.406052556844 0.119860761260466 -3.3707902078837 14.8543352658883 14.2816474114887 -0.00857809245913566 -3.46364889040755e-06 -0.000114116773004005 -3.76781559893939e-08
@@ -1498,8 +1533,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.33.22"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.23"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  444.406052614694 232.153020268533 -3.37079020839617 0.119860761247721 14.8827469895083 14.2926775423806 0.0129416840752552 0.00112153690567632 0.000177491703724107 1.27012873190295e-05
@@ -1656,8 +1691,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "31/03/20"
-@ TIME             %08s "22.33.24"
+@ DATE             %08s "08/04/20"
+@ TIME             %08s "14.29.24"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.4982327563 "BB_HO.L5B1_5"      6.00082134084755 6.0008213405002 0.0116999999906241 0.0116999998991201 15.0929288566673 14.5331459885635 -2.07090007591299e-05 -0.001999999999883 0.000295000000066424 6.21022902529556e-14
@@ -1717,6 +1752,12 @@ $ %le %s                 %le %le %le %le %le %le %le %le %le %le
 ++++++++++++++++++++++++++++
 ++ START MODULE 4: ERRORS ++
 ++++++++++++++++++++++++++++
+
+
+
+
+  --- Submodule 4a: preparation
+  -----------------------------
 
 
 enter Twiss module
@@ -1801,33 +1842,12 @@ synch_2 synch_3 synch_4 synch_5
 
 nflips 
 0 
-enter Twiss module
-  
-iteration:   1 error:   4.832862E-12 deltap:   0.000000E+00
-orbit:  -3.818791E-12  6.865030E-14 -2.241648E-13 -1.348262E-14  0.000000E+00  0.000000E+00
 
-++++++ table: summ
 
-length orbit5 alfa gammatr 
-26658.883199996 -0 0.000347435191273424 53.6491810961875 
+  --- Submodule 4b: align sep
+  ---------------------------
 
-q1 dq1 betxmax dxmax 
-62.3100004654651 1.96663307893808 625.669861687013 2.76919712370106 
 
-dxrms xcomax xcorms q2 
-1.42918169056869 0.0165165358664718 0.00210865766059168 60.3200004610188 
-
-dq2 betymax dymax dyrms 
-2.0070433574075 693.674864027818 0.404272191426251 0.130057171180646 
-
-ycomax ycorms deltap synch_1 
-0.0165165442433623 0.00210687329922105 0 0 
-
-synch_2 synch_3 synch_4 synch_5 
-0 0 0 0 
-
-nflips 
-0 
 Running survey for aligment calculations...
 mbrc_mech_sep      = 188 ;
 mbrd_mech_sep      = 186 ;
@@ -2182,6 +2202,18 @@ sx_mbrb.5r4.b1..4  = 127.463915094564 ;
 dx_mbrb.5r4.b1..4  = 1.36495700533978e-07 ;
 stest              = 0 ;
 Running survey for alignment calculations...
+
+
+  --- Submodule 4c: errortables
+  -----------------------------
+
+
+
+
+  --- Submodule 4d: efcomp
+  ------------------------
+
+
 nip                = 1 ;
 nip                = 2 ;
 nip                = 3 ;
@@ -2649,6 +2681,12 @@ val_bety2          = 10.004731049737 ;
 val_bety5          = 6.05131170486993 ;
 val_bety8          = 9.92060816557306 ;
 val_betymax        = 693.242730030505 ;
+
+
+  --- Submodule 4e: correction
+  ----------------------------
+
+
  Energy is   450.00000000000000      GeV
  ******Sector******            1           2
  308         MB   slices in sector  1
@@ -2719,6 +2757,12 @@ val_betymax        = 693.242730030505 ;
  a3res           1   1.1102230246251565E-016
  a2res           2   0.0000000000000000     
  a3res           2  -3.3306690738754696E-016
+
+
+  --- Submodule 4f: final
+  -----------------------
+
+
 ==================================================
 ======  OPTICS PARAMETERS: BEFORE MATCHING  ======
 ==================================================
@@ -2793,6 +2837,18 @@ val_betymax        = 693.217360554337 ;
 ++++++++++++++++++++++++++++
 ++ START MODULE 5: TUNING ++
 ++++++++++++++++++++++++++++
+
+
+
+
+  --- Submodule 5a: MO
+  --------------------
+
+
+
+
+  --- Submodule 5b: coupling
+  --------------------------
 
 
 START MATCHING
@@ -3255,6 +3311,12 @@ closest1           = 4.26413430005823e-05 ;
 closest2           = 4.26989919120047e-05 ;
 cmrskew            = -0.00246647485628472 ;
 cmiskew            = 2.67571633069142e-06 ;
+
+
+  --- Submodule 5c: limit
+  -----------------------
+
+
 nrj                = 450 ;
 ***********************************************
 ******** Limiting triplet correctors **********
@@ -3276,6 +3338,12 @@ kcd.a56b1:   -6.428571% (WARNING: limited strength to kmcdmax; desired strength 
 kcd.a67b1:   -6.428571% (WARNING: limited strength to kmcdmax; desired strength is -27.204655%)
 kcd.a78b1:   -6.428571% (WARNING: limited strength to kmcdmax; desired strength is -36.575487%)
 kcd.a81b1:   -6.428571% (WARNING: limited strength to kmcdmax; desired strength is -28.406091%)
+
+
+  --- Submodule 5d: matching
+  --------------------------
+
+
 START MATCHING
 
 number of sequences: 1
@@ -3851,6 +3919,12 @@ kqtd                      2.24822e-04  2.24821e-04 -1.00000e+20  1.00000e+20
 END MATCH SUMMARY
 
 VARIABLE "TAR" SET TO   2.52550146e-15
+
+
+  --- Submodule 5e: corrvalue
+  ---------------------------
+
+
 nrj                = 450 ;
 ************************************
 ********Triplet correctors**********
@@ -4120,14 +4194,23 @@ kod.a78b1/kmomax*100. = -7.76917449047586 ;
 kod.a81b1/kmomax*100. = -7.76917449047586 ;
 
 
+  --- Submodule 5f: RF
+  --------------------
+
+
+
+
 ++++++++++++++++++++++++++++++
-++ START MODULE 6: SIXTRACK ++
+++ START MODULE 6: GENERATE ++
 ++++++++++++++++++++++++++++++
 
 
-========================================
-======  OPTICS PARAMETERS: FINAL  ======
-========================================
+
+
+  --- Submodule 6a: sixtrack
+  --------------------------
+
+
 enter Twiss module
   
 iteration:   1 error:   4.263943E-05 deltap:   1.000000E-06
@@ -4178,6 +4261,12 @@ c6t terminated - total number of elements: 24019
                  alignment errors   MAD-X: 88
                 alignment errors SixTrack: 88
                           sequence length: 26658.883200 [m]
+
+
+  --- Submodule 6b: lasttwiss
+  ---------------------------
+
+
 enter Twiss module
   
 iteration:   1 error:   4.254996E-05 deltap:   0.000000E+00

@@ -1,0 +1,31 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 4f: final";
+print, text="  -----------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!    correct orbit distortion resulting from other magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
+  exec, initial_micado(4);
+  exec, initial_micado(4);
+  exec, initial_micado(4);
+  exec, initial_micado(4);
+};
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!    final orbit correction before applying crossing scheme
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
+  exec, final_micado(0.004);
+};
+
+! end of orbit correction, now switch ON crossing scheme
+! restoring crossing angle
+exec, crossing_restore;
+
+! coguess,x=x.ip1,px=px.ip1,y=y.ip1,py=py.ip1;
