@@ -1,6 +1,6 @@
 print, text="";
 print, text="";
-print, text="  --- Submodule 1e: test";
+print, text="  --- Submodule 1e: store";
 print, text="  ----------------------";
 print, text="";
 print, text="";
@@ -8,7 +8,7 @@ print, text="";
 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
-!                        TEST the optics
+!                        STORE the optics
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
 
 exec, crossing_disable;
@@ -35,7 +35,6 @@ if (par_verbose==1){
   twiss, sequence=lhcb2, file=twiss_crossing_disable.b2;
   twiss, sequence=lhcb2, table=twisscrossingdisableb2; ! handle for further analysis
   system, "cat twiss_crossing_disable.b2";
-
 };
 
 ! Switch on the crossing scheme
@@ -54,11 +53,6 @@ if (par_verbose==1){
     system, "cat twiss_crossing_enable.b1";
   };
 
-  xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
-  xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
-  xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
-  xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
-
   use, sequence=lhcb2;
   select, flag=twiss,clear;
   select, flag=twiss, pattern="IP1", column=name,s,x,y,px,py;
@@ -68,9 +62,19 @@ if (par_verbose==1){
   twiss, sequence=lhcb2, file=twiss_crossing_enable.b2;
   twiss, sequence=lhcb2, table=twisscrossingenableb2;  ! handle for further analysis
   system, "cat twiss_crossing_enable.b2";
-
-  value, xnom1,xnom2,xnom5,xnom8;
-  value, ynom1,ynom2,ynom5,ynom8;
-  value, pxnom1,pxnom2,pxnom5,pxnom8;
-  value, pynom1,pynom2,pynom5,pynom8;
 };
+
+on_disp=0; !more precise angles at IPs
+
+!Record the nominal IP position and crossing angle
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+twiss;
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+value,xnom1,xnom2,xnom5,xnom8;
+value,ynom1,ynom2,ynom5,ynom8;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+value,pynom1,pynom2,pynom5,pynom8;
