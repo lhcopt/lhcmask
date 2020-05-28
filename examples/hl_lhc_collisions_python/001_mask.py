@@ -34,15 +34,35 @@ mad.set_variables_from_dict(params=parameters)
 mad.call("modules/submodule_01a_preparation.madx")
 mad.call("modules/submodule_01b_beam.madx")
 
-var_dict = mad.get_variables_dict()
-sequence_to_check  = 'lhcb1'
-mad.use(sequence_to_check)
-mad.twiss()
-twiss_df = mad.get_table_df('twiss')
-pmt.check_twiss_value(twiss_df, element_name='ip1:1',
-        keyword='betx', target=15e-2, tol=1e-3)
-prrr
+var_dict = mad.get_variables_dicts()
 
+import optics_specific_tools as ost
+sequences_to_check = ['lhcb1', 'lhcb2']
+twiss_fname = 'twiss_from_optics'
+twiss_dfs = {}
+for ss in sequences_to_check:
+    mad.use(ss)
+    mad.twiss()
+    tdf = mad.get_table_df('twiss')
+    twiss_dfs[ss] = tdf
+
+for ss in sequences_to_check:
+    tt = twiss_dfs[ss]
+    if twiss_fname is not None:
+        tt.to_parquet(twiss_fname + f'_{ss}.parquet')
+
+
+for ss in sequences_to_check:
+    tt = twiss_dfs[ss]
+    ost.check_beta_at_ips_against_knobs(beam=ss[-1],
+            twiss_df=tt,
+            variable_dicts=var_dict,
+            tol=1e-3)
+print('IP beta test against knobs passed!')
+
+
+
+prrr
 
 mad.call("modules/submodule_01c_phase.madx")
 

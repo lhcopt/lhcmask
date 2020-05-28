@@ -14,4 +14,15 @@ def checks_on_parameter_dict(params):
     print('Checks on paramter dict passed!')
 
 def check_twiss_value(twiss_df, element_name, keyword, target, tol):
-    assert abs(twiss_df.loc[element_name][keyword] - target) < tol
+    assert (abs(twiss_df.loc[element_name][keyword] - target) < tol,
+                f'Check not passes on {keyword} at {element_name}')
+
+def check_twiss_against_knobs(checks, twiss_df, variable_dicts):
+    for cc in checks:
+        check_twiss_value(twiss_df,
+            element_name=cc['element_name'],
+            keyword=cc['keyword'],
+            target=variable_dicts['independent_variables'][cc['knob']],
+            tol=cc['tol'])
+
+

@@ -132,15 +132,25 @@ class Madxp(Madx):
         else:
             return pd.DataFrame()
 
-    def get_variables_dict(self):
+    def get_variables_dicts(self, expressions_as_str=True):
+        variables_df = self.get_variables_dataframes()
+        outp = {
+            'constants': variables_df['constants'].to_dict()['value'],
+            'independent_variables':
+                variables_df['independent_variables'].to_dict()['value'],
+            'dependent_variables':
+                variables_df['dependent_variables'].to_dict()['expression']}
+        return outp
+
+    def get_variables_dataframes(self, expressions_as_str=True):
         '''
         Extract the dictionary of the variables and constant pandas DF of the MAD-X global workspace.
 
         Returns:
             The a dictionary containing:
-            - constant_df: the pandas DF with the constants
-            - independent_variable_df: the pandas DF with the independent variables
-            - dependent_variable_df: the pandas DF with the dependent variables
+            - constants_df: the pandas DF with the constants
+            - independent_variables: the pandas DF with the independent variables
+            - dependent_variables: the pandas DF with the dependent variables
         All the three DFs have a columns 'value' with the numerical values of the costants/variables.
         The dependent_variable_df, in addition to 'value' has the following columns:
             - 'expression': the string corrensponding to the MAD-X expression
@@ -156,10 +166,14 @@ class Madxp(Madx):
         del independent_variables_df['constant']
         constant_df=aux[aux['constant']].copy()
         del constant_df['constant']
-        my_dict['constant_df']=constant_df
-        my_dict['independent_variable_df']=independent_variables_df
-        my_dict['dependent_variable_df']=self._dependent_variables_df()
+        my_dict['constants']=constant_df
+        my_dict['independent_variables']=independent_variables_df
+        my_dict['dependent_variables']=self._dependent_variables_df()
 
+        if expressions_as_str:
+            my_dict['dependent_variables']['expression'] = (
+                     my_dict['dependent_variables']['expression'].apply(
+                         str))
         return my_dict
 
     def _dependent_variables_df(self):
