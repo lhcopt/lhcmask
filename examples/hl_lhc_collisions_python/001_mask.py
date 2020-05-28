@@ -8,6 +8,7 @@ import pymasktools as pmt
 import optics_specific_tools as ost
 
 beam_to_configure = 1
+save_intermediate_twiss = True
 sequences_to_check = ['lhcb1', 'lhcb2']
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
@@ -31,11 +32,9 @@ mad.call('hl14_thin.madx')
 # Make optics (to become python function)
 mad.call('hl14_collision_optics.madx')
 
-# Load parameters 
+# Check and load parameters 
 from parameters import parameters
 pmt.checks_on_parameter_dict(parameters)
-
-
 mad.set_variables_from_dict(params=parameters)
 
 # Prepare sequences and attach beam
@@ -45,10 +44,11 @@ mad.call("modules/submodule_01b_beam.madx")
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
-        twiss_fname='twiss_from_optics',save_twiss_files= True,
+        twiss_fname='twiss_from_optics',
+        save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=True, check_separations_at_ips=True)
 
-# Set phase and apply/save crossing
+# Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
 mad.call("modules/submodule_01d_crossing.madx")
 
@@ -56,7 +56,8 @@ mad.call("modules/submodule_01d_crossing.madx")
 mad.input('exec, crossing_disable')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
-        twiss_fname='twiss_no_crossing', save_twiss_files= True,
+        twiss_fname='twiss_no_crossing',
+        save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=True, check_separations_at_ips=True)
 # Check flatness
 flat_tol = 1e-6
@@ -69,11 +70,14 @@ for ss in twiss_dfs.keys():
 mad.input('exec, crossing_restore')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
-        twiss_fname='twiss_with_crossing', save_twiss_files= True,
+        twiss_fname='twiss_with_crossing',
+        save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=True, check_separations_at_ips=True)
 
-#mad.call("modules/module_02_lumilevel.madx")
-#mad.call("modules/module_03_beambeam.madx")
-#mad.call("modules/module_04_errors.madx")
-#mad.call("modules/module_05_tuning.madx")
-#mad.call("modules/module_06_generate.madx")
+# Call other modules
+mad.use(f'lhcb{beam_to_configure}')
+mad.call("modules/module_02_lumilevel.madx")
+mad.call("modules/module_03_beambeam.madx")
+mad.call("modules/module_04_errors.madx")
+mad.call("modules/module_05_tuning.madx")
+mad.call("modules/module_06_generate.madx")
