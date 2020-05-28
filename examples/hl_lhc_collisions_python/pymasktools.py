@@ -36,6 +36,6 @@ def check_separation_value(twiss_df_b1, twiss_df_b2, element_name,
 def check_separations_against_madvars(checks, twiss_df_b1, twiss_df_b2, variables_dict):
     for cc in checks:
         tol = cc['tol']
-        target = variables_dict['all_variables_val'][cc['varname']]
+        target = variables_dict['all_variables_val'][cc['varname']]*cc['scale_factor']
         check_separation_value(twiss_df_b1, twiss_df_b2, cc['element_name'],
                 cc['plane'], target, cc['tol'])
