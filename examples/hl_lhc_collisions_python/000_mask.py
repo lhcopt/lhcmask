@@ -2,11 +2,15 @@ import os
 
 #from cpymad.madx import Madx
 from madxp import Madxp as Madx
+from tools import make_links
 
-os.system('rm tracking_tools errors')
+make_links(force=True, links_dict={
+    'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
+    'modules': 'tracking_tools/modules',
+    'tools': 'tracking_tools/tools',
+    'beambeam_macros': 'tracking_tools/beambeam_macros',
+    'errors': 'tracking_tools/errors'})
 
-os.symlink('/afs/cern.ch/eng/tracking-tools', 'tracking_tools')
-os.symlink('tracking_tools/errors', 'errors')
 
 mad = Madx()
 
