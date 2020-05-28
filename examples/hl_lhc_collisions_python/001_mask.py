@@ -3,6 +3,7 @@ import os
 #from cpymad.madx import Madx
 from madxp import Madxp as Madx
 import pymasktools as pmt
+import optics_specific_tools as ost
 
 beam_to_configure = 1
 
@@ -30,43 +31,17 @@ pmt.checks_on_parameter_dict(parameters)
 
 mad.set_variables_from_dict(params=parameters)
 
-# Call mask modules
+# Prepare sequences and attach beam
 mad.call("modules/submodule_01a_preparation.madx")
 mad.call("modules/submodule_01b_beam.madx")
 
-var_dict = mad.get_variables_dicts()
-
-import optics_specific_tools as ost
-sequences_to_check = ['lhcb1', 'lhcb2']
-twiss_fname = 'twiss_from_optics'
-twiss_dfs = {}
-for ss in sequences_to_check:
-    mad.use(ss)
-    mad.twiss()
-    tdf = mad.get_table_df('twiss')
-    twiss_dfs[ss] = tdf
-
-for ss in sequences_to_check:
-    tt = twiss_dfs[ss]
-    if twiss_fname is not None:
-        tt.to_parquet(twiss_fname + f'_{ss}.parquet')
+# Test machine before any change
+ost.twiss_and_check(mad, sequences_to_check=['lhcb1', 'lhcb2'],
+        twiss_fname='twiss_from_optics',
+        check_betas_at_ips=True, check_separations_at_ips=True)
 
 
-for ss in sequences_to_check:
-    tt = twiss_dfs[ss]
-    ost.check_beta_at_ips_against_madvars(beam=ss[-1],
-            twiss_df=tt,
-            variable_dicts=var_dict,
-            tol=1e-3)
-print('IP beta test against knobs passed!')
-
-twiss_df_b1 = twiss_dfs['lhcb1']
-twiss_df_b2 = twiss_dfs['lhcb2']
-ost.check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
-        var_dict, tol=1e-6)
-print('IP separation test against knobs passed!')
-
-mad.call("modules/submodule_01c_phase.madx")
+#mad.call("modules/submodule_01c_phase.madx")
 
 
 
