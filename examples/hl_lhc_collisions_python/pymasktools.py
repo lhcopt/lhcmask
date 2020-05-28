@@ -15,7 +15,7 @@ def checks_on_parameter_dict(params):
 
 def check_twiss_value(twiss_df, element_name, keyword, target, tol):
     assert abs(twiss_df.loc[element_name][keyword] - target) < tol,\
-                f'Check not passes on {keyword} at {element_name}'
+                f'Check not passed on {keyword} at {element_name}'
 
 def check_twiss_against_madvars(checks, twiss_df, variable_dicts):
     for cc in checks:
@@ -31,7 +31,7 @@ def check_separation_value(twiss_df_b1, twiss_df_b2, element_name,
     val = (twiss_df_b2.loc[element_name, plane]
             - twiss_df_b1.loc[element_name, plane])
     assert abs(val - target) < tol,\
-                f'Check not passes on {plane} separation at {element_name}'
+                f'Check not passed on {plane} separation at {element_name}'
 
 def check_separations_against_madvars(checks, twiss_df_b1, twiss_df_b2, variables_dict):
     for cc in checks:
