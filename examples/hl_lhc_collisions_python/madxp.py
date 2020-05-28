@@ -139,12 +139,22 @@ class Madxp(Madx):
             'independent_variables':
                 variables_df['independent_variables'].to_dict()['value'],
             'dependent_variables':
-                variables_df['dependent_variables'].to_dict()['expression']}
+                variables_df['dependent_variables'].to_dict()['expression'],
+            'dependent_variables_val':
+                variables_df['dependent_variables'].to_dict()['value'],
+            }
+
+        outp['all_variables_val'] = {kk:outp['constants'][kk] for
+                kk in outp['constants'].keys()}
+        outp['all_variables_val'].update(outp['independent_variables'])
+        outp['all_variables_val'].update(outp['dependent_variables_val'])
+
+
         return outp
 
     def get_variables_dataframes(self, expressions_as_str=True):
         '''
-        Extract the dictionary of the variables and constant pandas DF of the MAD-X global workspace.
+        Extract the dictionary of the variables and constant pandas DF of the -X global workspace.
 
         Returns:
             The a dictionary containing:

@@ -54,12 +54,14 @@ for ss in sequences_to_check:
 
 for ss in sequences_to_check:
     tt = twiss_dfs[ss]
-    ost.check_beta_at_ips_against_knobs(beam=ss[-1],
+    ost.check_beta_at_ips_against_madvars(beam=ss[-1],
             twiss_df=tt,
             variable_dicts=var_dict,
             tol=1e-3)
 print('IP beta test against knobs passed!')
 
+separations_to_check = [
+        {'element_name': 'ip1:1', 'plane':'v', 'knob': 'on_sep1', 'tol': 1e-3}]
 
 
 prrr
