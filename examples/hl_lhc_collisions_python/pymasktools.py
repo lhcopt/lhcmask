@@ -22,7 +22,7 @@ def check_twiss_against_madvars(checks, twiss_df, variable_dicts):
         check_twiss_value(twiss_df,
             element_name=cc['element_name'],
             keyword=cc['keyword'],
-            target=variable_dicts['all_variables_val'][cc['knob']],
+            target=variable_dicts['all_variables_val'][cc['varname']],
             tol=cc['tol'])
 
 

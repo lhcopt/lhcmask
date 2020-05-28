@@ -60,8 +60,25 @@ for ss in sequences_to_check:
             tol=1e-3)
 print('IP beta test against knobs passed!')
 
-separations_to_check = [
-        {'element_name': 'ip1:1', 'plane':'v', 'knob': 'on_sep1', 'tol': 1e-3}]
+separations_to_check = []
+for ip in [1,2,5,8]:
+    for plane in ['x', 'y']:
+        separations_to_check.append({
+                    'element_name': f'ip{ip}:1',
+                    'plane': plane,
+                    # knobs like on_sep1h, onsep8v etc
+                    'varname': f'on_sep{ip}'+{'x':'h', 'y':'v'}[plane],
+                    'tol': 1e-5})
+
+twiss_df_b1 = twiss_dfs['lhcb1']
+twiss_df_b2 = twiss_dfs['lhcb2']
+for cc in separations_to_check:
+    tol = cc['tol']
+    target = var_dict['all_variables_val'][cc['varname']]
+    val = (twiss_df_b2.loc[cc['element_name'], cc['plane']]
+            - twiss_df_b1.loc[cc['element_name'], cc['plane']])
+
+
 
 
 prrr

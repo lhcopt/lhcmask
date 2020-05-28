@@ -7,7 +7,7 @@ def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
             twiss_value_checks.append({
                     'element_name': f'ip{ip}:1',
                     'keyword': f'bet{plane}',
-                    'knob': f'bet{plane}ip{ip}b{beam}',
+                    'varname': f'bet{plane}ip{ip}b{beam}',
                     'tol': 1e-3})
 
     pmt.check_twiss_against_madvars(twiss_value_checks, twiss_df, variable_dicts)
