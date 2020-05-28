@@ -1,9 +1,13 @@
 import pymasktools as pmt
 
+# The parts marked by (*) in following need to be
+# adapted according to knob definitions
+
 def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     twiss_value_checks=[]
     for iip, ip in enumerate([1,2,5,8]):
         for plane in ['x', 'y']:
+            # (*) Adapet based on knob definitions
             twiss_value_checks.append({
                     'element_name': f'ip{ip}:1',
                     'keyword': f'bet{plane}',
@@ -18,6 +22,7 @@ def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
     separations_to_check = []
     for iip, ip in enumerate([1,2,5,8]):
         for plane in ['x', 'y']:
+            # (*) Adapet based on knob definitions
             separations_to_check.append({
                     'element_name': f'ip{ip}:1',
                     'scale_factor': -2*1e-3,
@@ -34,11 +39,14 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
 
     var_dict = mad.get_variables_dicts()
     twiss_dfs = {}
+    summ_dfs = {}
     for ss in sequences_to_check:
         mad.use(ss)
         mad.twiss()
-        tdf = mad.get_table_df('twiss')
+        tdf = mad.get_twiss_df('twiss')
         twiss_dfs[ss] = tdf
+        sdf = mad.get_summ_df('summ')
+        summ_dfs[ss] = sdf
     if save_twiss_files:
         for ss in sequences_to_check:
             tt = twiss_dfs[ss]
@@ -61,4 +69,8 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
                 var_dict, tol=tol_sep)
         print('IP separation test against knobs passed!')
 
-    return twiss_dfs, var_dict
+    other_data = {}
+    other_data.update(var_dict)
+    other_data['summ_dfs'] = summ_dfs
+
+    return twiss_dfs, other_data

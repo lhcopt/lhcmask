@@ -43,7 +43,7 @@ mad.call("modules/submodule_01a_preparation.madx")
 mad.call("modules/submodule_01b_beam.madx")
 
 # Test machine before any change
-ost.twiss_and_check(mad, sequences_to_check,
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_from_optics',save_twiss_files= True,
         check_betas_at_ips=True, check_separations_at_ips=True)
@@ -54,7 +54,7 @@ mad.call("modules/submodule_01d_crossing.madx")
 
 # Test flat machine
 mad.input('exec, crossing_disable')
-twiss_dfs, dict_var = ost.twiss_and_check(mad, sequences_to_check,
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_no_crossing', save_twiss_files= True,
         check_betas_at_ips=True, check_separations_at_ips=True)
@@ -67,7 +67,7 @@ for ss in twiss_dfs.keys():
 
 # Check machine after crossing restore
 mad.input('exec, crossing_restore')
-twiss_dfs, dict_var = ost.twiss_and_check(mad, sequences_to_check,
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_with_crossing', save_twiss_files= True,
         check_betas_at_ips=True, check_separations_at_ips=True)

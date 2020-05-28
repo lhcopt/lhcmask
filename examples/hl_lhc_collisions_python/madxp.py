@@ -310,7 +310,7 @@ class Madxp(Madx):
         last_columns.sort()
         return my_df[first_columns+last_columns]
 
-    def get_table_df(self, table_name):
+    def get_twiss_df(self, table_name):
         '''
         Extract the pandas DF of a MAD-X table.
 
@@ -328,4 +328,19 @@ class Madxp(Madx):
         my_df.index.name=''
         return my_df
 
+    def get_summ_df(self, table_name):
+        '''
+        Extract the pandas DF of a MAD-X summary table.
+
+        Args:
+            table_name: Name of the table
+        Returns:
+            The pandas DF of a MAD-X table.
+
+        See madxp/examples/variablesExamples/000_run.py
+        '''
+        table = self.table[table_name]
+        my_df=pd.DataFrame(dict(table))
+        my_df.index=[table._name]
+        return my_df
 
