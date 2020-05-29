@@ -3,6 +3,13 @@ import pymasktools as pmt
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
 
+def build_sequence(mad, beam):
+    mad.input(f'mylhcbeam = {beam}')
+    mad.call('hl14_thin.madx')
+
+def apply_optics(mad, optics_file):
+    mad.call('hl14_collision_optics.madx')
+
 def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     twiss_value_checks=[]
     for iip, ip in enumerate([1,2,5,8]):
@@ -47,6 +54,7 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
         twiss_dfs[ss] = tdf
         sdf = mad.get_summ_df('summ')
         summ_dfs[ss] = sdf
+
     if save_twiss_files:
         for ss in sequences_to_check:
             tt = twiss_dfs[ss]

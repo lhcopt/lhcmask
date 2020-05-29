@@ -138,7 +138,7 @@ class Madxp(Madx):
             'constants': variables_df['constants'].to_dict()['value'],
             'independent_variables':
                 variables_df['independent_variables'].to_dict()['value'],
-            'dependent_variables':
+            'dependent_variables_expr':
                 variables_df['dependent_variables'].to_dict()['expression'],
             'dependent_variables_val':
                 variables_df['dependent_variables'].to_dict()['value'],
