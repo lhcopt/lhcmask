@@ -155,15 +155,25 @@ if generate_b4_from_b2:
 # Temp (to be redefined)
 ip_names = ['ip1', 'ip2', 'ip5', 'ip8']
 numberOfLRPerIRSide = [25, 20, 25, 20]
-circumference = 26658.8832
 harmonic_number = 35640
 bunch_spacing_buckets = 10
 numberOfHOSlices = 11
-sigt = 0.075
-bunch_charge_ppb = 1.2e11
-madx_reference_bunch_charge = 1.2e11
-relativistic_gamma=6927.628061781486
+bunch_population_ppb = None #1.2e11
+sigmaz_m = None #0.075
+
+circumference = mad.sequence.lhcb1.circ
+madx_reference_bunch_charge = mad.sequence.lhcb1.beam.npart
+relativistic_gamma = mad.sequence.lhcb1.beam.gamma
 relativistic_beta = np.sqrt(1 - 1.0 / relativistic_gamma ** 2)
+if bunch_population_ppb is not None:
+    bunch_charge_ppb = bunch_population_ppb
+else:
+    bunch_charge_ppb = madx_reference_bunch_charge
+
+if sigmaz_m  is not None:
+    sigt = sigmaz_m
+else:
+    sigt = mad.sequence.lhcb1.beam.sigt
 
 import bb_tools as bbt
 bb_df_b1 = bbt.generate_set_of_bb_encounters_1beam(
