@@ -72,7 +72,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=True, check_separations_at_ips=True)
 
-# Call other modules
+# Call leveling module
 mad.use(f'lhcb{beam_to_configure}')
 mad.call("modules/module_02_lumilevel.madx")
 
@@ -80,78 +80,22 @@ mad.call("modules/module_02_lumilevel.madx")
 mad_b2 = mad
 mad_b4 = Madx()
 ost.build_sequence(mad_b4, beam=4)
-
-var_dicts_b2 = mad_b2.get_variables_dicts()
-var_dicts_b4 = mad_b4.get_variables_dicts()
+pmt.configure_b4_from_b2(mad_b4, mad_b2)
 
 
-b2_const=var_dicts_b2['constants']
-b4_const=var_dicts_b4['constants']
-for nn in b2_const.keys():
-    if nn[0]=='_':
-        print(f'The constant {nn} cannot be assigned!')
-    else:
-        if nn not in b4_const.keys():
-            mad_b4.input(f'const {nn}={b2_const[nn]}')
+twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad_b2,
+        sequences_to_check=['lhcb2'],
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_b2_for_b4check',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=True, check_separations_at_ips=False)
 
-# %% INDEPENDENT
-b2_indep=var_dicts_b2['independent_variables']
-b4_indep=var_dicts_b4['independent_variables']
-for nn in b2_indep.keys():
-    mad_b4.input(f'{nn}={b2_indep[nn]}')
-
-# %% DEPENDENT
-b2_dep=var_dicts_b2['dependent_variables_expr']
-b4_dep=var_dicts_b4['dependent_variables_expr']
-for nn in b2_dep.keys():
-    mad_b4.input(f'{nn}:={str(b2_dep[nn])}')
-
-# bv_aux and my my lhcbeam need to be defined explicitly
-mad_b4.input(f'bv_aux=-1')
-mad_b4.input(f'mylhcbeam=4')
-
-# Attach beam
-mad_b4.input(str(mad.sequence['lhcb2'].beam))
-mad_b4.use('lhcb2')
-mad_b4.sequence['lhcb2'].beam['bv']=1
-
-# %% CHECKS
-var_dicts_b2 = mad_b2.get_variables_dicts()
-var_dicts_b4 = mad_b4.get_variables_dicts()
-
-b2_const=var_dicts_b2['constants']
-b4_const=var_dicts_b4['constants']
-for nn in b4_const.keys():
-    assert b2_const[nn] == b4_const[nn]
-
-for nn in b2_const.keys():
-    if nn not in b4_const.keys():
-        print(f'Warning: b2 const {nn}={b2_const[nn]} is not in b4.')
-
-b2_indep=var_dicts_b2['independent_variables']
-b4_indep=var_dicts_b4['independent_variables']
-for nn in b2_indep.keys():
-    if str(nn) in 'bv_aux mylhcbeam':
-        continue
-    assert b4_indep[nn] == b2_indep[nn]
-
-for nn in b4_indep.keys():
-    if nn not in b2_indep.keys():
-        print(f'Warning: b4 indep {nn}={b4_indep[nn]} is not in b2.')
-
-b2_dep=var_dicts_b2['dependent_variables_expr']
-b4_dep=var_dicts_b4['dependent_variables_expr']
-for nn in b2_dep.keys():
-    if str(nn) in 'bv_aux mylhcbeam':
-        continue
-    assert str(b4_dep[nn]) == str(b2_dep[nn])
-
-for nn in b4_dep.keys():
-    if nn not in b2_dep.keys():
-        print(f'Warning: b4 dep {nn}={str(b4_dep[nn])} is not in b2.')
-
-
-
+twiss_dfs_b4, other_data_b4 = ost.twiss_and_check(mad_b4,
+        sequences_to_check=['lhcb2'],
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_b4_for_b4check',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=True, check_separations_at_ips=False)
 prrrrr
 
 mad.call("modules/module_03_beambeam.madx")

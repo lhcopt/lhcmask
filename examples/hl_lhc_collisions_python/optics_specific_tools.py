@@ -59,7 +59,7 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
         for ss in sequences_to_check:
             tt = twiss_dfs[ss]
             if twiss_fname is not None:
-                tt.to_parquet(twiss_fname + f'_{ss}.parquet')
+                tt.to_parquet(twiss_fname + f'_seq_{ss}.parquet')
 
     if check_betas_at_ips:
         for ss in sequences_to_check:
