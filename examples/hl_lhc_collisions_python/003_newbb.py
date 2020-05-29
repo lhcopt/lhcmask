@@ -192,6 +192,21 @@ bbt.install_lenses_in_sequences(mad,
     beam_names=['b1', 'b2'],
     sequence_names=['lhcb1', 'lhcb2'])
 
+# Use mad survey and twiss to get geometry and locations of all encounters
+bbt.get_geometry_and_optics_b1_b2(mad, bb_df_b1, bb_df_b2)
+
+# Get the position of the IPs in the surveys of the two beams
+ip_position_df = bbt.get_survey_ip_position_b1_b2(mad, ip_names)
+
+# Get geometry and optics at the partner encounter
+bbt.get_partner_corrected_position_and_optics(
+        bb_df_b1, bb_df_b2, ip_position_df)
+
+# Compute separation, crossing plane rotation and crossing angle
+for bb_df in [bb_df_b1, bb_df_b2]:
+    bbt.compute_separations(bb_df)
+    bbt.compute_dpx_dpy(bb_df)
+    bbt.compute_local_crossing_angle_and_plane(bb_df)
 prrrrr
 
 
