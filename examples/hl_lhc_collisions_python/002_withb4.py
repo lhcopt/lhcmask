@@ -7,10 +7,62 @@ from madxp import Madxp as Madx
 import pymasktools as pmt
 import optics_specific_tools as ost
 
-beam_to_configure = 1
+# Select mode
+#mode = 'b1_without_bb'
+mode = 'b1_with_bb'
+#mode = 'b1_with_bb_legacy_macros'
+#mode = 'b4_without_bb'
+#mode = 'b4_without_bb_from_b2'
+#mode = 'b4_with_bb_from_b2'
+
+
 optics_file = 'hl14_collision_optics.madx' #15 cm
+
+check_betas_at_ips = True
+check_separations_at_ips = True
 save_intermediate_twiss = True
-sequences_to_check = ['lhcb1', 'lhcb2']
+
+if mode=='b1_without_bb':
+    beam_to_configure = 1
+    sequences_to_check = ['lhcb1', 'lhcb2']
+    generate_b4_from_b2 = False
+    include_bb = False
+    bb_legacy_macros = False
+elif mode=='b1_with_bb':
+    beam_to_configure = 1
+    sequences_to_check = ['lhcb1', 'lhcb2']
+    generate_b4_from_b2 = False
+    include_bb = True
+    bb_legacy_macros = False
+elif mode=='b1_with_bb_legacy_macros':
+    beam_to_configure = 1
+    sequences_to_check = ['lhcb1', 'lhcb2']
+    generate_b4_from_b2 = False
+    include_bb = True
+    bb_legacy_macros = True
+elif mode == 'b4_without_bb':
+    beam_to_configure = 4
+    sequences_to_check = ['lhcb2']
+    generate_b4_from_b2 = False
+    include_bb = False
+    bb_legacy_macros = False
+    check_separations_at_ips = False
+elif mode == 'b4_without_bb_from_b2':
+    beam_to_configure = 1
+    sequences_to_check = ['lhcb1', 'lhcb2']
+    generate_b4_from_b2 = True
+    include_bb = False
+    bb_legacy_macros = False
+elif mode == 'b4_with_bb_from_b2':
+    beam_to_configure = 1
+    sequences_to_check = ['lhcb1', 'lhcb2']
+    generate_b4_from_b2 = True
+    include_bb = False
+    bb_legacy_macros = False
+
+
+
+
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
 tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
@@ -23,9 +75,9 @@ pmt.make_links(force=True, links_dict={
     'beambeam_macros': 'tracking_tools/beambeam_macros',
     'errors': 'tracking_tools/errors'})
 
-
 mad = Madx()
-# Build sequenc
+
+# Build sequence
 ost.build_sequence(mad, beam=beam_to_configure)
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
@@ -44,7 +96,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_from_optics',
         save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=True, check_separations_at_ips=True)
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
 # Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
@@ -56,7 +108,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_no_crossing',
         save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=True, check_separations_at_ips=True)
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 # Check flatness
 flat_tol = 1e-6
 for ss in twiss_dfs.keys():
@@ -70,33 +122,33 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_with_crossing',
         save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=True, check_separations_at_ips=True)
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
 # Call leveling module
 mad.use(f'lhcb{beam_to_configure}')
 mad.call("modules/module_02_lumilevel.madx")
 
 # Generate b4
-mad_b2 = mad
-mad_b4 = Madx()
-ost.build_sequence(mad_b4, beam=4)
-pmt.configure_b4_from_b2(mad_b4, mad_b2)
+if generate_b4_from_b2:
+    mad_b2 = mad
+    mad_b4 = Madx()
+    ost.build_sequence(mad_b4, beam=4)
+    pmt.configure_b4_from_b2(mad_b4, mad_b2)
 
+    twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad_b2,
+            sequences_to_check=['lhcb2'],
+            tol_beta=tol_beta, tol_sep=tol_sep,
+            twiss_fname='twiss_b2_for_b4check',
+            save_twiss_files=save_intermediate_twiss,
+            check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
-twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad_b2,
-        sequences_to_check=['lhcb2'],
-        tol_beta=tol_beta, tol_sep=tol_sep,
-        twiss_fname='twiss_b2_for_b4check',
-        save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=True, check_separations_at_ips=False)
+    twiss_dfs_b4, other_data_b4 = ost.twiss_and_check(mad_b4,
+            sequences_to_check=['lhcb2'],
+            tol_beta=tol_beta, tol_sep=tol_sep,
+            twiss_fname='twiss_b4_for_b4check',
+            save_twiss_files=save_intermediate_twiss,
+            check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
-twiss_dfs_b4, other_data_b4 = ost.twiss_and_check(mad_b4,
-        sequences_to_check=['lhcb2'],
-        tol_beta=tol_beta, tol_sep=tol_sep,
-        twiss_fname='twiss_b4_for_b4check',
-        save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=True, check_separations_at_ips=False)
-prrrrr
 
 mad.call("modules/module_03_beambeam.madx")
 mad.call("modules/module_04_errors.madx")
