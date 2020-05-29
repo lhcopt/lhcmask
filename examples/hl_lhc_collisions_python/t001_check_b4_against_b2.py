@@ -15,6 +15,7 @@ axbetx.plot(twiss_df_b4['s'][-1]-twiss_df_b4['s'],twiss_df_b4['betx'],'b')
 axbetx.plot(twiss_df_b2['s'], twiss_df_b2['betx'],'--r')
 axbetx.set_xlabel('s')
 axbetx.set_ylabel(r'$\beta_x$ [m]')
+axbetx.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 # %%
 axbety = fig.add_subplot(2,2,2, sharex=axbetx, sharey=axbetx)
@@ -23,6 +24,7 @@ axbety.plot(twiss_df_b4['s'][-1]-twiss_df_b4['s'],twiss_df_b4['bety'],'b',
 axbety.plot(twiss_df_b2['s'], twiss_df_b2['bety'],'--r', label='b4')
 axbety.set_xlabel('s')
 axbety.set_ylabel(r'$\beta_y$ [m]')
+axbety.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 axbety.legend()
 # %%
 
