@@ -20,8 +20,8 @@ axbetx.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 # %%
 axbety = fig.add_subplot(2,2,2, sharex=axbetx, sharey=axbetx)
 axbety.plot(twiss_df_b4['s'][-1]-twiss_df_b4['s'],twiss_df_b4['bety'],'b',
-        label='b2')
-axbety.plot(twiss_df_b2['s'], twiss_df_b2['bety'],'--r', label='b4')
+        label='b4')
+axbety.plot(twiss_df_b2['s'], twiss_df_b2['bety'],'--r', label='b2')
 axbety.set_xlabel('s')
 axbety.set_ylabel(r'$\beta_y$ [m]')
 axbety.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
