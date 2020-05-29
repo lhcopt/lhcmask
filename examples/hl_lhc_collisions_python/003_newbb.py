@@ -207,6 +207,19 @@ for bb_df in [bb_df_b1, bb_df_b2]:
     bbt.compute_separations(bb_df)
     bbt.compute_dpx_dpy(bb_df)
     bbt.compute_local_crossing_angle_and_plane(bb_df)
+
+# Get bb dataframe and mad model (with dummy bb) for beam 3 and 4
+bb_df_b3 = bbt.get_counter_rotating(bb_df_b1)
+bb_df_b4 = bbt.get_counter_rotating(bb_df_b2)
+bbt.generate_mad_bb_info(bb_df_b3, mode='dummy')
+bbt.generate_mad_bb_info(bb_df_b4, mode='dummy')
+
+# Generate mad info
+bbt.generate_mad_bb_info(bb_df_b1, mode='from_dataframe', madx_reference_bunch_charge=madx_reference_bunch_charge)
+bbt.generate_mad_bb_info(bb_df_b2, mode='from_dataframe', madx_reference_bunch_charge=madx_reference_bunch_charge)
+bbt.generate_mad_bb_info(bb_df_b3, mode='from_dataframe', madx_reference_bunch_charge=madx_reference_bunch_charge)
+bbt.generate_mad_bb_info(bb_df_b4, mode='from_dataframe', madx_reference_bunch_charge=madx_reference_bunch_charge)
+
 prrrrr
 
 
