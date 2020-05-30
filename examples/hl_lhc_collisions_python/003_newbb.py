@@ -161,7 +161,7 @@ numberOfHOSlices = 11
 bunch_population_ppb = None #1.2e11
 sigmaz_m = None #0.075
 
-circumference = mad.sequence.lhcb1.circ
+circumference = mad.sequence.lhcb1.beam.circ
 madx_reference_bunch_charge = mad.sequence.lhcb1.beam.npart
 relativistic_gamma = mad.sequence.lhcb1.beam.gamma
 relativistic_beta = np.sqrt(1 - 1.0 / relativistic_gamma ** 2)
