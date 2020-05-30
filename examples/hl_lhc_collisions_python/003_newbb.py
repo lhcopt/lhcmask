@@ -159,7 +159,8 @@ bb_dfs = bb.generate_bb_dataframes(mad,
     bunch_spacing_buckets=10,
     numberOfHOSlices=11,
     bunch_population_ppb=None,
-    sigmaz_m=None)
+    sigmaz_m=None,
+    remove_dummy_lenses=True)
 
 prrrrr
 
