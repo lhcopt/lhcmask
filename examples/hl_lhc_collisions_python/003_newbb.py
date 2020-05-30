@@ -149,25 +149,32 @@ if generate_b4_from_b2:
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
+if include_bb:
+    # Install beam beam
+    import beambeam as bb
+    bb_dfs = bb.generate_bb_dataframes(mad,
+        ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
+        numberOfLRPerIRSide=[25, 20, 25, 20],
+        harmonic_number=35640,
+        bunch_spacing_buckets=10,
+        numberOfHOSlices=11,
+        bunch_population_ppb=None,
+        sigmaz_m=None,
+        remove_dummy_lenses=True)
 
-# Install beam beam
-import beambeam as bb
-bb_dfs = bb.generate_bb_dataframes(mad,
-    ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
-    numberOfLRPerIRSide=[25, 20, 25, 20],
-    harmonic_number=35640,
-    bunch_spacing_buckets=10,
-    numberOfHOSlices=11,
-    bunch_population_ppb=None,
-    sigmaz_m=None,
-    remove_dummy_lenses=True)
+    # Here the datafremes can be edited, e.g. to set bbb intensity
 
-prrrrr
+    # We install the beam-beam lenses in the sequance we want to track
+    mad_track = mad
+    seq_track = 'lhcb1'
+    bb_df_track = bb_dfs['b1']
 
-
-
+    bb.install_lenses_in_sequence(mad_track, bb_df_track, seq_track)
+    # Disable bb
+    mad.globals.on_bb_charge = 0
+    mad.use(seq_track)
 
 # mad.call("modules/module_03_beambeam.madx")
-mad.call("modules/module_04_errors.madx")
-mad.call("modules/module_05_tuning.madx")
-mad.call("modules/module_06_generate.madx")
+mad_track.call("modules/module_04_errors.madx")
+mad_track.call("modules/module_05_tuning.madx")
+mad_track.call("modules/module_06_generate.madx")
