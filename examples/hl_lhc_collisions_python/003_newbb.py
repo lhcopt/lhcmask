@@ -33,8 +33,8 @@ check_betas_at_ips = True
 check_separations_at_ips = True
 save_intermediate_twiss = True
 
-(beam_to_configure, sequences_to_check, generate_b4_from_b2,
-    track_from_b4_mad_instance, include_bb, bb_legacy_macros,
+(beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
+    track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
     force_disable_check_separations_at_ips,
     ) = pmt.get_pymask_configuration(mode)
 
@@ -118,15 +118,10 @@ if generate_b4_from_b2:
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
-if include_bb and bb_legacy_macros:
-    assert(beam_to_configure == 1)
-    assert(not(track_from_b4_mad_instance))
-    mad.call("modules/module_03_beambeam.madx")
 
 
-ARRIVATO QUA
-
-
+# Prepare bb dataframes
+if enable_bb_python:
     import beambeam as bb
     bb_dfs = bb.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
@@ -138,28 +133,47 @@ ARRIVATO QUA
         sigmaz_m=None,
         remove_dummy_lenses=True)
 
-    # Here the datafremes can be edited, e.g. to set bbb intensity
+# Here the datafremes can be edited, e.g. to set bbb intensity
 
-    # We install the beam-beam lenses in the sequance we want to track
-
-    ###### TEMP!!!!
+# Select mad object
+if track_from_b4_mad_instance:
+    mad_track = mad_b4
+else:
     mad_track = mad
-    seq_track = 'lhcb1'
-    bb_df_track = bb_dfs['b1']
 
-    bb.install_lenses_in_sequence(mad_track, bb_df_track, seq_track)
+# Install bb lenses
+if enable_bb_python:
+    if track_from_b4_mad_instance:
+        bb_df_track = bb_dfs['b4']
+        assert(sequence_to_track=='lhcb2')
+    else:
+        bb_df_track = bb_dfs['b1']
+        assert(sequence_to_track=='lhcb1')
+
+    bb.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
+
     # Disable bb
     mad_track.input('on_bb_switch := on_bb_charge')
     mad_track.globals.on_bb_charge = 0
-    mad_track.use(seq_track)
 
 
-###### TEMP!!!!
-mad_track = mad
-seq_track = 'lhcb1'
-mad.use(seq_track)
+# Legacy bb macros
+if enable_bb_legacy:
+    assert(beam_to_configure == 1)
+    assert(not(track_from_b4_mad_instance))
+    assert(not(enable_bb_python))
+    mad_track.call("modules/module_03_beambeam.madx")
 
+
+# Final use
+mad_track.use(sequence_to_track)
+
+# Install and correct errors
 mad_track.call("modules/module_04_errors.madx")
+
+# Machine tuning (enables bb)
 mad_track.call("modules/module_05_tuning.madx")
+
+# Generate sixtr
 mad_track.call("modules/module_06_generate.madx")
 

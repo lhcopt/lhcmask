@@ -12,50 +12,56 @@ def get_pymask_configuration(mode):
     if mode=='b1_without_bb':
         beam_to_configure = 1
         sequences_to_check = ['lhcb1', 'lhcb2']
+        sequence_to_track = 'lhcb1'
         generate_b4_from_b2 = False
         track_from_b4_mad_instance = False
-        include_bb = False
-        bb_legacy_macros = False
+        enable_bb_python = False
+        enable_bb_legacy = False
         force_disable_check_separations_at_ips = False
     elif mode=='b1_with_bb':
         beam_to_configure = 1
         sequences_to_check = ['lhcb1', 'lhcb2']
+        sequence_to_track = 'lhcb1'
         generate_b4_from_b2 = False
         track_from_b4_mad_instance = False
-        include_bb = True
-        bb_legacy_macros = False
+        enable_bb_python = True
+        enable_bb_legacy = False
         force_disable_check_separations_at_ips = False
     elif mode=='b1_with_bb_legacy_macros':
         beam_to_configure = 1
         sequences_to_check = ['lhcb1', 'lhcb2']
+        sequence_to_track = 'lhcb1'
         generate_b4_from_b2 = False
         track_from_b4_mad_instance = False
-        include_bb = True
-        bb_legacy_macros = True
+        enable_bb_python = False
+        enable_bb_legacy = True
         force_disable_check_separations_at_ips = False
     elif mode == 'b4_without_bb':
         beam_to_configure = 4
         sequences_to_check = ['lhcb2']
+        sequence_to_track = 'lhcb2'
         generate_b4_from_b2 = False
         track_from_b4_mad_instance = False
-        include_bb = False
-        bb_legacy_macros = False
+        enable_bb_python = False
+        enable_bb_legacy = False
         force_disable_check_separations_at_ips = True
     elif mode == 'b4_from_b2_without_bb':
         beam_to_configure = 1
         sequences_to_check = ['lhcb1', 'lhcb2']
+        sequence_to_track = 'lhcb2'
         generate_b4_from_b2 = True
         track_from_b4_mad_instance = True
-        include_bb = False
-        bb_legacy_macros = False
+        enable_bb_python = False
+        enable_bb_legacy = False
         force_disable_check_separations_at_ips = False
     elif mode == 'b4_from_b2_with_bb':
         beam_to_configure = 1
         sequences_to_check = ['lhcb1', 'lhcb2']
+        sequence_to_track = 'lhcb2'
         generate_b4_from_b2 = True
         track_from_b4_mad_instance = True
-        include_bb = False
-        bb_legacy_macros = False
+        enable_bb_python = True
+        enable_bb_legacy = False
         force_disable_check_separations_at_ips = False
     else:
         raise ValueError(f'Mode "{mode}" not recognized!')
@@ -63,10 +69,11 @@ def get_pymask_configuration(mode):
     return (
         beam_to_configure,
         sequences_to_check,
+        sequence_to_track,
         generate_b4_from_b2,
         track_from_b4_mad_instance,
-        include_bb,
-        bb_legacy_macros,
+        enable_bb_python,
+        enable_bb_legacy,
         force_disable_check_separations_at_ips,
     )
 
