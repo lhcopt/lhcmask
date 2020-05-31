@@ -51,8 +51,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 # Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
 mad.call("modules/submodule_01d_crossing.madx")
-mad.call("modules/submodule_01e_test.madx")
-mad.call("modules/submodule_01f_use.madx")
+#mad.call("modules/submodule_01e_test.madx")
+#mad.call("modules/submodule_01f_use.madx")
 
 # Test flat machine
 mad.input('exec, crossing_disable')

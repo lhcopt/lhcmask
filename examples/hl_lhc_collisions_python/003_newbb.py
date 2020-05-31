@@ -11,14 +11,15 @@ import optics_specific_tools as ost
 # - Crabs
 # - Some twiss savings and testing
 # - Handle generation of sixtrack input correctly (legacy will be different)
+# - Sort out test_submodule inconsistency
 
 # Select mode
 #mode = 'b1_without_bb'
-#mode = 'b1_with_bb'
-mode = 'b1_with_bb_legacy_macros'
+mode = 'b1_with_bb'
+#mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
-#mode = 'b4_from_b2_with_bb'
+mode = 'b4_from_b2_with_bb'
 
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
@@ -172,6 +173,9 @@ if enable_bb_legacy:
 
 # Final use
 mad_track.use(sequence_to_track)
+
+prrrrr
+
 
 # Install and correct errors
 mad_track.call("modules/module_04_errors.madx")
