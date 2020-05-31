@@ -7,6 +7,68 @@ def make_links(links_dict, force=False):
                 os.remove(kk)
         os.symlink(links_dict[kk], kk)
 
+def get_pymask_configuration(mode):
+
+    if mode=='b1_without_bb':
+        beam_to_configure = 1
+        sequences_to_check = ['lhcb1', 'lhcb2']
+        generate_b4_from_b2 = False
+        track_from_b4_mad_instance = False
+        include_bb = False
+        bb_legacy_macros = False
+        force_disable_check_separations_at_ips = False
+    elif mode=='b1_with_bb':
+        beam_to_configure = 1
+        sequences_to_check = ['lhcb1', 'lhcb2']
+        generate_b4_from_b2 = False
+        track_from_b4_mad_instance = False
+        include_bb = True
+        bb_legacy_macros = False
+        force_disable_check_separations_at_ips = False
+    elif mode=='b1_with_bb_legacy_macros':
+        beam_to_configure = 1
+        sequences_to_check = ['lhcb1', 'lhcb2']
+        generate_b4_from_b2 = False
+        track_from_b4_mad_instance = False
+        include_bb = True
+        bb_legacy_macros = True
+        force_disable_check_separations_at_ips = False
+    elif mode == 'b4_without_bb':
+        beam_to_configure = 4
+        sequences_to_check = ['lhcb2']
+        generate_b4_from_b2 = False
+        track_from_b4_mad_instance = False
+        include_bb = False
+        bb_legacy_macros = False
+        force_disable_check_separations_at_ips = True
+    elif mode == 'b4_from_b2_without_bb':
+        beam_to_configure = 1
+        sequences_to_check = ['lhcb1', 'lhcb2']
+        generate_b4_from_b2 = True
+        track_from_b4_mad_instance = True
+        include_bb = False
+        bb_legacy_macros = False
+        force_disable_check_separations_at_ips = False
+    elif mode == 'b4_from_b2_with_bb':
+        beam_to_configure = 1
+        sequences_to_check = ['lhcb1', 'lhcb2']
+        generate_b4_from_b2 = True
+        track_from_b4_mad_instance = True
+        include_bb = False
+        bb_legacy_macros = False
+        force_disable_check_separations_at_ips = False
+    else:
+        raise ValueError(f'Mode "{mode}" not recognized!')
+
+    return (
+        beam_to_configure,
+        sequences_to_check,
+        generate_b4_from_b2,
+        track_from_b4_mad_instance,
+        include_bb,
+        bb_legacy_macros,
+        force_disable_check_separations_at_ips,
+    )
 
 def configure_b4_from_b2(mad_b4, mad_b2):
     var_dicts_b2 = mad_b2.get_variables_dicts()

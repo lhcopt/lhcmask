@@ -12,56 +12,8 @@ import optics_specific_tools as ost
 mode = 'b1_with_bb'
 #mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
-#mode = 'b4_without_bb_from_b2'
-#mode = 'b4_with_bb_from_b2'
-
-
-optics_file = 'hl14_collision_optics.madx' #15 cm
-
-check_betas_at_ips = True
-check_separations_at_ips = True
-save_intermediate_twiss = True
-
-if mode=='b1_without_bb':
-    beam_to_configure = 1
-    sequences_to_check = ['lhcb1', 'lhcb2']
-    generate_b4_from_b2 = False
-    include_bb = False
-    bb_legacy_macros = False
-elif mode=='b1_with_bb':
-    beam_to_configure = 1
-    sequences_to_check = ['lhcb1', 'lhcb2']
-    generate_b4_from_b2 = False
-    include_bb = True
-    bb_legacy_macros = False
-elif mode=='b1_with_bb_legacy_macros':
-    beam_to_configure = 1
-    sequences_to_check = ['lhcb1', 'lhcb2']
-    generate_b4_from_b2 = False
-    include_bb = True
-    bb_legacy_macros = True
-elif mode == 'b4_without_bb':
-    beam_to_configure = 4
-    sequences_to_check = ['lhcb2']
-    generate_b4_from_b2 = False
-    include_bb = False
-    bb_legacy_macros = False
-    check_separations_at_ips = False
-elif mode == 'b4_without_bb_from_b2':
-    beam_to_configure = 1
-    sequences_to_check = ['lhcb1', 'lhcb2']
-    generate_b4_from_b2 = True
-    include_bb = False
-    bb_legacy_macros = False
-elif mode == 'b4_with_bb_from_b2':
-    beam_to_configure = 1
-    sequences_to_check = ['lhcb1', 'lhcb2']
-    generate_b4_from_b2 = True
-    include_bb = False
-    bb_legacy_macros = False
-
-
-
+#mode = 'b4_from_b2_without_bb'
+#mode = 'b4_from_b2_with_bb'
 
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
@@ -75,10 +27,25 @@ pmt.make_links(force=True, links_dict={
     'beambeam_macros': 'tracking_tools/beambeam_macros',
     'errors': 'tracking_tools/errors'})
 
+optics_file = 'hl14_collision_optics.madx' #15 cm
+
+check_betas_at_ips = True
+check_separations_at_ips = True
+save_intermediate_twiss = True
+
+(beam_to_configure, sequences_to_check, generate_b4_from_b2,
+    track_from_b4_mad_instance, include_bb, bb_legacy_macros,
+    force_disable_check_separations_at_ips,
+    ) = pmt.get_pymask_configuration(mode)
+
+if force_disable_check_separations_at_ips:
+    check_separations_at_ips = False
+
 mad = Madx()
 
 # Build sequence
 ost.build_sequence(mad, beam=beam_to_configure)
+
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
 
@@ -151,8 +118,15 @@ if generate_b4_from_b2:
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
-if include_bb:
-    # Install beam beam
+if include_bb and bb_legacy_macros:
+    assert(beam_to_configure == 1)
+    assert(not(track_from_b4_mad_instance))
+    mad.call("modules/module_03_beambeam.madx")
+
+
+ARRIVATO QUA
+
+
     import beambeam as bb
     bb_dfs = bb.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
@@ -175,9 +149,9 @@ if include_bb:
 
     bb.install_lenses_in_sequence(mad_track, bb_df_track, seq_track)
     # Disable bb
-    mad.input('on_bb_switch := on_bb_charge')
-    mad.globals.on_bb_charge = 0
-    mad.use(seq_track)
+    mad_track.input('on_bb_switch := on_bb_charge')
+    mad_track.globals.on_bb_charge = 0
+    mad_track.use(seq_track)
 
 
 ###### TEMP!!!!
@@ -185,7 +159,6 @@ mad_track = mad
 seq_track = 'lhcb1'
 mad.use(seq_track)
 
-# mad.call("modules/module_03_beambeam.madx")
 mad_track.call("modules/module_04_errors.madx")
 mad_track.call("modules/module_05_tuning.madx")
 mad_track.call("modules/module_06_generate.madx")
