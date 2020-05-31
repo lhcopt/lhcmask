@@ -17,8 +17,8 @@ import optics_specific_tools as ost
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
 #mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
-#mode = 'b4_from_b2_without_bb'
+mode = 'b4_without_bb'
+mode = 'b4_from_b2_without_bb'
 mode = 'b4_from_b2_with_bb'
 
 
@@ -44,6 +44,7 @@ save_intermediate_twiss = True
     force_disable_check_separations_at_ips,
     ) = pmt.get_pymask_configuration(mode)
 
+
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
 
@@ -58,6 +59,10 @@ ost.apply_optics(mad, optics_file=optics_file)
 # Check and load parameters 
 from parameters import parameters
 pmt.checks_on_parameter_dict(parameters)
+
+if not(enable_bb_legacy) and not(enable_bb_python):
+    parameters['par_on_bb_switch'] = 0.
+
 mad.set_variables_from_dict(params=parameters)
 
 # Prepare sequences and attach beam
@@ -147,6 +152,23 @@ if track_from_b4_mad_instance:
 else:
     mad_track = mad
 
+mad_track.input('on_disp = 0;')
+
+mad_track.input('''
+!Record the nominal IP position and crossing angle
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+twiss;
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+value,xnom1,xnom2,xnom5,xnom8;
+value,ynom1,ynom2,ynom5,ynom8;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+value,pynom1,pynom2,pynom5,pynom8;
+''')
+
 # Install bb lenses
 if enable_bb_python:
     if track_from_b4_mad_instance:
@@ -174,7 +196,6 @@ if enable_bb_legacy:
 # Final use
 mad_track.use(sequence_to_track)
 
-prrrrr
 
 
 # Install and correct errors
