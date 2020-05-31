@@ -7,10 +7,15 @@ from madxp import Madxp as Madx
 import pymasktools as pmt
 import optics_specific_tools as ost
 
+# TODO:
+# - Crabs
+# - Some twiss savings and testing
+# - Handle generation of sixtrack input correctly (legacy will be different)
+
 # Select mode
 #mode = 'b1_without_bb'
-mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
+#mode = 'b1_with_bb'
+mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
@@ -174,6 +179,6 @@ mad_track.call("modules/module_04_errors.madx")
 # Machine tuning (enables bb)
 mad_track.call("modules/module_05_tuning.madx")
 
-# Generate sixtr
+# Generate sixtrack
 mad_track.call("modules/module_06_generate.madx")
 
