@@ -101,6 +101,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 # Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
 mad.call("modules/submodule_01d_crossing.madx")
+mad.call("modules/submodule_01e_test.madx")
+mad.call("modules/submodule_01f_use.madx")
 
 # Test flat machine
 mad.input('exec, crossing_disable')
@@ -165,16 +167,26 @@ if include_bb:
     # Here the datafremes can be edited, e.g. to set bbb intensity
 
     # We install the beam-beam lenses in the sequance we want to track
+
+    ###### TEMP!!!!
     mad_track = mad
     seq_track = 'lhcb1'
     bb_df_track = bb_dfs['b1']
 
     bb.install_lenses_in_sequence(mad_track, bb_df_track, seq_track)
     # Disable bb
+    mad.input('on_bb_switch := on_bb_charge')
     mad.globals.on_bb_charge = 0
     mad.use(seq_track)
+
+
+###### TEMP!!!!
+mad_track = mad
+seq_track = 'lhcb1'
+mad.use(seq_track)
 
 # mad.call("modules/module_03_beambeam.madx")
 mad_track.call("modules/module_04_errors.madx")
 mad_track.call("modules/module_05_tuning.madx")
 mad_track.call("modules/module_06_generate.madx")
+

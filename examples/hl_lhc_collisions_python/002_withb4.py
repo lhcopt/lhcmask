@@ -150,7 +150,8 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 
-mad.call("modules/module_03_beambeam.madx")
+#mad.call("modules/module_03_beambeam.madx")
+mad.globals.on_disp = 0
 mad.call("modules/module_04_errors.madx")
 mad.call("modules/module_05_tuning.madx")
 mad.call("modules/module_06_generate.madx")
