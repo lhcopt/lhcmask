@@ -18,8 +18,8 @@ import optics_specific_tools as ost
 mode = 'b1_with_bb'
 #mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
-# mode = 'b4_from_b2_without_bb'
-#mode = 'b4_from_b2_with_bb'
+#mode = 'b4_from_b2_without_bb'
+mode = 'b4_from_b2_with_bb'
 
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
@@ -138,11 +138,9 @@ if enable_bb_python:
     bb_dfs = bb.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
-        numberOfLRPerIRSide=[0, 0, 0, 0],
-        # numberOfLRPerIRSide=[25, 20, 25, 20],
+        numberOfLRPerIRSide=[25, 20, 25, 20],
         bunch_spacing_buckets=10,
-        #numberOfHOSlices=11,
-        numberOfHOSlices=1,
+        numberOfHOSlices=11,
         bunch_population_ppb=None,
         sigmaz_m=None,
         remove_dummy_lenses=True)
@@ -183,8 +181,10 @@ if enable_bb_python:
 
     bb.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
 
-    # Disable bb
+    # Connect on_bb_charge knob
     mad_track.input('on_bb_switch := on_bb_charge')
+
+    # Disable bb
     mad_track.globals.on_bb_charge = 0
 
 
@@ -199,24 +199,11 @@ if enable_bb_legacy:
 # Final use
 mad_track.use(sequence_to_track)
 
-# Temp
-mad_track.twiss()
-qx_no_bb = mad_track.table.summ.q1
+# Install and correct errors
+mad_track.call("modules/module_04_errors.madx")
 
-mad_track.globals['on_bb_charge'] = 1
-mad_track.twiss()
-qx_bb = mad_track.table.summ.q1
-
-print(f'Qx no bb: {qx_no_bb}')
-print(f'Qx with bb: {qx_bb}')
-
-prrr
-
-# # Install and correct errors
-# mad_track.call("modules/module_04_errors.madx")
-# 
-# # Machine tuning (enables bb)
-# mad_track.call("modules/module_05_tuning.madx")
+# Machine tuning (enables bb)
+mad_track.call("modules/module_05_tuning.madx")
 
 # # Generate sixtrack
 # mad_track.call("modules/module_06_generate.madx")
