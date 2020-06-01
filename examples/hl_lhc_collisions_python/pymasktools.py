@@ -107,9 +107,12 @@ def configure_b4_from_b2(mad_b4, mad_b2):
     mad_b4.input(f'mylhcbeam=4')
 
     # Attach beam
-    mad_b4.input(str(mad_b2.sequence['lhcb2'].beam))
     mad_b4.use('lhcb2')
-    mad_b4.sequence['lhcb2'].beam['bv']=1
+    beam_command = str(mad_b2.sequence['lhcb2'].beam)
+    assert(', bv=-1.0' in beam_command)
+    beam_command = beam_command.replace(', bv=-1.0', ', bv=1.0')
+    mad_b4.input(beam_command)
+    mad_b4.use('lhcb2')
 
     # %% CHECKS
     var_dicts_b2 = mad_b2.get_variables_dicts()
