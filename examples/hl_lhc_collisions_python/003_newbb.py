@@ -16,9 +16,9 @@ import optics_specific_tools as ost
 # Select mode
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
-#mode = 'b4_from_b2_without_bb'
+mode = 'b1_with_bb_legacy_macros'
+mode = 'b4_without_bb'
+mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 flag_ibeco_sixtrack = 1
@@ -204,7 +204,7 @@ if enable_bb_legacy:
 mad_track.use(sequence_to_track)
 # Disable use
 mad_track._use = mad_track.use
-mad_track.usei = None
+mad_track.use = None
 
 # Install and correct errors
 mad_track.call("modules/module_04_errors.madx")

@@ -312,6 +312,6 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
 
         f3_string += '\nNEXT\n'
 
-    with open(six_fol_name + '/fc.3', 'a') as fid:
-        fid.write(f3_string)
+        with open(six_fol_name + '/fc.3', 'a') as fid:
+            fid.write(f3_string)
 
