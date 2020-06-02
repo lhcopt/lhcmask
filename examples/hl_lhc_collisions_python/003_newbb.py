@@ -19,8 +19,9 @@ mode = 'b1_with_bb'
 #mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
-mode = 'b4_from_b2_with_bb'
+#mode = 'b4_from_b2_with_bb'
 
+flag_ibeco_sixtrack = 1
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
 tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
@@ -108,12 +109,25 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 mad.use(f'lhcb{beam_to_configure}')
 mad.call("modules/module_02_lumilevel.madx")
 
+# Prepare bb dataframes
+if enable_bb_python:
+    import beambeam as bb
+    bb_dfs = bb.generate_bb_dataframes(mad,
+        ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
+        harmonic_number=35640,
+        numberOfLRPerIRSide=[25, 20, 25, 20],
+        bunch_spacing_buckets=10,
+        numberOfHOSlices=11,
+        bunch_population_ppb=None,
+        sigmaz_m=None,
+        remove_dummy_lenses=True)
+
 # Generate b4
 if generate_b4_from_b2:
     mad_b2 = mad
     mad_b4 = Madx()
     ost.build_sequence(mad_b4, beam=4)
-    ost.apply_optics(mad_b4, optics_file=optics_file)
+    #ost.apply_optics(mad_b4, optics_file=optics_file)
     pmt.configure_b4_from_b2(mad_b4, mad_b2)
 
     twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad_b2,
@@ -132,18 +146,6 @@ if generate_b4_from_b2:
 
 
 
-# Prepare bb dataframes
-if enable_bb_python:
-    import beambeam as bb
-    bb_dfs = bb.generate_bb_dataframes(mad,
-        ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
-        harmonic_number=35640,
-        numberOfLRPerIRSide=[25, 20, 25, 20],
-        bunch_spacing_buckets=10,
-        numberOfHOSlices=11,
-        bunch_population_ppb=None,
-        sigmaz_m=None,
-        remove_dummy_lenses=True)
 
 # Here the datafremes can be edited, e.g. to set bbb intensity
 
@@ -186,6 +188,8 @@ if enable_bb_python:
 
     # Disable bb
     mad_track.globals.on_bb_charge = 0
+else:
+    bb_df_track = None
 
 
 # Legacy bb macros
@@ -200,7 +204,7 @@ if enable_bb_legacy:
 mad_track.use(sequence_to_track)
 # Disable use
 mad_track._use = mad_track.use
-mad_track.use = None
+mad_track.usei = None
 
 # Install and correct errors
 mad_track.call("modules/module_04_errors.madx")
@@ -209,5 +213,27 @@ mad_track.call("modules/module_04_errors.madx")
 mad_track.call("modules/module_05_tuning.madx")
 
 # # Generate sixtrack
-# mad_track.call("modules/module_06_generate.madx")
 
+if enable_bb_legacy:
+    mad_track.call("modules/module_06_generate.madx")
+else:
+    pmt.generate_sixtrack_input(mad_track,
+        seq_name=sequence_to_track,
+        bb_df=bb_df_track,
+        output_folder='./',
+        reference_bunch_charge_sixtrack_ppb=(
+            mad_track.sequence[sequence_to_track].beam.npart),
+        emitnx_sixtrack_um=(
+            mad_track.sequence[sequence_to_track].beam.exn),
+        emitny_sixtrack_um=(
+            mad_track.sequence[sequence_to_track].beam.eyn),
+        sigz_sixtrack_m=(
+            mad_track.sequence[sequence_to_track].beam.sigt),
+        sige_sixtrack=(
+            mad_track.sequence[sequence_to_track].beam.sige),
+        ibeco_sixtrack=flag_ibeco_sixtrack,
+        ibtyp_sixtrack=0,
+        lhc_sixtrack=2,
+        ibbc_sixtrack=0,
+        radius_sixtrack_multip_conversion_mad=0.017,
+        skip_mad_use=True)

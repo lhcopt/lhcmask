@@ -183,3 +183,135 @@ def check_separations_against_madvars(checks, twiss_df_b1, twiss_df_b2, variable
         target = variables_dict['all_variables_val'][cc['varname']]*cc['scale_factor']
         check_separation_value(twiss_df_b1, twiss_df_b2, cc['element_name'],
                 cc['plane'], target, cc['tol'])
+
+def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
+        reference_bunch_charge_sixtrack_ppb,
+        emitnx_sixtrack_um,
+        emitny_sixtrack_um,
+        sigz_sixtrack_m,
+        sige_sixtrack,
+        ibeco_sixtrack,
+        ibtyp_sixtrack,
+        lhc_sixtrack,
+        ibbc_sixtrack,
+        radius_sixtrack_multip_conversion_mad,
+        skip_mad_use=False):
+
+    six_fol_name = output_folder
+    os.makedirs(six_fol_name, exist_ok=True)
+
+    os.system('rm fc.*')
+    if not skip_mad_use:
+        mad.use(seq_name)
+    mad.twiss()
+    mad.input(f'sixtrack, cavall, radius={radius_sixtrack_multip_conversion_mad}')
+    os.system(f'mv fc.* {six_fol_name}')
+    os.system(f'cp {six_fol_name}/fc.2 {six_fol_name}/fc.2.old')
+
+    with open(six_fol_name + '/fc.2', 'r') as fid:
+        fc2lines = fid.readlines()
+
+    for ii, ll in enumerate(fc2lines):
+        llfields = ll.split()
+        try:
+            if int(llfields[1]) == 20:
+                newll = ' '.join([
+                    llfields[0],
+                    llfields[1]]
+                    + (len(llfields)-2)* ['0.0']
+                    +['\n'])
+                fc2lines[ii] = newll
+        except ValueError:
+            pass # line does not have an integer in the second field
+        except IndexError:
+            pass # line has less than two fields
+
+    with open(six_fol_name + '/fc.2', 'w') as fid:
+        fid.writelines(fc2lines)
+
+    # http://sixtrack.web.cern.ch/SixTrack/docs/user_full/manual.php#Ch6.S6
+
+    if bb_df is not None:
+        sxt_df_4d = bb_df[bb_df['label']=='bb_lr'].copy()
+        sxt_df_4d['h-sep [mm]'] = -sxt_df_4d['separation_x']*1e3
+        sxt_df_4d['v-sep [mm]'] = -sxt_df_4d['separation_y']*1e3
+        sxt_df_4d['strength-ratio'] = sxt_df_4d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
+        sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
+        sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
+        sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
+        sxt_df_4d['fort3entry'] = sxt_df_4d.apply(lambda x: ' '.join([
+                f"{x.elementName}",
+                '0',
+                f"{x['4dSxx [mm*mm]']}",
+                f"{x['4dSyy [mm*mm]']}",
+                f"{x['h-sep [mm]']}",
+                f"{x['v-sep [mm]']}",
+                f"{x['strength-ratio']}",
+                # f"{x['4dSxy [mm*mm]']}" Not really used
+                ]), axis=1)
+
+
+        sxt_df_6d = bb_df[bb_df['label']=='bb_ho'].copy()
+        sxt_df_6d['h-sep [mm]'] = -sxt_df_6d['separation_x']*1e3
+        sxt_df_6d['v-sep [mm]'] = -sxt_df_6d['separation_y']*1e3
+        sxt_df_6d['phi [rad]'] = sxt_df_6d['phi']
+        sxt_df_6d['alpha [rad]'] = sxt_df_6d['alpha']
+        sxt_df_6d['strength-ratio'] = sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
+        sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
+        sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
+        sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
+        sxt_df_6d['Syy [mm*mm]'] = sxt_df_6d['other_Sigma_33'] *1e6
+        sxt_df_6d['Syyp [mm*mrad]'] = sxt_df_6d['other_Sigma_34'] *1e6
+        sxt_df_6d['Sypyp [mrad*mrad]'] = sxt_df_6d['other_Sigma_44'] *1e6
+        sxt_df_6d['Sxy [mm*mm]'] = sxt_df_6d['other_Sigma_13'] *1e6
+        sxt_df_6d['Sxyp [mm*mrad]'] = sxt_df_6d['other_Sigma_14'] *1e6
+        sxt_df_6d['Sxpy [mrad*mm]'] = sxt_df_6d['other_Sigma_23'] *1e6
+        sxt_df_6d['Sxpyp [mrad*mrad]'] = sxt_df_6d['other_Sigma_24'] *1e6
+        sxt_df_6d['fort3entry'] = sxt_df_6d.apply(lambda x: ' '.join([
+                f"{x.elementName}",
+                '1',
+                f"{x['phi [rad]']}",
+                f"{x['alpha [rad]']}",
+                f"{x['h-sep [mm]']}",
+                f"{x['v-sep [mm]']}",
+                '\n'
+                f"{x['Sxx [mm*mm]']}",
+                f"{x['Sxxp [mm*mrad]']}",
+                f"{x['Sxpxp [mrad*mrad]']}",
+                f"{x['Syy [mm*mm]']}",
+                f"{x['Syyp [mm*mrad]']}",
+                '\n',
+                f"{x['Sypyp [mrad*mrad]']}",
+                f"{x['Sxy [mm*mm]']}",
+                f"{x['Sxyp [mm*mrad]']}",
+                f"{x['Sxpy [mrad*mm]']}",
+                f"{x['Sxpyp [mrad*mrad]']}",
+                f"{x['strength-ratio']}",
+                ]), axis=1)
+
+        f3_common_settings = ' '.join([
+            f"{reference_bunch_charge_sixtrack_ppb}",
+            f"{emitnx_sixtrack_um}",
+            f"{emitny_sixtrack_um}",
+            f"{sigz_sixtrack_m}",
+            f"{sige_sixtrack}",
+            f"{ibeco_sixtrack}",
+            f"{ibtyp_sixtrack}",
+            f"{lhc_sixtrack}",
+            f"{ibbc_sixtrack}",
+            ])
+
+        f3_string = '\n'.join([
+            'BEAM',
+            'EXPERT',
+            f3_common_settings])
+
+        f3_string += '\n'.join(
+            list(sxt_df_6d['fort3entry'].values)
+          + list(sxt_df_4d['fort3entry'].values))
+
+        f3_string += '\nNEXT\n'
+
+    with open(six_fol_name + '/fc.3', 'a') as fid:
+        fid.write(f3_string)
+
