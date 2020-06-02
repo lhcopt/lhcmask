@@ -18,7 +18,7 @@ import optics_specific_tools as ost
 mode = 'b1_with_bb'
 mode = 'b1_with_bb_legacy_macros'
 mode = 'b4_without_bb'
-mode = 'b4_from_b2_without_bb'
+#mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 flag_ibeco_sixtrack = 1
@@ -108,6 +108,12 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 # Call leveling module
 mad.use(f'lhcb{beam_to_configure}')
 mad.call("modules/module_02_lumilevel.madx")
+# TEMP
+#FORCE SEP
+mad.globals.on_sep8 = -0.03425547139366354
+mad.globals.on_sep2 = 0.14471680504084292
+##### 
+
 
 # Prepare bb dataframes
 if enable_bb_python:
@@ -127,7 +133,29 @@ if generate_b4_from_b2:
     mad_b2 = mad
     mad_b4 = Madx()
     ost.build_sequence(mad_b4, beam=4)
-    #ost.apply_optics(mad_b4, optics_file=optics_file)
+    ost.apply_optics(mad_b4, optics_file=optics_file)
+
+
+    # TEMP
+    mad_b4.set_variables_from_dict(params=parameters)
+    mad_b4.call("modules/submodule_01a_preparation.madx")
+    mad_b4.call("modules/submodule_01b_beam.madx")
+    mad_b4.call("modules/submodule_01c_phase.madx")
+    mad_b4.call("modules/submodule_01d_crossing.madx")
+    mad_b4.call("modules/submodule_01e_test.madx")
+    mad_b4.call("modules/submodule_01f_use.madx")
+    mad_b4.input('exec, crossing_disable')
+    mad_b4.input('exec, crossing_restore')
+    mad_b4.use(f'lhcb2')
+    mad_b4.call("modules/module_02_lumilevel.madx")
+
+
+    # TEMP
+    #FORCE SEP
+    mad_b4.globals.on_sep8 = -0.03425547139366354
+    mad_b4.globals.on_sep2 = 0.14471680504084292
+    ##### 
+
     pmt.configure_b4_from_b2(mad_b4, mad_b2)
 
     twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad_b2,
@@ -154,6 +182,32 @@ if track_from_b4_mad_instance:
     mad_track = mad_b4
 else:
     mad_track = mad
+
+#TEMP
+mad_track.input('sixtrack,cavall, radius=0.017;')
+os.system(f'mv fc.2 {mode}_fc.2')
+
+vardictb2 = mad_b2.get_variables_dicts()
+vardictb4 = mad_b4.get_variables_dicts()
+
+for nn in vardictb4['all_variables_val'].keys():
+    try:
+        vv2 = vardictb2['all_variables_val'][nn]
+        vv4 = vardictb4['all_variables_val'][nn]
+        if (vv2 != vv4):
+            print(nn, vv2, vv4)
+    except KeyError:
+        print('Not found: '+nn)
+
+#ENDTEMP
+
+
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_track_intermediate',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+prrrr
 
 mad_track.input('on_disp = 0;')
 
