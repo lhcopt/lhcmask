@@ -198,6 +198,9 @@ if enable_bb_legacy:
 
 # Final use
 mad_track.use(sequence_to_track)
+# Disable use
+mad_track._use = mad_track.use
+mad_track.use = None
 
 # Install and correct errors
 mad_track.call("modules/module_04_errors.madx")
