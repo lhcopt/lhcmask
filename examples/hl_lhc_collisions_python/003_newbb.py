@@ -17,8 +17,8 @@ import optics_specific_tools as ost
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
 mode = 'b1_with_bb_legacy_macros'
-mode = 'b4_without_bb'
-#mode = 'b4_from_b2_without_bb'
+#mode = 'b4_without_bb'
+mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 flag_ibeco_sixtrack = 1
@@ -115,7 +115,6 @@ mad.globals.on_sep8 = -0.03425547139366354
 mad.globals.on_sep2 = 0.14471680504084292
 mad.input('exec, crossing_save')
 ##### 
-
 
 # Prepare bb dataframes
 if enable_bb_python:
@@ -253,5 +252,3 @@ else:
         radius_sixtrack_multip_conversion_mad=0.017,
         skip_mad_use=True)
 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST
-os.system(f'cp fc.2 {mode}_fc.2')

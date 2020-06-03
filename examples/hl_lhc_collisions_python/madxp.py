@@ -38,7 +38,8 @@ def _extract_parameters(my_string):
     Returns:
         The list of the parameters present in the MAD-X expression.
     '''
-    if type(my_string)=='NoneType' or my_string==None or my_string=='None' or my_string=='[None]':
+    if (type(my_string)=='NoneType' or my_string==None
+            or my_string=='None' or my_string=='[None]' or 'table(' in my_string):
         return []
     else:
         for i in [
@@ -51,7 +52,7 @@ def _extract_parameters(my_string):
         if type(my_list)=='NoneType':
             my_list=[]
         for i in my_list.copy():
-            if i.isdigit() or i[0].isdigit():
+            if i.isdigit() or i[0].isdigit() or i[0]=='.':
                 my_list.remove(i)
         my_list=list(set(my_list)-
         set([

@@ -5,7 +5,7 @@ def make_links(links_dict, force=False):
         if force:
             if os.path.exists(kk):
                 os.remove(kk)
-        os.symlink(links_dict[kk], kk)
+        os.symlink(os.path.abspath(links_dict[kk]), kk)
 
 def get_pymask_configuration(mode):
 
@@ -88,13 +88,13 @@ def configure_b4_from_b2(mad_b4, mad_b2):
             print(f'The constant {nn} cannot be assigned!')
         else:
             if nn not in b4_const.keys():
-                mad_b4.input(f'const {nn}={b2_const[nn]}')
+                mad_b4.input(f'const {nn}={b2_const[nn]:.50e}')
 
     # %% INDEPENDENT
     b2_indep=var_dicts_b2['independent_variables']
     b4_indep=var_dicts_b4['independent_variables']
     for nn in b2_indep.keys():
-        mad_b4.input(f'{nn}={b2_indep[nn]}')
+        mad_b4.input(f'{nn}={b2_indep[nn]:.50e}')
 
     # %% DEPENDENT
     b2_dep=var_dicts_b2['dependent_variables_expr']

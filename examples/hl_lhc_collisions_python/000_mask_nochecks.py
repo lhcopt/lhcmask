@@ -15,7 +15,9 @@ make_links(force=True, links_dict={
 mad = Madx()
 
 # Build sequence
-mad.input('mylhcbeam = 1')
+mad.input('mylhcbeam = 4')
+mad.input('on_bb_switch = 0')
+
 mad.call('hl14_thin.madx')
 
 # Make optics
@@ -29,7 +31,7 @@ mad.set_variables_from_dict(params=parameters)
 # Call mask modules
 mad.call("modules/module_01_orbit.madx")
 mad.call("modules/module_02_lumilevel.madx")
-#mad.call("modules/module_03_beambeam.madx")
-mad.call("modules/module_04_errors.madx")
-mad.call("modules/module_05_tuning.madx")
+mad.call("modules/module_03_beambeam.madx")
+#mad.call("modules/module_04_errors.madx")
+#mad.call("modules/module_05_tuning.madx")
 mad.call("modules/module_06_generate.madx")
