@@ -1,0 +1,266 @@
+!*************************!
+!   Prepare environment   !
+!*************************!
+
+! Check documentation at http://lhcmaskdoc.web.cern.ch/mainmask/
+system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
+
+! Mask code folder
+system, "ln -fns tracking_tools/modules modules";
+
+! Machine folder
+system, "ln -fns tracking_tools/machines machines"; 
+
+! Toolkit folder
+system, "ln -fns tracking_tools/tools tools"; 
+
+! Beam-beam macros folder
+system, "ln -fns tracking_tools/beambeam_macros beambeam_macros"; 
+
+! Errors folder
+system, "ln -fns tracking_tools/errors errors";  
+
+
+!*************************!
+!  General configuration  !
+!*************************!
+
+! Choose build machine script (sequence, makethin, optics, optics toolkit, cycle)
+system, "ln -fns machines/sequences/hl14_thin.madx make_sequence.madx";
+
+! Choose optics (magnet strengths)
+system, "ln -fns machines/optics/hl14_collision.madx optics.madx";
+
+par_verbose              = 1;
+
+mylhcbeam                = 4;            ! LHC beam 1 (clockwise), LHC beam 2 (clockwise), LHC beam 2 (counterclockwise)
+
+! Beam parameters
+par_beam_norm_emit       = %EMIT_BEAM;   ! [um]
+par_beam_sigt            = 0.076;        ! [m]
+par_beam_sige            = 1.1e-4;       ! [-]
+par_beam_npart           = %NPART;       ! [-]
+par_beam_energy_tot      = 7000;         ! [GeV]
+
+! Settings
+par_oct_current          = -235;         ! [A]
+par_chromaticity         = 5;            ! [-] (Q'=5 for colliding bunches, Q'=15 for non-colliding bunches)
+par_vrf_total            = 16.;          ! [MV]
+
+! Tunes
+par_qx0                  = 62.31;
+par_qy0                  = 60.32;
+
+!IP specific orbit settings
+par_x1                   = %XING;        ! [urad]
+par_sep1                 = 0;            ! [mm]
+par_x2                   = -170;         ! [urad]
+par_sep2                 = 0.138;        ! [mm]
+par_x5                   = par_x1;       ! [urad]
+par_sep5                 = 0;            ! [mm]
+par_x8                   = -250;         ! [urad]
+par_sep8                 = -0.043;       ! [mm]
+par_a1                   = 0;            ! [urad]
+par_o1                   = 0;            ! [mm]
+par_a2                   = 0;            ! [urad]
+par_o2                   = 0;            ! [mm]
+par_a5                   = 0;            ! [urad]
+par_o5                   = 0;            ! [mm]
+par_a8                   = 0;            ! [urad]
+par_o8                   = 0;            ! [mm]
+par_crab1                = -190;         ! [urad]
+par_crab5                = par_crab1;    ! [urad]
+
+! Dispersion correction knob
+par_on_disp              = 1;
+
+! Magnets of the experiments
+par_on_alice             = 1;
+par_on_lhcb              = 1;
+
+par_on_sol_atlas         = 0;
+par_on_sol_cms           = 0;
+par_on_sol_alice         = 0;
+
+
+!*************************!
+! Beam-beam configuration !
+!*************************!
+
+par_on_collision         = 1;            ! If 1 lumi leveling in ip8 is applied and q/q' match is done with bb off 
+par_on_bb_switch         = 0;
+par_b_t_dist             = 25.;          ! bunch separation [ns]
+par_n_inside_D1          = 5;            ! default value for the number of additionnal parasitic encounters inside D1
+
+par_nho_IR1              = 11;           ! number of slices for head-on in IR1 (between 0 and 201)
+par_nho_IR2              = 11;           ! number of slices for head-on in IR2 (between 0 and 201)
+par_nho_IR5              = 11;           ! number of slices for head-on in IR5 (between 0 and 201)
+par_nho_IR8              = 11;           ! number of slices for head-on in IR8 (between 0 and 201)
+
+par_install_crabcavities = 1;
+
+
+!*************************!
+!     Leveling in IP8     !
+!*************************!
+
+! This variables set the leveled luminosity in IP8 (considered if par_on_collision=1)
+par_lumi_ip8             = 2e33;         ![Hz/cm2]
+
+! These variables define the number of Head-On collisions in the 4 IPs
+par_nco_IP1              = 2748;
+par_nco_IP2              = 2494;
+par_nco_IP5              = par_nco_IP1;
+par_nco_IP8              = 2572;
+
+
+!*************************!
+!  Errors and corrections !
+!*************************!
+
+! Select seed for errors
+par_myseed               = %SEEDRAN;
+
+! Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
+par_correct_for_D2       = 0;
+! Set this flag to correct the errors of MCBXF in the NLC (warning: this might be less reproducable in reality, use with care)
+par_correct_for_MCBX     = 0;
+
+par_on_errors_LHC        = 1;
+par_on_errors_MBH        = 1;
+par_on_errors_Q5         = 1;
+par_on_errors_Q4         = 1;
+par_on_errors_D2         = 1;
+par_on_errors_D1         = 1;
+par_on_errors_IT         = 1;
+par_on_errors_MCBRD      = 0;
+par_on_errors_MCBXF      = 0;
+
+
+!*************************!
+!           RUN           !
+!*************************!
+
+! Build machine and optics
+! (the user can intruduce in this section additional custom code 
+! to edit machine and/or optics)
+call, file="make_sequence.madx";
+call, file="optics.madx";
+
+! Call mask modules
+call, file="modules/module_01_orbit.madx";
+call, file="modules/module_02_lumilevel.madx";
+! I have to force the values as the leveling does not work on b4
+on_sep8 = -0.03425547139366354;
+on_sep2 = 0.14471680504084292;
+exec, crossing_save;
+
+
+
+call, file="modules/module_03_beambeam.madx";
+call, file="modules/module_04_errors.madx";
+
+! I have to force this (it's just a rounding error)
+kqtd.a67b2 := 0.3256812283e-03+dkqtd.a67b2+1.0*kqtd.b2;
+kss.a12b2 :=  -.28697336e-01/l.mss;
+kss.a34b2 := -.19503133e-01/l.mss;
+kss.a56b2 := -.13313494e-03/l.mss;
+kss.a67b2 := -.21770186e-02/l.mss;
+
+
+call, file="modules/module_05_tuning.madx";
+
+! I try some more
+b21= -0.0066424155;
+b22= 0.031440365;
+b31= 0.043778852;
+b61= -0.010349824;
+b62= 0.023562274;
+b72= -0.020102376;
+b_t_dist= 0.0;
+beamx= 3.350971718928571e-10;
+beamy= 3.350971718928571e-10;
+closest1= 0.00011405986249712896;
+closest2= 0.00011324142807467297;
+cmiskew= 0.001017445046035728;
+cmrskew= -0.0017910847200135074;
+cta0= 0.000970098527808716;
+ctam= 0.001479097078536995;
+ctap= 0.000462259975734014;
+halo8= 3.055828191427181;
+kqtd= -3.7061906302662356e-05;
+kqtf= -5.901401534201236e-06;
+ksd= -0.006776238764785617;
+ksf= 0.005963376724770219;
+mux_ip15_ref= 31.379498160295967;
+muy_ip15_ref= 30.331055953126093;
+nho_ir1= 0.0;
+nho_ir2= 0.0;
+nho_ir5= 0.0;
+nho_ir8= 0.0;
+offlvl_int= 219999999999.99994;
+offlvl_l0= 2.0649036597409149e+34;
+offlvl_log= 1.5279140957135906;
+offlvl_phi_2= -0.0001150121307126104;
+offlvl_px= -0.0001150121307126104;
+offlvl_py= 1.8097362200838896e-06;
+offlvl_sigeff= 2.406325692712561e-05;
+offlvl_sigp= 2.241976266196865e-05;
+offlvl_sigx= 2.2419558819963593e-05;
+offlvl_sigz= 0.076;
+offlvl_sx= 2.2419558819963593e-05;
+offlvl_sy= 2.241976266196865e-05;
+pos_mbl= -315.797763252892;
+pos_mbr= 315.797763252892;
+qx= 62.31505659350815;
+qy= 60.31494335208008;
+sepr1= 6.142537719038808e-11;
+sepr2= 4.767932789873738;
+sepr5= 2.8038710027837196e-11;
+sepr8= 3.8359014453870515;
+sepx1= -8.624885019031097e-12;
+sepx2= -4.767932789873738;
+sepx5= 2.8033888710978026e-11;
+sepx8= 2.3144895443626897e-11;
+sepy1= -6.081684241548504e-11;
+sepy2= -6.723870500317726e-13;
+sepy5= 5.199459256854492e-13;
+sepy8= -3.8359014453870515;
+sige= 0.00011;
+sigz= 0.076;
+tar= 2.9229409419836814e-14;
+val_betx1= 0.15131438934120597;
+val_betx2= 10.034917439895555;
+val_betx5= 0.15384334888076417;
+val_betx8= 1.5357272264745723;
+val_betxmax= 21968.4008331121;
+val_bety1= 0.15048293735819449;
+val_bety2= 10.00799725976868;
+val_bety5= 0.15443243034264276;
+val_bety8= 1.5288021570224557;
+val_betymax= 21670.85320250036;
+val_dq1= -0.038725332274225366;
+val_dq2= 1.6157696265395316;
+val_pxnom1= -0.000253242733373506;
+val_pxnom2= -5.789261051853537e-07;
+val_pxnom5= -6.684157310636196e-07;
+val_pxnom8= 0.0001151954075712951;
+val_pynom1= -2.0108377132241992e-06;
+val_pynom2= -0.00010037349581639026;
+val_pynom5= 0.000252179526706816;
+val_pynom8= 1.1144435724333507e-06;
+val_q1= 62.31641464313002;
+val_q2= 60.31861244938853;
+val_xnom1= -1.4755875614886889e-06;
+val_xnom2= -0.00014855976982160952;
+val_xnom5= -2.0289640010684374e-07;
+val_xnom8= 1.6291770046411493e-06;
+val_ynom1= -4.314659468156664e-07;
+val_ynom2= -2.2238414938122219e-07;
+val_ynom5= -1.9228307960455788e-07;
+val_ynom8= 3.815290024797055e-05;
+
+
+call, file="modules/module_06_generate.madx";
+
+stop;

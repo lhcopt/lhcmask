@@ -111,8 +111,8 @@ mad.call("modules/module_02_lumilevel.madx")
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TEMP
 #FORCE SEP
-mad.globals.on_sep8 = -0.03425547139366354
-mad.globals.on_sep2 = 0.14471680504084292
+mad.input('on_sep2 = 0.14471680504084292')
+mad.input('on_sep8 =  -0.03425547139366354')
 mad.input('exec, crossing_save')
 ##### 
 
