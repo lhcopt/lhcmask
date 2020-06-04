@@ -1,6 +1,15 @@
 
 exec, crossing_disable;
-call, file="modules/submodule_01c_phase.madx";
+if (mylhcbeam==1){
+    exec, check_ip(b1);
+  } else {
+    exec, check_ip(b2);
+  };
+mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+
+value, mux_ip15_ref, muy_ip15_ref;
+  
 exec, crossing_restore;
 
 on_disp = 0;
