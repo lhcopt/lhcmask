@@ -30,4 +30,4 @@ if (ON_COLLISION==1){
   exec, crossing_save;
 };
 
-if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
+exec, use_and_store_for_matching;

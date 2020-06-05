@@ -1,4 +1,4 @@
-store_references_for_matching: macro = {
+use_and_store_for_matching: macro = {
 	on_disp=0; !more precise angles at IPs
 
 	!Record the nominal IP position and crossing angle
