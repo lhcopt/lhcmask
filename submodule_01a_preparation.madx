@@ -17,6 +17,7 @@ if ( ver_lhc_run <> 0 && ver_hllhc_optics <> 0 ) {
   stop;
 };
 
+call, file="modules/module_macros.madx";
 system, "if [ -d temp ]; then rm -r temp; fi";
 system, "mkdir temp";
 
