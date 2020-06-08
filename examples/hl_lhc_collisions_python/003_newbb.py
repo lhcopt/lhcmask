@@ -18,7 +18,7 @@ import optics_specific_tools as ost
 mode = 'b1_with_bb'
 mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
-mode = 'b4_from_b2_without_bb'
+#mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 flag_ibeco_sixtrack = 1
@@ -75,7 +75,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_from_optics',
         save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
+        check_betas_at_ips=check_betas_at_ips,
+        check_separations_at_ips=check_separations_at_ips)
 
 # Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
@@ -161,26 +162,6 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
-mad_track.input('exec, crossing_disable')
-ATTENTION
-mad_track.call("modules/submodule_01c_phase.madx")
-mad_track.input('exec, crossing_restore')
-
-mad_track.input('on_disp = 0;')
-mad_track.input('''
-!Record the nominal IP position and crossing angle
-if(mylhcbeam==1) {use,  sequence=lhcb1;};
-if(mylhcbeam>1) {use,  sequence=lhcb2;};
-twiss;
-xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
-xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
-xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
-xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
-value,xnom1,xnom2,xnom5,xnom8;
-value,ynom1,ynom2,ynom5,ynom8;
-value,pxnom1,pxnom2,pxnom5,pxnom8;
-value,pynom1,pynom2,pynom5,pynom8;
-''')
 
 # Install bb lenses
 if enable_bb_python:
@@ -210,6 +191,32 @@ if enable_bb_legacy:
     mad_track.call("modules/module_03_beambeam.madx")
 
 
+mad_track.input('''
+exec, crossing_disable;
+on_disp = 0;
+if(mylhcbeam==1)
+ {exec, check_ip(1)};
+if(mylhcbeam>1)
+ {exec, check_ip(2)};
+mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+value, mux_ip15_ref, muy_ip15_ref;
+exec, crossing_restore;
+
+on_disp = 0;
+ !Record the nominal IP position and crossing angle
+ if(mylhcbeam==1) {use,  sequence=lhcb1;};
+ if(mylhcbeam>1) {use,  sequence=lhcb2;};
+ twiss;
+ xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+ xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+ xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+ xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+ value,xnom1,xnom2,xnom5,xnom8;
+ value,ynom1,ynom2,ynom5,ynom8;
+ value,pxnom1,pxnom2,pxnom5,pxnom8;
+ value,pynom1,pynom2,pynom5,pynom8;
+''')
 
 # Final use
 mad_track.use(sequence_to_track)
