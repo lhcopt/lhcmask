@@ -307,6 +307,8 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             'EXPERT',
             f3_common_settings])
 
+        f3_string += '\n'
+
         f3_string += '\n'.join(
             list(sxt_df_6d['fort3entry'].values)
           + list(sxt_df_4d['fort3entry'].values))

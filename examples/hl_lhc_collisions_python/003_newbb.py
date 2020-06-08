@@ -17,9 +17,9 @@ import optics_specific_tools as ost
 # Select mode
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-mode = 'b1_with_bb_legacy_macros'
+#mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
-mode = 'b4_from_b2_without_bb'
+#mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 flag_ibeco_sixtrack = 1
@@ -114,6 +114,7 @@ mad.call("modules/module_02_lumilevel.madx")
 # Prepare bb dataframes
 if enable_bb_python:
     import beambeam as bb
+    mad.input('on_disp = 0')
     bb_dfs = bb.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
