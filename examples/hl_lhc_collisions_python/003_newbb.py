@@ -1,4 +1,5 @@
 import os
+import pickle
 
 import numpy as np
 
@@ -230,8 +231,7 @@ mad_track.call("modules/module_04_errors.madx")
 # Machine tuning (enables bb)
 mad_track.call("modules/module_05_tuning.madx")
 
-# # Generate sixtrack
-
+# Generate sixtrack
 if enable_bb_legacy:
     mad_track.call("modules/module_06_generate.madx")
 else:
@@ -256,3 +256,19 @@ else:
         radius_sixtrack_multip_conversion_mad=0.017,
         skip_mad_use=True)
 
+# Get optics and orbit at start ring
+optics_orbit_start_ring = pmt.get_optics_and_orbit_at_start_ring(
+        mad_track, sequence_to_track, skip_mad_use=True)
+with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
+    pickle.dump(optics_orbit_start_ring, fid)
+
+# Generate pysixtrack lines
+if enable_bb_legacy:
+    print('Pysixtrack line is not generated with bb legacy macros')
+else:
+    pysix_fol_name = "./pysixtrack"
+    dct_pysxt = pmt.generate_pysixtrack_line_with_bb(mad_track,
+        sequence_to_track, bb_df_track,
+        closed_orbit_method='from_mad',
+        pickle_lines_in_folder=pysix_fol_name,
+        skip_mad_use=True)
