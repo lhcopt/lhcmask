@@ -151,10 +151,51 @@ call, file="optics.madx";
 ! Call mask modules
 call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
-call, file="modules/module_40_save_references.madx";
 call, file="modules/module_03_beambeam.madx";
+
+exec, crossing_disable;
+on_disp = 0;
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+twiss;
+mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+value, mux_ip15_ref, muy_ip15_ref;
+exec, crossing_restore;
+
+on_disp = 0;
+ !Record the nominal IP position and crossing angle
+ if(mylhcbeam==1) {use,  sequence=lhcb1;};
+ if(mylhcbeam>1) {use,  sequence=lhcb2;};
+ twiss;
+ xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+ xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+ xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+ xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+ value,xnom1,xnom2,xnom5,xnom8;
+ value,ynom1,ynom2,ynom5,ynom8;
+ value,pxnom1,pxnom2,pxnom5,pxnom8;
+ value,pynom1,pynom2,pynom5,pynom8;
+xnom1              = -9.63855731339613441833e-17 ;
+xnom2              = -1.44716805041729190207e-04 ;
+xnom5              = 2.51729757562323457341e-16 ;
+xnom8              = 6.02057466381200612204e-16 ;
+ynom1              = -2.32055362121390857693e-16 ;
+ynom2              = 2.38416057729562425038e-16 ;
+ynom5              = -6.51605505663788164838e-17 ;
+ynom8              = -3.42554713943081669660e-05 ;
+pxnom1             = 2.49999999999118928309e-04 ;
+pxnom2             = 2.91925889626332964755e-07 ;
+pxnom5             = -1.82519810781243950679e-16 ;
+pxnom8             = -1.15012130712610348188e-04 ;
+pynom1             = -4.16922173014038954805e-16 ;
+pynom2             = -1.00000608722281936029e-04 ;
+pynom5             = 2.49999999998857147694e-04 ;
+pynom8             = 1.80973622017296190823e-06 ;
+mux_ip15_ref       = 3.13794981598636653075e+01 ;
+muy_ip15_ref       = 3.03310559530274161943e+01 ;
+
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
 call, file="modules/module_06_generate.madx";
 
-stop;

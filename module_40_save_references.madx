@@ -1,6 +1,12 @@
 
 exec, crossing_disable;
-call, file="modules/submodule_01c_phase.madx";
+on_disp = 0;
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+twiss;
+mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+value, mux_ip15_ref, muy_ip15_ref;
 exec, crossing_restore;
 
 on_disp = 0;
@@ -16,3 +22,5 @@ value,xnom1,xnom2,xnom5,xnom8;
 value,ynom1,ynom2,ynom5,ynom8;
 value,pxnom1,pxnom2,pxnom5,pxnom8;
 value,pynom1,pynom2,pynom5,pynom8;
+
+!exec, crossing_restore;
