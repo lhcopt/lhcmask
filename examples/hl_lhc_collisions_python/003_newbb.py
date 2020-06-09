@@ -30,7 +30,8 @@ tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
 
 pmt.make_links(force=True, links_dict={
     'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-    'modules': 'tracking_tools/modules',
+    'modules': '/home/giadarol/Desktop/20191212_pymask/lhcmask',
+    #'modules': 'tracking_tools/modules',
     'tools': 'tracking_tools/tools',
     'beambeam_macros': 'tracking_tools/beambeam_macros',
     'errors': 'tracking_tools/errors'})
@@ -192,6 +193,10 @@ if enable_bb_legacy:
     assert(not(enable_bb_python))
     mad_track.call("modules/module_03_beambeam.madx")
 
+# Install crab cavities
+if not enable_bb_legacy:
+    if parameters.par_install_crabcavities > 0:
+        mad.call("tools/enable_crabcavities.madx")
 
 mad_track.input('''
 exec, crossing_disable;
