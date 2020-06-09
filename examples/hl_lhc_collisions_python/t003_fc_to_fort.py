@@ -1,0 +1,20 @@
+import shutil
+
+folder_list = [
+    './',
+    '../hl_lhc_collision/',
+    '../hl_lhc_collision/reference',
+    '../hl_lhc_collision_nobb_b4']
+
+for sixtrack_input_folder in folder_list:
+    for iff in [2,8,16,34]:
+        shutil.copy(sixtrack_input_folder + f"/fc.{iff}",
+                sixtrack_input_folder + f"/fort.{iff}")
+
+    with open(sixtrack_input_folder + "/fort.3", "w") as fout:
+        with open("fort_parts/fort_beginning.3", "r") as fid_fort3b:
+            fout.write(fid_fort3b.read())
+        with open(sixtrack_input_folder + "/fc.3", "r") as fid_fc3:
+            fout.write(fid_fc3.read())
+        with open("fort_parts/fort_end.3", "r") as fid_fort3e:
+            fout.write(fid_fort3e.read())

@@ -177,7 +177,7 @@ on_disp = 0;
  value,ynom1,ynom2,ynom5,ynom8;
  value,pxnom1,pxnom2,pxnom5,pxnom8;
  value,pynom1,pynom2,pynom5,pynom8;
-
+ 
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
 call, file="modules/module_06_generate.madx";
