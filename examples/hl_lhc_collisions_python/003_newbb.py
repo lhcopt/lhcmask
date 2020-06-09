@@ -195,7 +195,7 @@ if enable_bb_legacy:
 
 # Install crab cavities
 if not enable_bb_legacy:
-    if parameters.par_install_crabcavities > 0:
+    if parameters['par_install_crabcavities'] > 0: # Do we want to keep this?
         mad.call("tools/enable_crabcavities.madx")
 
 mad_track.input('''
