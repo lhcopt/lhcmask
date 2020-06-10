@@ -1,7 +1,24 @@
+import itertools
+
 import numpy as np
 import pandas as pd
 
 from cpymad.madx import Madx
+import cpymad
+
+def knob_df(my_knob,my_df):
+    '''
+    Filter the pandas DF, 'my_df', returning only the rows that depend on the selected knob, 'my_knob'.
+
+    Args:
+        my_knob: the name of the knob to filter.
+        my_df: a pandas DF (it assumes that DF has a column called "knobs").
+    Returns:
+        The filter pandas DF showing the rows that depend on the selected knob, 'my_knob'.
+
+    See madxp/examples/variablesExamples/000_run.py
+    '''
+    return my_df[my_df['knobs'].apply(lambda x: my_knob in x)]
 
 def _knobs_from_parameters(parameters, indep_df, dep_df):
     '''
