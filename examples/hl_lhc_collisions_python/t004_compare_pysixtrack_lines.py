@@ -129,10 +129,10 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 if diff_abs < 10e-6:
                     continue
             if kk == "x_bb_co":
-                if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.002:
+                if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.004:
                     continue
             if kk == "y_bb_co":
-                if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.002:
+                if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.004:
                     continue
 
         # If it got here it means that no condition above is met
