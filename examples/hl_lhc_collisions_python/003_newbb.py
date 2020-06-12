@@ -174,6 +174,12 @@ if enable_bb_python:
             bb_dfs[bacw][f'{ww}_y_crab'] = bb_dfs[bcw][f'{ww}_y_crab']
             bb_dfs[bacw][f'{ww}_py_crab'] = bb_dfs[bcw][f'{ww}_py_crab'] * (-1)
 
+    # Correct separation
+    for beam in ['b1', 'b2', 'b3', 'b4']:
+        bb_df = bb_dfs[beam]
+        bb_df['separation_x'] += bb_df['other_x_crab']
+        bb_df['separation_y'] += bb_df['other_y_crab']
+
     if True :
         for beam in ['b1', 'b2']:
             bbdf = bb_dfs[beam]

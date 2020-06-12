@@ -271,7 +271,7 @@ def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
                     'slot_id = %d'%({'bb_lr': 4, 'bb_ho': 6}[label]) # need to add 60 for central
         bb_df['elementDefinition']=bb_df.apply(lambda x: elementDefinition(x.elementName, x.elementClass,
             eattributes(np.sqrt(x['other_Sigma_11']),np.sqrt(x['other_Sigma_33']),
-                x['separation_x']+x['other_x_crab'], x['separation_y']+x['other_y_crab'],
+                x['separation_x'], x['separation_y'],
                 x['other_charge_ppb']/madx_reference_bunch_charge, x['label'])),
             axis=1)
         bb_df['elementInstallation']=bb_df.apply(lambda x: elementInstallation(x.elementName, x.elementClass, x.atPosition, x.ip_name), axis=1)
