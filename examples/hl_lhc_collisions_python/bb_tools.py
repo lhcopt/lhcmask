@@ -210,6 +210,7 @@ def generate_set_of_bb_encounters_1beam(
         # where circ is used
         BBSpacing = circumference / harmonic_number * bunch_spacing_buckets / 2.
         myBBLR['atPosition']=BBSpacing*myBBLR['identifier']
+        myBBLR['z_centroid'] = 0.
         # assuming a sequence rotated in IR3
     else:
         myBBLR = pd.DataFrame()
@@ -233,6 +234,7 @@ def generate_set_of_bb_encounters_1beam(
     myBBHO['self_relativistic_beta'] = relativistic_beta
     for ip_nn in ip_names:
         myBBHO.loc[myBBHO['ip_name']==ip_nn, 'atPosition']=list(z_centroids)
+        myBBHO.loc[myBBHO['ip_name']==ip_nn, 'z_centroid']=list(z_centroids)
 
     myBBHO['elementName']=myBBHO.apply(lambda x: elementName(x.label, x.ip_name.replace('ip', ''), x.beam, x.identifier), axis=1)
     myBBHO['other_elementName']=myBBHO.apply(lambda x: elementName(x.label, x.ip_name.replace('ip', ''), x.other_beam, x.identifier), axis=1)
@@ -335,7 +337,7 @@ def install_lenses_in_sequence(mad, bb_df, sequence_name,
 
     if regenerate_mad_bb_info_in_df:
         madx_reference_bunch_charge = mad.sequence[sequence_name].beam.npart
-        bbt.generate_mad_bb_info(bb_df, mode='from_dataframe',
+        generate_mad_bb_info(bb_df, mode='from_dataframe',
                 madx_reference_bunch_charge=madx_reference_bunch_charge)
 
     mad.input(bb_df['elementDefinition'].str.cat(sep='\n'))

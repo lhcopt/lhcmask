@@ -125,7 +125,66 @@ if enable_bb_python:
         numberOfHOSlices=11,
         bunch_population_ppb=None,
         sigmaz_m=None,
-        remove_dummy_lenses=True)
+        #remove_dummy_lenses=True)
+        remove_dummy_lenses=False)
+
+    #--------------------------------------------------------------------------
+    # Crab strong beam
+    z_crab_twiss = 1e-2
+
+    for beam in ['b1', 'b2']:
+        bb_df = bb_dfs[beam]
+
+        # Compute crab bump shape
+        mad.input('exec, crossing_disable')
+        mad.globals.z_crab = z_crab_twiss
+
+        mad.use('lhc'+beam)
+        mad.twiss()
+        tw_crab_bump_df = mad.get_twiss_df(table_name='twiss')
+
+        mad.globals.z_crab = 0
+        mad.input('exec, crossing_restore')
+
+        # Remove last part of the name
+        tw_crab_bump_df.index = tw_crab_bump_df.name.apply(
+                lambda nn: ''.join(nn.split(':')[:-1]))
+
+        bump_at_bbs = tw_crab_bump_df.loc[bb_df.index, ['x', 'y', 'px', 'py']]
+
+        rf_mod = np.sin(2.*np.pi*mad.globals.hrf400
+                /mad.globals.lhclength*2*bb_df.z_centroid)
+        rf_mod_twiss = np.sin(2.*np.pi*mad.globals.hrf400
+                /mad.globals.lhclength*2*z_crab_twiss)
+
+        for coord in ['x', 'px', 'y', 'py']:
+            bb_df[f'self_{coord}_crab'] = bump_at_bbs[coord]*rf_mod/rf_mod_twiss
+
+    for coord in ['x', 'px', 'y', 'py']:
+        bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'][f'self_{coord}_crab']
+        bb_dfs['b1'][f'other_{coord}_crab'] = bb_dfs['b2'][f'self_{coord}_crab']
+
+    # Handle b3 and b4
+    for bcw, bacw in zip(['b1', 'b2'], ['b3', 'b4']):
+        for ww in ['self', 'other']:
+            bb_dfs[bacw][f'{ww}_x_crab'] = bb_dfs[bcw][f'{ww}_x_crab'] * (-1)
+            bb_dfs[bacw][f'{ww}_px_crab'] = bb_dfs[bcw][f'{ww}_px_crab'] * (-1) * (-1)
+            bb_dfs[bacw][f'{ww}_y_crab'] = bb_dfs[bcw][f'{ww}_y_crab']
+            bb_dfs[bacw][f'{ww}_py_crab'] = bb_dfs[bcw][f'{ww}_py_crab'] * (-1)
+
+    if True :
+        for beam in ['b1', 'b2']:
+            bbdf = bb_dfs[beam]
+            mad.input(f'seqedit, sequence={"lhc"+beam};')
+            mad.input('flatten;')
+            for nn in bbdf.elementName.values:
+                print(f'remove, element={nn}')
+                mad.input(f'remove, element={nn}')
+            mad.input('flatten;')
+            mad.input(f'endedit;')
+
+    prrrrrr
+    #--------------------------------------------------------------------------
 
 # Generate b4
 if generate_b4_from_b2:

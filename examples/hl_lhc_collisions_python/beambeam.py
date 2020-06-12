@@ -51,8 +51,10 @@ def generate_bb_dataframes(mad,
     bbt.generate_mad_bb_info(bb_df_b2, mode='dummy')
 
     # Install dummy bb lenses in mad sequences
-    bbt.install_lenses_in_sequence(mad, bb_df=bb_df_b1, sequence_name='lhcb1')
-    bbt.install_lenses_in_sequence(mad, bb_df=bb_df_b2, sequence_name='lhcb2')
+    bbt.install_lenses_in_sequence(mad, bb_df=bb_df_b1, sequence_name='lhcb1',
+            regenerate_mad_bb_info_in_df=False) # We cannot regenerate because dummy does not have all columns!!!!!!!!!!!!
+    bbt.install_lenses_in_sequence(mad, bb_df=bb_df_b2, sequence_name='lhcb2',
+            regenerate_mad_bb_info_in_df=False)
 
     # Use mad survey and twiss to get geometry and locations of all encounters
     bbt.get_geometry_and_optics_b1_b2(mad, bb_df_b1, bb_df_b2)
