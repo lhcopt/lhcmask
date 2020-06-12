@@ -16,8 +16,8 @@ import optics_specific_tools as ost
 
 # Select mode
 #mode = 'b1_without_bb'
-mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
+#mode = 'b1_with_bb'
+mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
@@ -33,7 +33,8 @@ pmt.make_links(force=True, links_dict={
     'modules': '/home/giadarol/Desktop/20191212_pymask/lhcmask',
     #'modules': 'tracking_tools/modules',
     'tools': 'tracking_tools/tools',
-    'beambeam_macros': 'tracking_tools/beambeam_macros',
+    #'beambeam_macros': 'tracking_tools/beambeam_macros',
+    'beambeam_macros': '/home/giadarol/Desktop/20191212_pymask/beambeam_macros',
     'errors': 'tracking_tools/errors'})
 
 optics_file = 'hl14_collision_optics.madx' #15 cm
@@ -158,8 +159,10 @@ if track_from_b4_mad_instance:
 else:
     mad_track = mad
 
+mad_collider = mad
+del(mad)
 
-twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
+twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_track_intermediate',
         save_twiss_files=save_intermediate_twiss,
@@ -196,8 +199,13 @@ if enable_bb_legacy:
 # Install crab cavities
 if not enable_bb_legacy:
     if parameters['par_install_crabcavities'] > 0: # Do we want to keep this?
-        mad.call("tools/enable_crabcavities.madx")
+        mad_track.call("tools/enable_crabcavities.madx")
 
+# Switch off crab cavities
+mad_track.globals.on_crab1 = 0
+mad_track.globals.on_crab5 = 0
+
+# Save references
 mad_track.input('''
 exec, crossing_disable;
 on_disp = 0;
@@ -205,9 +213,6 @@ if(mylhcbeam==1)
  {exec, check_ip(1)};
 if(mylhcbeam>1)
  {exec, check_ip(2)};
-mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
-muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
-value, mux_ip15_ref, muy_ip15_ref;
 exec, crossing_restore;
 
 on_disp = 0;
@@ -236,6 +241,10 @@ mad_track.call("modules/module_04_errors.madx")
 
 # Machine tuning (enables bb)
 mad_track.call("modules/module_05_tuning.madx")
+
+# Switch on crab cavities
+mad_track.globals.on_crab1 = parameters['par_crab1']
+mad_track.globals.on_crab5 = parameters['par_crab5']
 
 # Generate sixtrack
 if enable_bb_legacy:

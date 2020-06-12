@@ -5,10 +5,9 @@ import numpy as np
 import pysixtrack
 import sixtracktools
 
-# Test b1 nobb sixtrack
+# Test b1 
 path_test = './'
 type_test = 'sixtrack'
-path_ref = '../hl_lhc_collision/reference'
 path_ref = '../hl_lhc_collision'
 type_ref = 'sixtrack'
 
@@ -31,8 +30,10 @@ def prepare_line(path, input_type):
         with open(path, "rb") as fid:
             ltest = pysixtrack.Line.from_dict(pickle.load(fid))
     elif input_type == 'sixtrack':
+        print('Build pysixtrack from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
         ltest = pysixtrack.Line.from_sixinput(sixinput_test)
+        print('Done')
     else:
         raise ValueError('What?!')
 

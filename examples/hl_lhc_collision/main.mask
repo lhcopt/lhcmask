@@ -152,7 +152,7 @@ call, file="optics.madx";
 ! Call mask modules
 call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
-skip_strong_beam_crabbing = 1;
+!skip_strong_beam_crabbing = 1;
 call, file="modules/module_03_beambeam.madx";
 
 on_crab1 = 0;
@@ -164,9 +164,6 @@ if(mylhcbeam==1)
  {exec, check_ip(1)};
 if(mylhcbeam>1) 
  {exec, check_ip(2)};
-mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
-muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
-value, mux_ip15_ref, muy_ip15_ref;
 exec, crossing_restore;
 
 on_disp = 0;
