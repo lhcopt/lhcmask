@@ -272,7 +272,6 @@ def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
     else:
         raise ValueError("mode must be 'dummy' or 'from_dataframe")
 
-    return bb_df
 
 def get_counter_rotating(bb_df):
 
@@ -331,7 +330,13 @@ def get_counter_rotating(bb_df):
 
     return c_bb_df
 
-def install_lenses_in_sequence(mad, bb_df, sequence_name):
+def install_lenses_in_sequence(mad, bb_df, sequence_name,
+        regenerate_mad_bb_info_in_df=True):
+
+    if regenerate_mad_bb_info_in_df:
+        madx_reference_bunch_charge = mad.sequence[sequence_name].beam.npart
+        bbt.generate_mad_bb_info(bb_df, mode='from_dataframe',
+                madx_reference_bunch_charge=madx_reference_bunch_charge)
 
     mad.input(bb_df['elementDefinition'].str.cat(sep='\n'))
 

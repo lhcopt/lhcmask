@@ -13,6 +13,9 @@ def generate_bb_dataframes(mad,
     sigmaz_m=None,
     remove_dummy_lenses=True):
 
+    for pp in ['circ', 'npart', 'gamma']:
+        assert mad.sequence.lhcb1.beam[pp] == mad.sequence.lhcb2.beam[pp]
+
     circumference = mad.sequence.lhcb1.beam.circ
     madx_reference_bunch_charge = mad.sequence.lhcb1.beam.npart
     relativistic_gamma = mad.sequence.lhcb1.beam.gamma
@@ -27,7 +30,6 @@ def generate_bb_dataframes(mad,
     else:
         sigt = mad.sequence.lhcb1.beam.sigt
 
-    import bb_tools as bbt
     bb_df_b1 = bbt.generate_set_of_bb_encounters_1beam(
         circumference, harmonic_number,
         bunch_spacing_buckets,
