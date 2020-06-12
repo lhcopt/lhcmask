@@ -243,6 +243,10 @@ def generate_set_of_bb_encounters_1beam(
     myBB=pd.concat([myBBHO, myBBLR],sort=False)
     myBB = myBB.set_index('elementName', drop=False, verify_integrity=True).sort_index()
 
+    for ww in ['self', 'other']:
+        for coord in ['x', 'px', 'y', 'py']:
+            myBB[f'{ww}_{coord}_crab'] = 0
+
     return myBB
 
 def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
@@ -267,7 +271,7 @@ def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
                     'slot_id = %d'%({'bb_lr': 4, 'bb_ho': 6}[label]) # need to add 60 for central
         bb_df['elementDefinition']=bb_df.apply(lambda x: elementDefinition(x.elementName, x.elementClass,
             eattributes(np.sqrt(x['other_Sigma_11']),np.sqrt(x['other_Sigma_33']),
-                x['separation_x'], x['separation_y'],
+                x['separation_x']+x['other_x_crab'], x['separation_y']+x['other_y_crab'],
                 x['other_charge_ppb']/madx_reference_bunch_charge, x['label'])),
             axis=1)
         bb_df['elementInstallation']=bb_df.apply(lambda x: elementInstallation(x.elementName, x.elementClass, x.atPosition, x.ip_name), axis=1)
@@ -326,6 +330,13 @@ def get_counter_rotating(bb_df):
 
     c_bb_df['dpx'] = bb_df['dpx'] * (-1.) * (-1.)
     c_bb_df['dpy'] = bb_df['dpy'] * (-1.)
+
+    for ww in ['self', 'other']:
+        c_bb_df[f'{ww}_x_crab'] = bb_df[f'{ww}_x_crab'] * (-1)
+        c_bb_df[f'{ww}_px_crab'] = bb_df[f'{ww}_px_crab'] * (-1) * (-1)
+        c_bb_df[f'{ww}_y_crab'] = bb_df[f'{ww}_y_crab']
+        c_bb_df[f'{ww}_py_crab'] = bb_df[f'{ww}_py_crab'] * (-1)
+
 
     # Compute phi and alpha from dpx and dpy
     compute_local_crossing_angle_and_plane(c_bb_df)

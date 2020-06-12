@@ -161,8 +161,10 @@ if enable_bb_python:
             bb_df[f'self_{coord}_crab'] = bump_at_bbs[coord]*rf_mod/rf_mod_twiss
 
     for coord in ['x', 'px', 'y', 'py']:
-        bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'][f'self_{coord}_crab']
-        bb_dfs['b1'][f'other_{coord}_crab'] = bb_dfs['b2'][f'self_{coord}_crab']
+        bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'].loc[
+                bb_dfs['b2']['other_elementName'], f'self_{coord}_crab'].values
+        bb_dfs['b1'][f'other_{coord}_crab'] = bb_dfs['b2'].loc[
+                bb_dfs['b1']['other_elementName'], f'self_{coord}_crab'].values
 
     # Handle b3 and b4
     for bcw, bacw in zip(['b1', 'b2'], ['b3', 'b4']):
@@ -183,7 +185,7 @@ if enable_bb_python:
             mad.input('flatten;')
             mad.input(f'endedit;')
 
-    prrrrrr
+
     #--------------------------------------------------------------------------
 
 # Generate b4
