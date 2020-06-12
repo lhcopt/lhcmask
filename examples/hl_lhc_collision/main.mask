@@ -152,8 +152,11 @@ call, file="optics.madx";
 ! Call mask modules
 call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
-!skip_strong_beam_crabbing = 1;
+skip_strong_beam_crabbing = 1;
 call, file="modules/module_03_beambeam.madx";
+
+on_crab1 = 0;
+on_crab5 = 0;
 
 exec, crossing_disable;
 on_disp = 0;
@@ -182,5 +185,9 @@ on_disp = 0;
  
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
+
+on_crab1 = par_crab1;
+on_crab5 = par_crab5;
+
 call, file="modules/module_06_generate.madx";
 

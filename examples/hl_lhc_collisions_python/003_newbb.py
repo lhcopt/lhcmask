@@ -111,11 +111,11 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 # Call leveling module
 mad.use(f'lhcb{beam_to_configure}')
 mad.call("modules/module_02_lumilevel.madx")
+mad.input('on_disp = 0')
 
 # Prepare bb dataframes
 if enable_bb_python:
     import beambeam as bb
-    mad.input('on_disp = 0')
     bb_dfs = bb.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,

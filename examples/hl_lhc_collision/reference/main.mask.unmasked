@@ -154,6 +154,9 @@ call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";
 
+on_crab1 = 0;
+on_crab5 = 0;
+
 exec, crossing_disable;
 on_disp = 0;
 if(mylhcbeam==1) 
@@ -181,6 +184,9 @@ on_disp = 0;
  
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
-call, file="modules/module_06_generate.madx";
 
+on_crab1 = par_crab1;
+on_crab5 = par_crab5;
+
+call, file="modules/module_06_generate.madx";
 
