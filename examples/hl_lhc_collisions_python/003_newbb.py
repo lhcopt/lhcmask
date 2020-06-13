@@ -130,7 +130,7 @@ if enable_bb_python:
 
     #--------------------------------------------------------------------------
     # Crab strong beam
-    z_crab_twiss = 1e-2
+    z_crab_twiss = 7.5e-2
 
     for beam in ['b1', 'b2']:
         bb_df = bb_dfs[beam]
@@ -155,7 +155,7 @@ if enable_bb_python:
         rf_mod = np.sin(2.*np.pi*mad.globals.hrf400
                 /mad.globals.lhclength*2*bb_df.z_centroid)
         rf_mod_twiss = np.sin(2.*np.pi*mad.globals.hrf400
-                /mad.globals.lhclength*2*z_crab_twiss)
+                /mad.globals.lhclength*z_crab_twiss)
 
         for coord in ['x', 'px', 'y', 'py']:
             bb_df[f'self_{coord}_crab'] = bump_at_bbs[coord]*rf_mod/rf_mod_twiss
@@ -177,6 +177,8 @@ if enable_bb_python:
     # Correct separation
     for beam in ['b1', 'b2', 'b3', 'b4']:
         bb_df = bb_dfs[beam]
+        bb_df['separation_x_no_crab'] = bb_df['separation_x']
+        bb_df['separation_y_no_crab'] = bb_df['separation_y']
         bb_df['separation_x'] += bb_df['other_x_crab']
         bb_df['separation_y'] += bb_df['other_y_crab']
 
@@ -190,7 +192,6 @@ if enable_bb_python:
                 mad.input(f'remove, element={nn}')
             mad.input('flatten;')
             mad.input(f'endedit;')
-
 
     #--------------------------------------------------------------------------
 
