@@ -153,7 +153,7 @@ if enable_bb_python:
         bump_at_bbs = tw_crab_bump_df.loc[bb_df.index, ['x', 'y', 'px', 'py']]
 
         rf_mod = np.sin(2.*np.pi*mad.globals.hrf400
-                /mad.globals.lhclength*2*bb_df.z_centroid)
+                /mad.globals.lhclength*2*bb_df.s_crab)
         rf_mod_twiss = np.sin(2.*np.pi*mad.globals.hrf400
                 /mad.globals.lhclength*z_crab_twiss)
 

@@ -210,7 +210,7 @@ def generate_set_of_bb_encounters_1beam(
         # where circ is used
         BBSpacing = circumference / harmonic_number * bunch_spacing_buckets / 2.
         myBBLR['atPosition']=BBSpacing*myBBLR['identifier']
-        myBBLR['z_centroid'] = 0.
+        myBBLR['s_crab'] = 0.
         # assuming a sequence rotated in IR3
     else:
         myBBLR = pd.DataFrame()
@@ -234,7 +234,7 @@ def generate_set_of_bb_encounters_1beam(
     myBBHO['self_relativistic_beta'] = relativistic_beta
     for ip_nn in ip_names:
         myBBHO.loc[myBBHO['ip_name']==ip_nn, 'atPosition']=list(z_centroids)
-        myBBHO.loc[myBBHO['ip_name']==ip_nn, 'z_centroid']=list(z_centroids)
+    myBBHO['s_crab'] = myBBHO['atPosition']
 
     myBBHO['elementName']=myBBHO.apply(lambda x: elementName(x.label, x.ip_name.replace('ip', ''), x.beam, x.identifier), axis=1)
     myBBHO['other_elementName']=myBBHO.apply(lambda x: elementName(x.label, x.ip_name.replace('ip', ''), x.other_beam, x.identifier), axis=1)
@@ -242,6 +242,7 @@ def generate_set_of_bb_encounters_1beam(
 
     myBB=pd.concat([myBBHO, myBBLR],sort=False)
     myBB = myBB.set_index('elementName', drop=False, verify_integrity=True).sort_index()
+
 
     for ww in ['self', 'other']:
         for coord in ['x', 'px', 'y', 'py']:
