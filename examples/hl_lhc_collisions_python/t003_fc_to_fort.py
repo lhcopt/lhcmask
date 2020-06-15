@@ -8,8 +8,11 @@ folder_list = [
 
 for sixtrack_input_folder in folder_list:
     for iff in [2,8,16,34]:
-        shutil.copy(sixtrack_input_folder + f"/fc.{iff}",
+        try:
+            shutil.copy(sixtrack_input_folder + f"/fc.{iff}",
                 sixtrack_input_folder + f"/fort.{iff}")
+        except Exception:
+            print(f"/fc.{iff} not found!")
 
     with open(sixtrack_input_folder + "/fort.3", "w") as fout:
         with open("fort_parts/fort_beginning.3", "r") as fid_fort3b:
