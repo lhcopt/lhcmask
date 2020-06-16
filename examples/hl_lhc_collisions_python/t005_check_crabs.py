@@ -145,7 +145,6 @@ y_lenses = []
 for ibb, bb in enumerate(bb_elems):
     y_lenses.append(list_co[bb_index[ibb]].y[ibb])
 
-plt.figure()
 axcrab.plot(s_rel, y_lenses, 'o')
 
 # part_list = []

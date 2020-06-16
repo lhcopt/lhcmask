@@ -9,6 +9,10 @@ folder_list = [
 for sixtrack_input_folder in folder_list:
     for iff in [2,8,16,34]:
         try:
+            os.system(f"rm /fort.{iff}")
+        except Exception:
+            pass
+        try:
             shutil.copy(sixtrack_input_folder + f"/fc.{iff}",
                 sixtrack_input_folder + f"/fort.{iff}")
         except Exception:
