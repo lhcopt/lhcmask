@@ -131,7 +131,7 @@ if enable_bb_python:
     #--------------------------------------------------------------------------
     # Crab strong beam
     z_crab_twiss = 7.5e-2
-
+    crab_kicker_dict = {'z_crab': z_crab_twiss}
     for beam in ['b1', 'b2']:
         bb_df = bb_dfs[beam]
 
@@ -139,9 +139,18 @@ if enable_bb_python:
         mad.input('exec, crossing_disable')
         mad.globals.z_crab = z_crab_twiss
 
-        mad.use('lhc'+beam)
+        seqn = 'lhc'+beam
+        mad.use(seqn)
         mad.twiss()
         tw_crab_bump_df = mad.get_twiss_df(table_name='twiss')
+
+        # Save crab kickers
+        seq = mad.sequence[seqn]
+        mad_crab_kickers = [(nn, ee) for (nn, ee) in zip(seq.element_names(), seq.elements) if nn.startswith('acf')]
+        for cc in mad_crab_kickers:
+            nn = cc[0]
+            ee = cc[1]
+            crab_kicker_dict[nn] = {kk:repr(ee[kk]) for kk in ee.keys()}
 
         mad.globals.z_crab = 0
         mad.input('exec, crossing_restore')
@@ -268,6 +277,20 @@ if enable_bb_legacy:
 if not enable_bb_legacy:
     if parameters['par_install_crabcavities'] > 0: # Do we want to keep this?
         mad_track.call("tools/enable_crabcavities.madx")
+# Save crab cavities
+crab_cav_dict = {}
+seq = mad_track.sequence[sequence_to_track]
+mad_crab_cav_mark = [(nn, ee) for (nn, ee) in zip(seq.element_names(), seq.elements) if nn.startswith('acf')]
+for cc in mad_crab_cav_mark:
+    nn = cc[0]
+    ee = cc[1]
+    if 'freq' in ee.keys():
+        crab_cav_dict[nn] = {kk:repr(ee[kk]) for kk in ee.keys()}
+
+with open('crabs.pkl', 'wb') as fid:
+    pickle.dump({
+        'kickers': crab_kicker_dict,
+        'cavities': crab_cav_dict}, fid)
 
 # Switch off crab cavities
 mad_track.globals.on_crab1 = 0
@@ -304,11 +327,11 @@ mad_track.use(sequence_to_track)
 mad_track._use = mad_track.use
 mad_track.use = None
 
-# Install and correct errors
-mad_track.call("modules/module_04_errors.madx")
-
-# Machine tuning (enables bb)
-mad_track.call("modules/module_05_tuning.madx")
+# # Install and correct errors
+# mad_track.call("modules/module_04_errors.madx")
+# 
+# # Machine tuning (enables bb)
+# mad_track.call("modules/module_05_tuning.madx")
 
 # Switch on crab cavities
 mad_track.globals.on_crab1 = parameters['par_crab1']
