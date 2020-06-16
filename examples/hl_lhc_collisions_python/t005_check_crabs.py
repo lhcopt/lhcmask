@@ -65,12 +65,19 @@ h_cc = 35640
 phi = 250e-6
 phi_c = -190e-6
 
-# For B1 as weak beam
+# For B1 as weak beam (and we plot B2 as stron beam)
 Y_crab = -phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
 Y_no_crab = -phi * s_rel
 Y1_orbit = phi * s_rel
-axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems])+Y1_orbit, 'o')
-plt.plot(s_rel, Y_no_crab + Y_crab, '*')
+
+axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems])+Y1_orbit, 'o', color = 'r', alpha=.5)
+plt.plot(s_rel, Y_no_crab + Y_crab, '*', color='darkred')
+
+#axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems]), 'o', color='r', alpha=.5)
+#plt.plot(s_rel, Y_no_crab + Y_crab - Y1_orbit, '*', color='darkred')
+
+#plt.plot(s_rel, Y_no_crab, 'xr')
+#plt.plot(s_rel, Y_crab, 'xb')
 #plt.figure()
 #plt.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems])
 #                    /(2*s_rel), 'o')
@@ -91,7 +98,7 @@ bb_all, _ = ltest.get_elements_of_type([pysixtrack.elements.BeamBeam4D,
 for bb in bb_all: bb.enabled = False
 
 # # Switch off all beam-beam lenses
-crabs, _ = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole])
+crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole])
 #for cc in crabs:
 #    cc.pn = [-90]
 #    cc.ps = [-90]
@@ -141,29 +148,35 @@ for iz, zz in enumerate(z_slices):
     axcox.plot([pp.s[iz] for pp in list_co],  [pp.x[iz] for pp in list_co])
     axcoy.plot([pp.s[iz] for pp in list_co],  [pp.y[iz] for pp in list_co])
 
+# For each s_lens, we find the transverse position of the weak beam slice 
+# that collides with the sycnhronous particle of the strong
 y_lenses = []
 for ibb, bb in enumerate(bb_elems):
     y_lenses.append(list_co[bb_index[ibb]].y[ibb])
 
-axcrab.plot(s_rel, y_lenses, 'o')
+axcrab.plot(s_rel, y_lenses, 'o', color='b', alpha=.5)
+Yw_crab = phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
+Yw_no_crab = phi * s_rel
+axcrab.plot(s_rel, Yw_crab + Yw_no_crab, '*', color='darkblue')
 
-# part_list = []
-# for nn, ee in zip(ltest.element_names, ltest.elements):
-#     print(nn)
-#     ee.track(partco)
-#     part_list.append(partco.copy())
-#     print(partco)
-#     if np.any(np.abs(partco.delta)> 1e-3):
-#         prrrr
-#     if np.any(np.abs(partco.zeta)> 1.):
-#         prrrr
-#     if np.isnan(np.sum(partco.x)):
-#         prrr
-#     if np.isnan(np.sum(partco.px)):
-#         prrr
-#     if np.isnan(np.sum(partco.y)):
-#         prrr
-#     if np.isnan(np.sum(partco.py)):
-#         prrr
+# Check kicks
+with open('crabs.pkl', 'rb') as fid:
+    crab_dict = pickle.load(fid)
+
+crab_name_test = 'acfcav.bl5.b1'
+kicker_name = crab_name_test.replace('v.', '.')
+crab_test = crabs[crab_names.index(crab_name_test)]
+
+kick_test = float(crab_dict['kickers'][kicker_name]['vkick'])
+
+part_test = partco.copy()
+part_test.x = 0
+part_test.px = 0
+part_test.y = 0
+part_test.py = 0
+part_test.zeta = 0
+part_test.delta = 0
+
+part_test.zeta = crab_dict['kickers']['z_crab']
 
 plt.show()
