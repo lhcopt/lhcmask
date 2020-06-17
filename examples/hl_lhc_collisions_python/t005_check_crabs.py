@@ -19,26 +19,26 @@ plane = 'y'
 phi_weak = Phi
 phi_c_weak = Phi_c
 
-# B1 ip1
-beam_track = 'b1'
-ip_choice = 1
-plane = 'x'
-phi_weak = Phi
-phi_c_weak = Phi_c
-
-# B4 ip5
-beam_track = 'b4'
-ip_choice = 5
-plane = 'y'
-phi_weak = Phi
-phi_c_weak = Phi_c
-
-# B4 ip1
-beam_track = 'b4'
-ip_choice = 1
-plane = 'x'
-phi_weak = -Phi
-phi_c_weak = -Phi_c
+# # B1 ip1
+# beam_track = 'b1'
+# ip_choice = 1
+# plane = 'x'
+# phi_weak = Phi
+# phi_c_weak = Phi_c
+# 
+# # B4 ip5
+# beam_track = 'b4'
+# ip_choice = 5
+# plane = 'y'
+# phi_weak = Phi
+# phi_c_weak = Phi_c
+# 
+# # B4 ip1
+# beam_track = 'b4'
+# ip_choice = 1
+# plane = 'x'
+# phi_weak = -Phi
+# phi_c_weak = -Phi_c
 
 phi_strong = -phi_weak
 phi_c_strong = -phi_c_weak
@@ -193,22 +193,25 @@ axcrab.legend(loc='best')
 
 # Check crab bump
 import pandas as pd
+z_crab_twiss = 0.075
 
 if beam_track == 'b1':
-    crab_df = pd.read_parquet('./twiss_z_crab_0.07500_seq_lhcb1.parquet')
+    crab_df = pd.read_parquet(f'./twiss_z_crab_{z_crab_twiss:.5f}_seq_lhcb1.parquet')
     s_twiss = crab_df.s.values
     x_twiss = crab_df.x.values
     y_twiss = crab_df.y.values
     px_twiss = crab_df.px.values
     py_twiss = crab_df.py.values
+    z_crab_track = z_crab_twiss
 elif beam_track == 'b4':
-    crab_df = pd.read_parquet('./twiss_z_crab_0.07500_seq_lhcb2.parquet')
+    crab_df = pd.read_parquet(f'./twiss_z_crab_{z_crab_twiss:.5f}_seq_lhcb2.parquet')
     s_twiss = -crab_df.s.values[::-1]
     s_twiss -= s_twiss[0]
     x_twiss = -crab_df.x.values[::-1]
     y_twiss = crab_df.y.values[::-1]
     px_twiss = crab_df.px.values[::-1]
     py_twiss = -crab_df.py.values[::-1]
+    z_crab_track = -z_crab_twiss
 else:
     raise ValueError('????!!!!!')
 
@@ -220,7 +223,7 @@ axcbx.plot(s_twiss, x_twiss)
 axcby.plot(s_twiss, y_twiss)
 
 part = pysixtrack.Particles.from_dict(ddd)
-z_test = np.array([0, 0.075])
+z_test = np.array([0, z_crab_track])
 part.zeta += z_test
 part.x += 0*z_test + np.array([0, x_twiss[0]])
 part.s += 0*z_test
