@@ -8,10 +8,10 @@ We test the commit 89ef222ad8371704bb055185358ff133a42be6de
 ## Test 1 - b1 with bb legacy macros
 
 We select:
-```
+```python
 mode = 'b1_with_bb_legacy_macros'
 ```
-We exeute the python
+We exeute the python version:
 ```bash
 python 004_pymask.py
 ```
@@ -33,11 +33,11 @@ diff fc.34 ../hl_lhc_collision/fc.34
 
 ## Test 2 - b1 with new bb tools
 We select:
-```
+```python
 mode = 'b1_with_bb'
 ```
 
-We exeute the python
+We exeute the python version:
 ```bash
 python 004_pymask.py
 ```
