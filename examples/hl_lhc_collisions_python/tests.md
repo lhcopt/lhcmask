@@ -73,3 +73,39 @@ python t005_check_crabs.py
 Minor deviations on crab orbit are observed due to errors and tuning.
 
 Repeat for IP1.
+
+## Test 3 - b4 without bb
+
+We execute the reference:
+```bash
+ cd ../hl_lhc_collision_nobb_b4
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run
+```
+
+We setup the python version:
+```bash
+cd ../hl_lhc_collisions_python
+
+```
+We select:
+```python
+mode = 'b4_without_bb'
+```
+We run the python version:
+```
+python 004_pymask.py
+```
+
+
+
+
+
+
+We check that the output is identical
+```bash
+diff fc.2 ../hl_lhc_collision/fc.2
+diff fc.3 ../hl_lhc_collision/fc.3
+diff fc.8 ../hl_lhc_collision/fc.8
+diff fc.16 ../hl_lhc_collision/fc.16
+diff fc.34 ../hl_lhc_collision/fc.34
+```
