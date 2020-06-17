@@ -22,8 +22,6 @@ mode = 'b1_with_bb'
 #mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
-flag_ibeco_sixtrack = 1
-
 # Tolarances for checks [ip1, ip2, ip5, ip8]
 tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
 tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
@@ -43,15 +41,15 @@ check_betas_at_ips = True
 check_separations_at_ips = True
 save_intermediate_twiss = True
 
+# Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
     force_disable_check_separations_at_ips,
     ) = pmt.get_pymask_configuration(mode)
-
-
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
 
+# Start mad
 mad = Madx()
 
 # Build sequence
@@ -64,9 +62,11 @@ ost.apply_optics(mad, optics_file=optics_file)
 from parameters import parameters
 pmt.checks_on_parameter_dict(parameters)
 
+# Force disable beam-beam when needed
 if not(enable_bb_legacy) and not(enable_bb_python):
     parameters['par_on_bb_switch'] = 0.
 
+# Pass parameters to mad
 mad.set_variables_from_dict(params=parameters)
 
 # Prepare sequences and attach beam
@@ -125,38 +125,20 @@ if enable_bb_python:
         numberOfHOSlices=11,
         bunch_population_ppb=None,
         sigmaz_m=None,
-        #remove_dummy_lenses=True)
-        remove_dummy_lenses=False)
+        z_crab_twiss = 0.075,
+        remove_dummy_lenses=True)
 
-    #--------------------------------------------------------------------------
-    # Crab strong beam
-    crab_kicker_dict = pmt.crabbing_strong_beam(mad, bb_dfs,
-            z_crab_twiss=0.075,
-            save_crab_twiss=True)
+    # Here the datafremes can be edited, e.g. to set bbb intensity
 
-    if True :
-        for beam in ['b1', 'b2']:
-            bbdf = bb_dfs[beam]
-            mad.input(f'seqedit, sequence={"lhc"+beam};')
-            mad.input('flatten;')
-            for nn in bbdf.elementName.values:
-                print(f'remove, element={nn}')
-                mad.input(f'remove, element={nn}')
-            mad.input('flatten;')
-            mad.input(f'endedit;')
-
-    #--------------------------------------------------------------------------
-
-# Generate b4
+# Generate mad instance for b4
 if generate_b4_from_b2:
-    mad_b2 = mad
     mad_b4 = Madx()
     ost.build_sequence(mad_b4, beam=4)
     ost.apply_optics(mad_b4, optics_file=optics_file)
 
-    pmt.configure_b4_from_b2(mad_b4, mad_b2)
+    pmt.configure_b4_from_b2(mad_b4, mad)
 
-    twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad_b2,
+    twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad,
             sequences_to_check=['lhcb2'],
             tol_beta=tol_beta, tol_sep=tol_sep,
             twiss_fname='twiss_b2_for_b4check',
@@ -171,8 +153,8 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 
-# Here the datafremes can be edited, e.g. to set bbb intensity
 
+# We working exclusively on the sequence to track
 # Select mad object
 if track_from_b4_mad_instance:
     mad_track = mad_b4
@@ -182,6 +164,7 @@ else:
 mad_collider = mad
 del(mad)
 
+# Twiss machine to track
 twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_track_intermediate',
@@ -200,9 +183,6 @@ if enable_bb_python:
 
     bb.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
 
-    # Connect on_bb_charge knob
-    mad_track.input('on_bb_switch := on_bb_charge')
-
     # Disable bb
     mad_track.globals.on_bb_charge = 0
 else:
@@ -220,53 +200,16 @@ if enable_bb_legacy:
 if not enable_bb_legacy:
     if parameters['par_install_crabcavities'] > 0: # Do we want to keep this?
         mad_track.call("tools/enable_crabcavities.madx")
-        ## PATCH!!!!!!
-        #if mode.startswith('b4'):
-        #    mad_track.
-
-# Save crab cavities
-crab_cav_dict = {}
-seq = mad_track.sequence[sequence_to_track]
-mad_crab_cav_mark = [(nn, ee) for (nn, ee) in zip(seq.element_names(), seq.elements) if nn.startswith('acf')]
-for cc in mad_crab_cav_mark:
-    nn = cc[0]
-    ee = cc[1]
-    if 'freq' in ee.keys():
-        crab_cav_dict[nn] = {kk:repr(ee[kk]) for kk in ee.keys()}
-
-with open('crabs.pkl', 'wb') as fid:
-    pickle.dump({
-        'kickers': crab_kicker_dict,
-        'cavities': crab_cav_dict}, fid)
 
 # Switch off crab cavities
 mad_track.globals.on_crab1 = 0
 mad_track.globals.on_crab5 = 0
 
-# Save references
-mad_track.input('''
-exec, crossing_disable;
-on_disp = 0;
-if(mylhcbeam==1)
- {exec, check_ip(1)};
-if(mylhcbeam>1)
- {exec, check_ip(2)};
-exec, crossing_restore;
+# Save references (orbit at IPs)
+mad_track.call('modules/auxiliary_00_savereferences.madx')
 
-on_disp = 0;
- !Record the nominal IP position and crossing angle
- if(mylhcbeam==1) {use,  sequence=lhcb1;};
- if(mylhcbeam>1) {use,  sequence=lhcb2;};
- twiss;
- xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
- xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
- xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
- xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
- value,xnom1,xnom2,xnom5,xnom8;
- value,ynom1,ynom2,ynom5,ynom8;
- value,pxnom1,pxnom2,pxnom5,pxnom8;
- value,pynom1,pynom2,pynom5,pynom8;
-''')
+# Switch off dipersion correction knob
+mad_track.globals.on_disp = 0.
 
 # Final use
 mad_track.use(sequence_to_track)
@@ -302,7 +245,7 @@ else:
             mad_track.sequence[sequence_to_track].beam.sigt),
         sige_sixtrack=(
             mad_track.sequence[sequence_to_track].beam.sige),
-        ibeco_sixtrack=flag_ibeco_sixtrack,
+        ibeco_sixtrack=1,
         ibtyp_sixtrack=0,
         lhc_sixtrack=2,
         ibbc_sixtrack=0,

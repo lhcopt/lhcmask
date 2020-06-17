@@ -3,6 +3,75 @@ import bb_tools as bbt
 
 install_lenses_in_sequence = bbt.install_lenses_in_sequence
 
+def crabbing_strong_beam(mad, bb_dfs, z_crab_twiss,
+        save_crab_twiss=True):
+
+    crab_kicker_dict = {'z_crab': z_crab_twiss}
+    for beam in ['b1', 'b2']:
+        bb_df = bb_dfs[beam]
+
+        # Compute crab bump shape
+        mad.input('exec, crossing_disable')
+        mad.globals.z_crab = z_crab_twiss
+
+        seqn = 'lhc'+beam
+        mad.use(seqn)
+        mad.twiss()
+        tw_crab_bump_df = mad.get_twiss_df(table_name='twiss')
+        if save_crab_twiss:
+            tw_crab_bump_df.to_parquet(
+                f'twiss_z_crab_{z_crab_twiss:.5f}_seq_{seqn}.parquet')
+
+        # Save crab kickers
+        seq = mad.sequence[seqn]
+        mad_crab_kickers = [(nn, ee) for (nn, ee) in zip(
+            seq.element_names(), seq.elements) if nn.startswith('acf')]
+        for cc in mad_crab_kickers:
+            nn = cc[0]
+            ee = cc[1]
+            crab_kicker_dict[nn] = {kk:repr(ee[kk]) for kk in ee.keys()}
+
+        mad.globals.z_crab = 0
+        mad.input('exec, crossing_restore')
+
+        # Remove last part of the name
+        tw_crab_bump_df.index = tw_crab_bump_df.name.apply(
+                lambda nn: ''.join(nn.split(':')[:-1]))
+
+        bump_at_bbs = tw_crab_bump_df.loc[bb_df.index, ['x', 'y', 'px', 'py']]
+
+        rf_mod = np.sin(2.*np.pi*mad.globals.hrf400
+                /mad.globals.lhclength*2*bb_df.s_crab)
+        rf_mod_twiss = np.sin(2.*np.pi*mad.globals.hrf400
+                /mad.globals.lhclength*z_crab_twiss)
+
+        for coord in ['x', 'px', 'y', 'py']:
+            bb_df[f'self_{coord}_crab'] = bump_at_bbs[coord]*rf_mod/rf_mod_twiss
+
+    for coord in ['x', 'px', 'y', 'py']:
+        bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'].loc[
+                bb_dfs['b2']['other_elementName'], f'self_{coord}_crab'].values
+        bb_dfs['b1'][f'other_{coord}_crab'] = bb_dfs['b2'].loc[
+                bb_dfs['b1']['other_elementName'], f'self_{coord}_crab'].values
+
+    # Handle b3 and b4
+    for bcw, bacw in zip(['b1', 'b2'], ['b3', 'b4']):
+        for ww in ['self', 'other']:
+            bb_dfs[bacw][f'{ww}_x_crab'] = bb_dfs[bcw][f'{ww}_x_crab'] * (-1)
+            bb_dfs[bacw][f'{ww}_px_crab'] = bb_dfs[bcw][f'{ww}_px_crab'] * (-1) * (-1)
+            bb_dfs[bacw][f'{ww}_y_crab'] = bb_dfs[bcw][f'{ww}_y_crab']
+            bb_dfs[bacw][f'{ww}_py_crab'] = bb_dfs[bcw][f'{ww}_py_crab'] * (-1)
+
+    # Correct separation
+    for beam in ['b1', 'b2', 'b3', 'b4']:
+        bb_df = bb_dfs[beam]
+        bb_df['separation_x_no_crab'] = bb_df['separation_x']
+        bb_df['separation_y_no_crab'] = bb_df['separation_y']
+        bb_df['separation_x'] += bb_df['other_x_crab']
+        bb_df['separation_y'] += bb_df['other_y_crab']
+
+    return crab_kicker_dict
+
 def generate_bb_dataframes(mad,
     ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
     numberOfLRPerIRSide=[25, 20, 25, 20],
@@ -11,6 +80,7 @@ def generate_bb_dataframes(mad,
     numberOfHOSlices=11,
     bunch_population_ppb=None,
     sigmaz_m=None,
+    z_crab_twiss=0.,
     remove_dummy_lenses=True):
 
     for pp in ['circ', 'npart', 'gamma']:
@@ -93,6 +163,13 @@ def generate_bb_dataframes(mad,
         'b2': bb_df_b2,
         'b3': bb_df_b3,
         'b4': bb_df_b4}
+
+    if abs(z_crab_twiss)>0:
+        crab_kicker_dict = crabbing_strong_beam(mad, bb_dfs,
+                z_crab_twiss=z_crab_twiss,
+                save_crab_twiss=True)
+    else:
+        print('Crabbing of strong beam skipped!')
 
     if remove_dummy_lenses:
         for beam in ['b1', 'b2']:
