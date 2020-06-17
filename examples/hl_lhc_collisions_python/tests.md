@@ -48,8 +48,8 @@ We execute the reference (can be reused from the previous test):
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
- Check using pysixtrack lines:
-```
+Check using pysixtrack lines:
+```bash
 python t003_fc_to_fort.py
 python t004_compare_pysixtrack_lines.py
 ```
