@@ -53,3 +53,20 @@ Check using pysixtrack lines:
 python t003_fc_to_fort.py
 python t004_compare_pysixtrack_lines.py
 ```
+
+**Check crab cavities:**
+
+In ```t005_check_crabs.py``` set:
+```python
+# B1 ip5
+beam_track = 'b1'
+ip_choice = 5
+plane = 'y'
+phi_weak = Phi
+phi_c_weak = Phi_c
+```
+
+Run check:
+```bash
+python t005_check_crabs.py
+```
