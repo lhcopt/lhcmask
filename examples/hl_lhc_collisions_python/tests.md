@@ -82,6 +82,8 @@ Repeat for IP1.
 
 ## Test 3 - b4 without bb
 
+**WARNING!!!! In this mode the leveling mask module is not working, values are forced in python and the module is skipped**
+
 We execute the reference:
 ```bash
  cd ../hl_lhc_collision_nobb_b4
