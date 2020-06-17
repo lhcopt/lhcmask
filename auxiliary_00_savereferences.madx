@@ -1,10 +1,18 @@
 
 exec, crossing_disable;
 on_disp = 0;
+!  if (mylhcbeam==1){
+!    print, text="P1";
+!    exec, check_ip(b1);
+!  } else {
+!    print, text="P2";
+!    exec, check_ip(b2);
+!  };
+
 if(mylhcbeam==1)
- {exec, check_ip(1)};
+ {exec, check_ip(b1);};
 if(mylhcbeam>1)
- {exec, check_ip(2)};
+ {exec, check_ip(b2);};
 exec, crossing_restore;
 
 on_disp = 0;

@@ -19,7 +19,7 @@ import optics_specific_tools as ost
 #mode = 'b1_with_bb'
 #mode = 'b1_with_bb_legacy_macros'
 mode = 'b4_without_bb'
-#mode = 'b4_from_b2_without_bb'
+mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
@@ -174,6 +174,19 @@ else:
 mad_collider = mad
 del(mad)
 
+# For tests
+#mad_track.call("modules/submodule_01a_preparation.madx")
+#mad_track.call("modules/submodule_01b_beam.madx")
+#mad_track.call("modules/submodule_01c_phase.madx")
+#mad_track.call("modules/submodule_01d_crossing.madx")
+#mad_track.call("modules/submodule_01e_test.madx")
+#mad_track.call("modules/submodule_01f_use.madx")
+#mad_track.input('exec, crossing_restore')
+#mad_track.globals.on_sep8 = -0.03425547139366354;
+#mad_track.globals.on_sep2 = 0.14471680504084292;
+#mad_track.input('exec, crossing_save')
+
+
 # Twiss machine to track
 twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
@@ -214,6 +227,13 @@ mad_track.globals.on_crab1 = 0
 mad_track.globals.on_crab5 = 0
 
 # Save references (orbit at IPs)
+#mad_track.input('''
+#  if (mylhcbeam==1){
+#    exec, check_ip(b1);
+#  } else {
+#    exec, check_ip(b2);
+#  };
+#''')
 mad_track.call('modules/auxiliary_00_savereferences.madx')
 
 # Switch off dipersion correction knob
