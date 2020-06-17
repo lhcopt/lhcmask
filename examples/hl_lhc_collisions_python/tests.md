@@ -70,5 +70,6 @@ Run check:
 ```bash
 python t005_check_crabs.py
 ```
+Minor deviations on crab orbit are observed due to errors and tuning.
 
 Repeat for IP1.
