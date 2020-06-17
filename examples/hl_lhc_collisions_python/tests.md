@@ -3,6 +3,8 @@
 For pysixtrack we are using the branch: "feature/cc_from_mad_and_sixtrack"
 Sixtracktools is on the master
 
+We test the commit 89ef222ad8371704bb055185358ff133a42be6de
+
 ## Test 1 - b1 with bb legacy macros
 
 We select:
