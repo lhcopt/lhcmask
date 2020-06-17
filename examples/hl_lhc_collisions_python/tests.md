@@ -47,3 +47,9 @@ We execute the reference (can be reused from the previous test):
  cd ../hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
+
+ Check using pysixtrack lines:
+```
+python t003_fc_to_fort.py
+python t004_compare_pysixtrack_lines.py
+```
