@@ -63,8 +63,6 @@ parameters = {
     'par_nho_IR5'              : 11,           # number of slices for head-on in IR5 (between 0 and 201)
     'par_nho_IR8'              : 11,           # number of slices for head-on in IR8 (between 0 and 201)
 
-    'par_install_crabcavities' : 1,
-
     #*************************#
     #     Leveling in IP8     #
     #*************************#

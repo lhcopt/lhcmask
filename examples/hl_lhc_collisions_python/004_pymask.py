@@ -197,9 +197,7 @@ if enable_bb_legacy:
     mad_track.call("modules/module_03_beambeam.madx")
 
 # Install crab cavities
-if not enable_bb_legacy:
-    if parameters['par_install_crabcavities'] > 0: # Do we want to keep this?
-        mad_track.call("tools/enable_crabcavities.madx")
+mad_track.call("tools/enable_crabcavities.madx")
 
 # Switch off crab cavities
 mad_track.globals.on_crab1 = 0
