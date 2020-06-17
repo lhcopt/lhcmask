@@ -143,6 +143,8 @@ if enable_bb_python:
         mad.use(seqn)
         mad.twiss()
         tw_crab_bump_df = mad.get_twiss_df(table_name='twiss')
+        tw_crab_bump_df.to_parquet(
+                f'twiss_z_crab_{z_crab_twiss:.5f}_seq_{seqn}.parquet')
 
         # Save crab kickers
         seq = mad.sequence[seqn]

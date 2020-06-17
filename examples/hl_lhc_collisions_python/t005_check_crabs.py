@@ -8,29 +8,40 @@ import sixtracktools
 L_lhc = 27e3
 h_cc = 35640
 
+# Mad-X knobs
+Phi = 250e-6
+Phi_c = -190e-6
+
 # B1 ip5
+beam_track = 'b1'
 ip_choice = 5
 plane = 'y'
-phi = 250e-6
-phi_c = -190e-6
+phi_weak = Phi
+phi_c_weak = Phi_c
 
 # B1 ip1
+beam_track = 'b1'
 ip_choice = 1
 plane = 'x'
-phi = 250e-6
-phi_c = -190e-6
+phi_weak = Phi
+phi_c_weak = Phi_c
 
-# # B4 ip1
-# ip_choice = 1
-# plane = 'x'
-# phi = -250e-6
-# phi_c = 190e-6
-# 
-# # B4 ip5
-# ip_choice = 5
-# plane = 'y'
-# phi = 250e-6
-# phi_c = -190e-6
+# B4 ip5
+beam_track = 'b4'
+ip_choice = 5
+plane = 'y'
+phi_weak = Phi
+phi_c_weak = Phi_c
+
+# B4 ip1
+beam_track = 'b4'
+ip_choice = 1
+plane = 'x'
+phi_weak = -Phi
+phi_c_weak = -Phi_c
+
+phi_strong = -phi_weak
+phi_c_strong = -phi_c_weak
 
 path_test = './'
 type_test = 'sixtrack'
@@ -82,9 +93,11 @@ axcrab = fig1.add_subplot(111)
 
 
 # For B1 as weak beam (and we plot B2 as stron beam)
-R_crab = -phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
-R_no_crab = -phi * s_rel
-R1_orbit = phi * s_rel
+# phi_c_strong = dR_crab / dz
+# phi_strong = dR_crab / ds
+R_crab = phi_c_strong * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
+R_no_crab = phi_strong * s_rel
+R1_orbit = phi_weak * s_rel
 
 axcrab.plot(s_rel, np.array(
     [getattr(bb, f'{plane}_bb_co') for bb in bb_elems])+R1_orbit,
@@ -107,7 +120,6 @@ with open('./optics_orbit_at_start_ring.pkl', 'rb') as fid:
     ddd = pickle.load(fid)
 
 ddd['p0c'] =  ddd['p0c_eV']
-partco = pysixtrack.Particles.from_dict(ddd)
 
 
 # Switch off all beam-beam lenses
@@ -124,6 +136,7 @@ crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole]
 # for cc in crabs:
 #     cc.knl[0] *= -1
 
+partco = pysixtrack.Particles.from_dict(ddd)
 z_slices = s_rel * 2.0
 partco.zeta += z_slices
 partco.x += 0*z_slices
@@ -172,9 +185,52 @@ for ibb, bb in enumerate(bb_elems):
     r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
 
 axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak pysixtrack')
-Rw_crab = phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
-Rw_no_crab = phi * s_rel
+Rw_crab = phi_c_weak * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
+Rw_no_crab = phi_weak * s_rel
 axcrab.plot(s_rel, Rw_crab + Rw_no_crab, '*', color='darkblue',
         label='weak formula')
 axcrab.legend(loc='best')
+
+# Check crab bump
+import pandas as pd
+
+if beam_track == 'b1':
+    crab_df = pd.read_parquet('./twiss_z_crab_0.07500_seq_lhcb1.parquet')
+    s_twiss = crab_df.s.values
+    x_twiss = crab_df.x.values
+    y_twiss = crab_df.y.values
+    px_twiss = crab_df.px.values
+    py_twiss = crab_df.py.values
+elif beam_track == 'b4':
+    crab_df = pd.read_parquet('./twiss_z_crab_0.07500_seq_lhcb2.parquet')
+    s_twiss = -crab_df.s.values[::-1]
+    s_twiss -= s_twiss[0]
+    x_twiss = -crab_df.x.values[::-1]
+    y_twiss = crab_df.y.values[::-1]
+    px_twiss = crab_df.px.values[::-1]
+    py_twiss = -crab_df.py.values[::-1]
+else:
+    raise ValueError('????!!!!!')
+
+figcb = plt.figure(4)
+axcbx = figcb.add_subplot(2,1,1)
+axcby = figcb.add_subplot(2,1,2, sharex=axcbx)
+
+axcbx.plot(s_twiss, x_twiss)
+axcby.plot(s_twiss, y_twiss)
+
+part = pysixtrack.Particles.from_dict(ddd)
+z_test = np.array([0, 0.075])
+part.zeta += z_test
+part.x += 0*z_test + np.array([0, x_twiss[0]])
+part.s += 0*z_test
+part.y += 0*z_test + np.array([0, y_twiss[0]])
+part.px += 0*z_test + np.array([0, px_twiss[0]])
+part.py += 0*z_test + np.array([0, py_twiss[0]])
+part.delta += 0*z_test
+list_track = ltest.track_elem_by_elem(part)
+
+axcbx.plot([pp.s[0] for pp in list_track],  [pp.x[1] - pp.x[0] for pp in list_track])
+axcby.plot([pp.s[0] for pp in list_track],  [pp.y[1] - pp.y[0] for pp in list_track])
+
 plt.show()
