@@ -104,9 +104,9 @@ python 004_pymask.py
 
 We check that the output is identical
 ```bash
-diff fc.2 ../hl_lhc_collision/fc.2
-diff fc.3 ../hl_lhc_collision/fc.3
-diff fc.8 ../hl_lhc_collision/fc.8
-diff fc.16 ../hl_lhc_collision/fc.16
-diff fc.34 ../hl_lhc_collision/fc.34
+diff fc.2 ../hl_lhc_collision_nobb_b4/fc.2
+diff fc.3 ../hl_lhc_collision_nobb_b4/fc.3
+diff fc.8 ../hl_lhc_collision_nobb_b4/fc.8
+diff fc.16 ../hl_lhc_collision_nobb_b4/fc.16
+diff fc.34 ../hl_lhc_collision_nobb_b4/fc.34
 ```
