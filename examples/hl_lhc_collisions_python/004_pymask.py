@@ -17,8 +17,8 @@ import optics_specific_tools as ost
 # Select mode
 #mode = 'b1_without_bb'
 #mode = 'b1_with_bb'
-mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
+#mode = 'b1_with_bb_legacy_macros'
+mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
@@ -41,6 +41,14 @@ check_betas_at_ips = True
 check_separations_at_ips = True
 save_intermediate_twiss = True
 
+# Check and load parameters 
+from parameters import parameters
+pmt.checks_on_parameter_dict(parameters)
+# PATCH FOR KNOWN BUG in levelling!!!
+if mode=='b4_without_bb':
+    parameters['par_sep8'] = -0.03425547139366354;
+    parameters['par_sep2'] = 0.14471680504084292;
+
 # Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
@@ -58,9 +66,6 @@ ost.build_sequence(mad, beam=beam_to_configure)
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
 
-# Check and load parameters 
-from parameters import parameters
-pmt.checks_on_parameter_dict(parameters)
 
 # Force disable beam-beam when needed
 if not(enable_bb_legacy) and not(enable_bb_python):
@@ -111,7 +116,12 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 
 # Call leveling module
 mad.use(f'lhcb{beam_to_configure}')
-mad.call("modules/module_02_lumilevel.madx")
+if mode=='b4_without_bb':
+    print('Leveling not working in this mode!')
+else:
+    mad.call("modules/module_02_lumilevel.madx")
+
+
 mad.input('on_disp = 0')
 
 # Prepare bb dataframes
