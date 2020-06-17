@@ -16,7 +16,8 @@ if (mylhcbeam==4){
 option, -echo, warn,-info;
 
 !Install HL-LHC
-call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/hllhc_sequence.madx";
+!call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/hllhc_sequence.madx";
+call, file="hllhc_sequence_local.madx";
 
 
 ! Slice nominal sequence

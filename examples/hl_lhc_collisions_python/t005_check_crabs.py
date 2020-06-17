@@ -5,7 +5,33 @@ import numpy as np
 import pysixtrack
 import sixtracktools
 
-# Test b1 
+L_lhc = 27e3
+h_cc = 35640
+
+# B1 ip5
+ip_choice = 5
+plane = 'y'
+phi = 250e-6
+phi_c = -190e-6
+
+# B1 ip1
+ip_choice = 1
+plane = 'x'
+phi = 250e-6
+phi_c = -190e-6
+
+# # B4 ip1
+# ip_choice = 1
+# plane = 'x'
+# phi = -250e-6
+# phi_c = 190e-6
+# 
+# # B4 ip5
+# ip_choice = 5
+# plane = 'y'
+# phi = 250e-6
+# phi_c = -190e-6
+
 path_test = './'
 type_test = 'sixtrack'
 
@@ -28,12 +54,6 @@ def prepare_line(path, input_type):
 # Load
 ltest = prepare_line(path_test, type_test)
 
-# bb6d_elems, bb6d_names = ltest.get_elements_of_type(pysixtrack.elements.BeamBeam6D)
-# 
-ip_choice = 5
-# 
-# bb6d_elems_ip, bb6d_names_ip = list(zip(*[(ee, nn) for ee, nn in zip(bb6d_elems, bb6d_names)
-#                                   if f'{ip_choice}b' in nn]))i
 
 s_all_elems = ltest.get_s_elements()
 names_all_elems = ltest.element_names
@@ -60,18 +80,16 @@ plt.close('all')
 fig1 = plt.figure(1)
 axcrab = fig1.add_subplot(111)
 
-L_lhc = 27e3
-h_cc = 35640
-phi = 250e-6
-phi_c = -190e-6
 
 # For B1 as weak beam (and we plot B2 as stron beam)
-Y_crab = -phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
-Y_no_crab = -phi * s_rel
-Y1_orbit = phi * s_rel
+R_crab = -phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
+R_no_crab = -phi * s_rel
+R1_orbit = phi * s_rel
 
-axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems])+Y1_orbit, 'o', color = 'r', alpha=.5)
-plt.plot(s_rel, Y_no_crab + Y_crab, '*', color='darkred')
+axcrab.plot(s_rel, np.array(
+    [getattr(bb, f'{plane}_bb_co') for bb in bb_elems])+R1_orbit,
+    'o', color = 'r', alpha=.5, label='strong pyst')
+plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula')
 
 #axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems]), 'o', color='r', alpha=.5)
 #plt.plot(s_rel, Y_no_crab + Y_crab - Y1_orbit, '*', color='darkred')
@@ -104,8 +122,7 @@ crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole]
 #    cc.ps = [-90]
 
 # for cc in crabs:
-#     cc.ksl = [0]
-#     cc.knl = [0]
+#     cc.knl[0] *= -1
 
 z_slices = s_rel * 2.0
 partco.zeta += z_slices
@@ -150,33 +167,14 @@ for iz, zz in enumerate(z_slices):
 
 # For each s_lens, we find the transverse position of the weak beam slice 
 # that collides with the sycnhronous particle of the strong
-y_lenses = []
+r_lenses = []
 for ibb, bb in enumerate(bb_elems):
-    y_lenses.append(list_co[bb_index[ibb]].y[ibb])
+    r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
 
-axcrab.plot(s_rel, y_lenses, 'o', color='b', alpha=.5)
-Yw_crab = phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
-Yw_no_crab = phi * s_rel
-axcrab.plot(s_rel, Yw_crab + Yw_no_crab, '*', color='darkblue')
-
-# Check kicks
-with open('crabs.pkl', 'rb') as fid:
-    crab_dict = pickle.load(fid)
-
-crab_name_test = 'acfcav.bl5.b1'
-kicker_name = crab_name_test.replace('v.', '.')
-crab_test = crabs[crab_names.index(crab_name_test)]
-
-kick_test = float(crab_dict['kickers'][kicker_name]['vkick'])
-
-part_test = partco.copy()
-part_test.x = 0
-part_test.px = 0
-part_test.y = 0
-part_test.py = 0
-part_test.zeta = 0
-part_test.delta = 0
-
-part_test.zeta = crab_dict['kickers']['z_crab']
-
+axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak pysixtrack')
+Rw_crab = phi_c * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
+Rw_no_crab = phi * s_rel
+axcrab.plot(s_rel, Rw_crab + Rw_no_crab, '*', color='darkblue',
+        label='weak formula')
+axcrab.legend(loc='best')
 plt.show()

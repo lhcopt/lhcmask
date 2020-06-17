@@ -277,6 +277,10 @@ if enable_bb_legacy:
 if not enable_bb_legacy:
     if parameters['par_install_crabcavities'] > 0: # Do we want to keep this?
         mad_track.call("tools/enable_crabcavities.madx")
+        ## PATCH!!!!!!
+        #if mode.startswith('b4'):
+        #    mad_track.
+
 # Save crab cavities
 crab_cav_dict = {}
 seq = mad_track.sequence[sequence_to_track]
