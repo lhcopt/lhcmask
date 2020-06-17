@@ -70,3 +70,5 @@ Run check:
 ```bash
 python t005_check_crabs.py
 ```
+
+Repeat for IP1.
