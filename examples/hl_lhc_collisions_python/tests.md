@@ -30,3 +30,20 @@ diff fc.8 ../hl_lhc_collision/fc.8
 diff fc.16 ../hl_lhc_collision/fc.16
 diff fc.34 ../hl_lhc_collision/fc.34
 ```
+
+## Test 2 - b1 with new bb tools
+We select:
+```
+mode = 'b1_with_bb'
+```
+
+We exeute the python
+```bash
+python 004_pymask.py
+```
+
+We execute the reference (can be reused from the previous test):
+```bash
+ cd ../hl_lhc_collision
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run
+```
