@@ -3,7 +3,7 @@
 For pysixtrack we are using the branch: "feature/cc_from_mad_and_sixtrack"
 Sixtracktools is on the master
 
-## Test 1 = b1 with bb legacy macros
+## Test 1 - b1 with bb legacy macros
 
 We select:
 ```
