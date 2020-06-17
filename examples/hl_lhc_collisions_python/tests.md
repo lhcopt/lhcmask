@@ -20,7 +20,7 @@ cd ../hl_lhc_collisions_python
 ```
 We select:
 ```python
-mode = 'b4_without_bb'
+mode = 'b1_with_bb_legacy_macros'
 ```
 We run the python version:
 ```
