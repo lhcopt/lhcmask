@@ -160,9 +160,10 @@ on_crab1 = 0;
 on_crab5 = 0;
 
 !Save references
-call, file="modules/auxiliary_00_savereferences.madx"
+call, file="modules/auxiliary_00_savereferences.madx";
 
 ! Errors and tuning 
+on_disp = 0;
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
 
