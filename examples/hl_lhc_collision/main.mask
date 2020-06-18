@@ -151,23 +151,8 @@ call, file="optics.madx";
 call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";
-
-! Install and switch off crabs
-call, file="tools/enable_crabcavities.madx";
-on_crab1 = 0;
-on_crab5 = 0;
-
-!Save references
-call, file="modules/auxiliary_00_savereferences.madx";
-
-! Errors and tuning 
-on_disp = 0;
+call, file="modules/module_04_1_finalizeseq_storerefs.madx";
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
-
-! Switch off crabs
-on_crab1 = par_crab1;
-on_crab5 = par_crab5;
-
 call, file="modules/module_06_generate.madx";
 

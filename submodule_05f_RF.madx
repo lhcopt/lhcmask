@@ -13,3 +13,6 @@ LAGRF400.B1=0.5;
 LAGRF400.B2=0.;
 VRF400 := par_vrf_total;
 
+! Switch on crabs
+on_crab1 = par_crab1;
+on_crab5 = par_crab5;
