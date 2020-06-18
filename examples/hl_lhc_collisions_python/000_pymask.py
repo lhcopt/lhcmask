@@ -8,7 +8,7 @@ sys.path.append('../../')
 import pymask as pm
 
 import optics_specific_tools as ost
-from parameters import parameters
+from mask_parameters import mask_parameters
 
 Madx = pm.Madxp
 
@@ -16,7 +16,7 @@ Madx = pm.Madxp
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
 mode = 'b1_with_bb_legacy_macros'
-mode = 'b4_without_bb'
+#mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
@@ -40,11 +40,7 @@ check_separations_at_ips = True
 save_intermediate_twiss = True
 
 # Check and load parameters 
-pm.checks_on_parameter_dict(parameters)
-# PATCH FOR KNOWN BUG in levelling!!!
-if mode=='b4_without_bb':
-    parameters['par_sep8'] = -0.03425547139366354;
-    parameters['par_sep2'] = 0.14471680504084292;
+pm.checks_on_parameter_dict(mask_parameters)
 
 # Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
@@ -63,13 +59,12 @@ ost.build_sequence(mad, beam=beam_to_configure)
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
 
-
 # Force disable beam-beam when needed
 if not(enable_bb_legacy) and not(enable_bb_python):
-    parameters['par_on_bb_switch'] = 0.
+    mask_parameters['par_on_bb_switch'] = 0.
 
 # Pass parameters to mad
-mad.set_variables_from_dict(params=parameters)
+mad.set_variables_from_dict(params=mask_parameters)
 
 # Prepare sequences and attach beam
 mad.call("modules/submodule_01a_preparation.madx")
@@ -85,7 +80,12 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 
 # Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
-mad.call("modules/submodule_01d_crossing.madx")
+
+# Set optics-specific knobs
+ost.set_optics_specific_knobs(mad, mode)
+
+# Crossing-save and some reference measurements
+mad.input('exec, crossing_save')
 mad.call("modules/submodule_01e_test.madx")
 mad.call("modules/submodule_01f_use.madx")
 
@@ -228,8 +228,8 @@ mad_track.call("modules/module_04_errors.madx")
 mad_track.call("modules/module_05_tuning.madx")
 
 # Switch on crab cavities
-mad_track.globals.on_crab1 = parameters['par_crab1']
-mad_track.globals.on_crab5 = parameters['par_crab5']
+mad_track.globals.on_crab1 = mad_track.globals.par_crab1
+mad_track.globals.on_crab5 = mad_track.globals.par_crab5
 
 # Generate sixtrack
 if enable_bb_legacy:
