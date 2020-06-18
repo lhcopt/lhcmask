@@ -86,8 +86,7 @@ ost.set_optics_specific_knobs(mad, mode)
 
 # Crossing-save and some reference measurements
 mad.input('exec, crossing_save')
-mad.call("modules/submodule_01e_test.madx")
-mad.call("modules/submodule_01f_use.madx")
+mad.call("modules/submodule_01e_final.madx")
 
 # Test flat machine
 mad.input('exec, crossing_disable')
@@ -206,12 +205,11 @@ if enable_bb_legacy:
 # # Install crab cavities
 # mad_track.call("tools/enable_crabcavities.madx")
 
-# # Switch off crab cavities
-# mad_track.globals.on_crab1 = 0
-# mad_track.globals.on_crab5 = 0
+# # Install crab cavities
+#mad_track.call("modules/submodule_04_1a_install_crabs.madx")
 
 # Save references (orbit at IPs)
-mad_track.call('modules/auxiliary_00_savereferences.madx')
+mad_track.call('modules/submodule_04_1b_save_references.madx')
 
 # Switch off dipersion correction knob
 mad_track.globals.on_disp = 0.

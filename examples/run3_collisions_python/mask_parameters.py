@@ -23,8 +23,8 @@ mask_parameters = {
     # Beam-beam configuration #
     #*************************#
 
-    'par_on_collision'         : 1,            # If 1 lumi leveling in ip8 is applied and q/q' match is done with bb off 
     'par_on_bb_switch'         : 1,
+    'par_match_with_bb'        : 0,            # should be off at collision
     'par_b_t_dist'             : 25.,          # bunch separation [ns]
     'par_n_inside_D1'          : 5,            # default value for the number of additionnal parasitic encounters inside D1
 
