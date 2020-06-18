@@ -1,4 +1,4 @@
-import pymasktools as pmt
+import pymask as pm
 
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
@@ -21,7 +21,7 @@ def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
                     'varname': f'bet{plane}ip{ip}b{beam}',
                     'tol': tol[iip]})
 
-    pmt.check_twiss_against_madvars(twiss_value_checks, twiss_df, variable_dicts)
+    pm.check_twiss_against_madvars(twiss_value_checks, twiss_df, variable_dicts)
 
 def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
         variables_dict, tol):
@@ -37,7 +37,7 @@ def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
                     # knobs like on_sep1h, onsep8v etc
                     'varname': f'on_sep{ip}'+{'x':'h', 'y':'v'}[plane],
                     'tol': tol[iip]})
-    pmt.check_separations_against_madvars(separations_to_check,
+    pm.check_separations_against_madvars(separations_to_check,
             twiss_df_b1, twiss_df_b2, variables_dict)
 
 def twiss_and_check(mad, sequences_to_check, twiss_fname,

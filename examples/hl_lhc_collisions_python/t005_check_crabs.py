@@ -25,14 +25,14 @@ ip_choice = 1
 plane = 'x'
 phi_weak = Phi
 phi_c_weak = Phi_c
-# 
+
 # # B4 ip5
 # beam_track = 'b4'
 # ip_choice = 5
 # plane = 'y'
 # phi_weak = Phi
 # phi_c_weak = Phi_c
-# 
+
 # # B4 ip1
 # beam_track = 'b4'
 # ip_choice = 1

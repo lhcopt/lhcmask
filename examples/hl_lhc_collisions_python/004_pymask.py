@@ -4,29 +4,24 @@ import pickle
 import numpy as np
 
 #from cpymad.madx import Madx
-from madxp import Madxp as Madx
-import pymasktools as pmt
-import optics_specific_tools as ost
+from pymask import Madxp as Madx
+import pymask as pm
 
-# TODO:
-# - Crabs
-# - Some twiss savings and testing
-# - Handle generation of sixtrack input correctly (legacy will be different)
-# - Sort out test_submodule inconsistency
+import optics_specific_tools as ost
 
 # Select mode
 #mode = 'b1_without_bb'
-#mode = 'b1_with_bb'
-mode = 'b1_with_bb_legacy_macros'
+mode = 'b1_with_bb'
+#mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
-#mode = 'b4_from_b2_with_bb'
+mode = 'b4_from_b2_with_bb'
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
 tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
 tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
 
-pmt.make_links(force=True, links_dict={
+pm.make_links(force=True, links_dict={
     'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
     'modules': '/home/giadarol/Desktop/20191212_pymask/lhcmask',
     #'modules': 'tracking_tools/modules',
@@ -43,7 +38,7 @@ save_intermediate_twiss = True
 
 # Check and load parameters 
 from parameters import parameters
-pmt.checks_on_parameter_dict(parameters)
+pm.checks_on_parameter_dict(parameters)
 # PATCH FOR KNOWN BUG in levelling!!!
 if mode=='b4_without_bb':
     parameters['par_sep8'] = -0.03425547139366354;
@@ -53,7 +48,7 @@ if mode=='b4_without_bb':
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
     force_disable_check_separations_at_ips,
-    ) = pmt.get_pymask_configuration(mode)
+    ) = pm.get_pymask_configuration(mode)
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
 
@@ -126,8 +121,7 @@ mad.input('on_disp = 0')
 
 # Prepare bb dataframes
 if enable_bb_python:
-    import beambeam as bb
-    bb_dfs = bb.generate_bb_dataframes(mad,
+    bb_dfs = pm.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
         numberOfLRPerIRSide=[25, 20, 25, 20],
@@ -146,7 +140,7 @@ if generate_b4_from_b2:
     ost.build_sequence(mad_b4, beam=4)
     ost.apply_optics(mad_b4, optics_file=optics_file)
 
-    pmt.configure_b4_from_b2(mad_b4, mad)
+    pm.configure_b4_from_b2(mad_b4, mad)
 
     twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad,
             sequences_to_check=['lhcb2'],
@@ -225,11 +219,11 @@ mad_track.use(sequence_to_track)
 mad_track._use = mad_track.use
 mad_track.use = None
 
-# Install and correct errors
-mad_track.call("modules/module_04_errors.madx")
-
-# Machine tuning (enables bb)
-mad_track.call("modules/module_05_tuning.madx")
+# # Install and correct errors
+# mad_track.call("modules/module_04_errors.madx")
+# 
+# # Machine tuning (enables bb)
+# mad_track.call("modules/module_05_tuning.madx")
 
 # Switch on crab cavities
 mad_track.globals.on_crab1 = parameters['par_crab1']
@@ -239,7 +233,7 @@ mad_track.globals.on_crab5 = parameters['par_crab5']
 if enable_bb_legacy:
     mad_track.call("modules/module_06_generate.madx")
 else:
-    pmt.generate_sixtrack_input(mad_track,
+    pm.generate_sixtrack_input(mad_track,
         seq_name=sequence_to_track,
         bb_df=bb_df_track,
         output_folder='./',
@@ -261,7 +255,7 @@ else:
         skip_mad_use=True)
 
 # Get optics and orbit at start ring
-optics_orbit_start_ring = pmt.get_optics_and_orbit_at_start_ring(
+optics_orbit_start_ring = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
 with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
     pickle.dump(optics_orbit_start_ring, fid)
@@ -271,7 +265,7 @@ if enable_bb_legacy:
     print('Pysixtrack line is not generated with bb legacy macros')
 else:
     pysix_fol_name = "./pysixtrack"
-    dct_pysxt = pmt.generate_pysixtrack_line_with_bb(mad_track,
+    dct_pysxt = pm.generate_pysixtrack_line_with_bb(mad_track,
         sequence_to_track, bb_df_track,
         closed_orbit_method='from_mad',
         pickle_lines_in_folder=pysix_fol_name,
