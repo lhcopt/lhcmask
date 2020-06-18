@@ -54,6 +54,15 @@ We execute the reference (can be reused from the previous test):
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
+Configure ```t004_compare_pysixtrack_lines.py``` for the test:
+```python
+# Test b1
+path_test = './'
+type_test = 'sixtrack'
+path_ref = '../hl_lhc_collision'
+type_ref = 'sixtrack
+```
+
 Check using pysixtrack lines:
 ```bash
 python t003_fc_to_fort.py
