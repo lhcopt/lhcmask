@@ -86,8 +86,7 @@ ost.set_optics_specific_knobs(mad, mode)
 
 # Crossing-save and some reference measurements
 mad.input('exec, crossing_save')
-mad.call("modules/submodule_01e_test.madx")
-mad.call("modules/submodule_01f_use.madx")
+mad.call("modules/submodule_01e_final.madx")
 
 # Test flat machine
 mad.input('exec, crossing_disable')
