@@ -6,7 +6,8 @@
 system, "ln -fns /afs/cern.ch/eng/tracking-tools tracking_tools";
 
 ! Mask code folder
-system, "ln -fns tracking_tools/modules modules";
+!system, "ln -fns tracking_tools/modules modules";
+system, "ln -fns /home/giadarol/Desktop/20191212_pymask/lhcmask modules";
 
 ! Machine folder
 system, "ln -fns tracking_tools/machines machines"; 
@@ -15,7 +16,8 @@ system, "ln -fns tracking_tools/machines machines";
 system, "ln -fns tracking_tools/tools tools"; 
 
 ! Beam-beam macros folder
-system, "ln -fns tracking_tools/beambeam_macros beambeam_macros"; 
+!system, "ln -fns tracking_tools/beambeam_macros beambeam_macros"; 
+system, "ln -fns /home/giadarol/Desktop/20191212_pymask/beambeam_macros beambeam_macros";
 
 ! Errors folder
 system, "ln -fns tracking_tools/errors errors";  
@@ -87,8 +89,8 @@ par_on_sol_alice         = 0;
 ! Beam-beam configuration !
 !*************************!
 
-par_on_collision         = 0;            ! If 1 lumi leveling in ip8 is applied and q/q' match is done with bb off 
 par_on_bb_switch         = 1;
+par_match_with_bb        = 1;            ! should be off at collision
 par_b_t_dist             = 25.;          ! bunch separation [ns]
 par_n_inside_D1          = 5;            ! default value for the number of additional parasitic encounters inside D1
 
@@ -96,8 +98,6 @@ par_nho_IR1              = 11;           ! number of slices for head-on in IR1 (
 par_nho_IR2              = 11;           ! number of slices for head-on in IR2 (between 0 and 201)
 par_nho_IR5              = 11;           ! number of slices for head-on in IR5 (between 0 and 201)
 par_nho_IR8              = 11;           ! number of slices for head-on in IR8 (between 0 and 201)
-
-par_install_crabcavities = 0;
 
 
 !*************************!
@@ -151,8 +151,8 @@ call, file="optics.madx";
 call, file="modules/module_01_orbit.madx";
 !call, file="modules/module_02_lumilevel.madx";    ! no levelling at injection
 call, file="modules/module_03_beambeam.madx";
+call, file="modules/module_04_1_finalizeseq_storerefs.madx";
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
 call, file="modules/module_06_generate.madx";
 
-stop;
