@@ -6,28 +6,23 @@ print, text="+++++++++++++++++++++++++++++++";
 print, text="";
 print, text="";
 
-
-on_collision = par_on_collision;
-
 call, file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
 
 exec, DEFINE_BB_PARAM;  !Define main beam-beam parameters
 
-if (ON_COLLISION==1){
-  !Switch on Xscheme in precollision
-  on_disp:=0;
-  halo1=0;halo2=5;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
-  !number of collision/turn at IP1/2/5/8 
-  nco_IP1 = par_nco_IP1;
-  nco_IP5 = par_nco_IP5;
-  nco_IP2 = par_nco_IP2;
-  nco_IP8 = par_nco_IP8;
-  exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip8, 8); value,halo8;
-  !Redefine the on_sep's accordingly
-  exec, CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
-  ! Saving new crossing scheme with separation
-  on_disp=on_dispaux; ! reset on_disp before saving
-  exec, crossing_save;
-};
+!Switch on Xscheme in precollision
+on_disp:=0;
+halo1=0;halo2=5;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
+!number of collision/turn at IP1/2/5/8 
+nco_IP1 = par_nco_IP1;
+nco_IP5 = par_nco_IP5;
+nco_IP2 = par_nco_IP2;
+nco_IP8 = par_nco_IP8;
+exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip8, 8); value,halo8;
+!Redefine the on_sep's accordingly
+exec, CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
+! Saving new crossing scheme with separation
+on_disp=on_dispaux; ! reset on_disp before saving
+exec, crossing_save;
 
 if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
