@@ -185,7 +185,7 @@ if enable_bb_python:
         bb_df_track = bb_dfs['b1']
         assert(sequence_to_track=='lhcb1')
 
-    bb.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
+    pm.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
 
     # Disable bb
     mad_track.globals.on_bb_charge = 0

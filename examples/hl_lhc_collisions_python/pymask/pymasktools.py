@@ -3,6 +3,8 @@ import pickle
 
 import numpy as np
 
+from . import beambeam as bb
+
 def make_links(links_dict, force=False):
     for kk in links_dict.keys():
         if force:
@@ -380,7 +382,7 @@ def generate_pysixtrack_line_with_bb(mad, seq_name, bb_df,
         mad.sequence[seq_name])
 
     if bb_df is not None:
-        setup_beam_beam_in_line(pysxt_line, bb_df, bb_coupling=False)
+        bb.setup_beam_beam_in_line(pysxt_line, bb_df, bb_coupling=False)
 
     # Temporary fix due to bug in mad loader
     cavities, cav_names = pysxt_line.get_elements_of_type(
