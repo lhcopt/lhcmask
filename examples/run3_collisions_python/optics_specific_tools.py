@@ -4,11 +4,60 @@ import pymask as pm
 # adapted according to knob definitions
 
 def build_sequence(mad, beam):
+
+    slicefactor = 2
+
+    pm.make_links(force=True, links_dict={
+        'optics_indep_macros.madx': 'tools/optics_indep_macros.madx',
+        'macro.madx': ('/afs/cern.ch/user/s/sterbini/public/'
+                         'tracking_tools/tools/macro.madx'),
+        'optics_runII': '/afs/cern.ch/eng/lhc/optics/runII',
+        'optics_runIII': '/afs/cern.ch/eng/lhc/optics/runIII',})
+
+
+    mylhcbeam = int(beam)
+
+    mad.input('ver_lhc_run = 3')
+
     mad.input(f'mylhcbeam = {beam}')
-    mad.call('hl14_thin.madx')
+    mad.input('option, -echo,warn, -info;')
+
+    # optics dependent macros
+    mad.call('macro.madx')
+    # optics independent macros
+    mad.call('optics_indep_macros.madx')
+
+    assert mylhcbeam in [1, 2, 4], "Invalid mylhcbeam (it should be in [1, 2, 4])"
+
+    if mylhcbeam in [1, 2]:
+        mad.call('optics_runII/2018/lhc_as-built.seq')
+    else:
+        mad.call('optics_runII/2018/lhcb4_as-built.seq')
+
+    # New IR7 MQW layout and cabling
+    mad.call('optics_runIII/RunIII_dev/IR7-Run3seqedit.madx')
+
+    # Makethin part
+    if slicefactor > 0:
+        # the variable in the macro is slicefactor
+        mad.input(f'slicefactor={slicefactor};')
+        mad.call('optics_runII/2018/toolkit/myslice.madx')
+        mad.beam()
+        for my_sequence in ['lhcb1','lhcb2']:
+            if my_sequence in list(mad.sequence):
+                mad.input(f'use, sequence={my_sequence}; makethin, sequence={my_sequence}, style=teapot, makedipedge=false;')
+    else:
+        warnings.warn('The sequences are not thin!')
+
+    # Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+    for my_sequence in ['lhcb1','lhcb2']:
+        if my_sequence in list(mad.sequence):
+            mad.input(f'seqedit, sequence={my_sequence}; flatten; cycle, start=IP3; flatten; endedit;')
 
 def apply_optics(mad, optics_file):
-    mad.call('hl14_collision_optics.madx')
+    pm.make_links(force=True, links_dict={
+        'optics.madx' : 'optics_runIII/RunIII_dev/2022_V1/PROTON/' + optics_file})
+    mad.call('optics.madx')
 
 def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     twiss_value_checks=[]
@@ -28,32 +77,25 @@ def set_optics_specific_knobs(mad, mode=None):
 
     from knob_parameters import knob_parameters as kp
 
-    # PATCH!!!!!!! for leveling not working for b4
-    if mode == 'b4_without_bb':
-        kp['par_sep8'] = -0.03425547139366354
-        kp['par_sep2'] = 0.14471680504084292
-
     mad.set_variables_from_dict(params=kp)
 
     # Set IP knobs
     mad.globals['on_x1'] = kp['par_x1']
     mad.globals['on_sep1'] = kp['par_sep1']
-    mad.globals['on_x2'] = kp['par_x2']
-    mad.globals['on_sep2'] = kp['par_sep2']
+
+    mad.globals['on_x2h'] = kp['par_x2h']
+    mad.globals['on_x2v'] = kp['par_x2v']
+    mad.globals['on_sep2h'] = kp['par_sep2h']
+    mad.globals['on_sep2v'] = kp['par_sep2v']
+
     mad.globals['on_x5'] = kp['par_x5']
     mad.globals['on_sep5'] = kp['par_sep5']
-    mad.globals['on_x8'] = kp['par_x8']
-    mad.globals['on_sep8'] = kp['par_sep8']
-    mad.globals['on_a1'] = kp['par_a1']
-    mad.globals['on_o1'] = kp['par_o1']
-    mad.globals['on_a2'] = kp['par_a2']
-    mad.globals['on_o2'] = kp['par_o2']
-    mad.globals['on_a5'] = kp['par_a5']
-    mad.globals['on_o5'] = kp['par_o5']
-    mad.globals['on_a8'] = kp['par_a8']
-    mad.globals['on_o8'] = kp['par_o8']
-    mad.globals['on_crab1'] = kp['par_crab1']
-    mad.globals['on_crab5'] = kp['par_crab5']
+
+    mad.globals['on_x8h'] = kp['par_x8h']
+    mad.globals['on_x8v'] = kp['par_x8v']
+    mad.globals['on_sep8h'] = kp['par_sep8h']
+    mad.globals['on_sep8v'] = kp['par_sep8v']
+
     mad.globals['on_disp'] = kp['par_on_disp']
 
     # A check
@@ -71,12 +113,11 @@ def set_optics_specific_knobs(mad, mode=None):
     mad.globals.on_sol_cms = kp['par_on_sol_cms']
     mad.globals.on_sol_alice = kp['par_on_sol_alice']
 
-
 def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
         variables_dict, tol):
 
     separations_to_check = []
-    for iip, ip in enumerate([1,2,5,8]):
+    for iip, ip in enumerate([2,8]):
         for plane in ['x', 'y']:
             # (*) Adapet based on knob definitions
             separations_to_check.append({
@@ -86,6 +127,18 @@ def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
                     # knobs like on_sep1h, onsep8v etc
                     'varname': f'on_sep{ip}'+{'x':'h', 'y':'v'}[plane],
                     'tol': tol[iip]})
+    separations_to_check.append({ # IP1
+            'element_name': f'ip1:1',
+                    'scale_factor': -2*1e-3,
+                    'plane': 'x',
+                    'varname': 'on_sep1',
+                    'tol': tol[0]})
+    separations_to_check.append({ # IP5
+            'element_name': f'ip5:1',
+                    'scale_factor': -2*1e-3,
+                    'plane': 'y',
+                    'varname': 'on_sep5',
+                    'tol': tol[2]})
     pm.check_separations_against_madvars(separations_to_check,
             twiss_df_b1, twiss_df_b2, variables_dict)
 

@@ -33,7 +33,7 @@ pm.make_links(force=True, links_dict={
     'beambeam_macros': '/home/giadarol/Desktop/20191212_pymask/beambeam_macros',
     'errors': 'tracking_tools/errors'})
 
-optics_file = 'hl14_collision_optics.madx' #15 cm
+optics_file = 'opticsfile.29'
 
 check_betas_at_ips = True
 check_separations_at_ips = True
@@ -111,12 +111,13 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
-# Call leveling module
 mad.use(f'lhcb{beam_to_configure}')
-if mode=='b4_without_bb':
-    print('Leveling not working in this mode!')
-else:
-    mad.call("modules/module_02_lumilevel.madx")
+
+# # Call leveling module
+# if mode=='b4_without_bb':
+#     print('Leveling not working in this mode!')
+# else:
+#     mad.call("modules/module_02_lumilevel.madx")
 
 
 mad.input('on_disp = 0')
@@ -131,7 +132,7 @@ if enable_bb_python:
         numberOfHOSlices=11,
         bunch_population_ppb=None,
         sigmaz_m=None,
-        z_crab_twiss = 0.075,
+        z_crab_twiss = 0,
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
@@ -202,12 +203,12 @@ if enable_bb_legacy:
     assert(not(enable_bb_python))
     mad_track.call("modules/module_03_beambeam.madx")
 
-# Install crab cavities
-mad_track.call("tools/enable_crabcavities.madx")
+# # Install crab cavities
+# mad_track.call("tools/enable_crabcavities.madx")
 
-# Switch off crab cavities
-mad_track.globals.on_crab1 = 0
-mad_track.globals.on_crab5 = 0
+# # Switch off crab cavities
+# mad_track.globals.on_crab1 = 0
+# mad_track.globals.on_crab5 = 0
 
 # Save references (orbit at IPs)
 mad_track.call('modules/auxiliary_00_savereferences.madx')
@@ -221,15 +222,15 @@ mad_track.use(sequence_to_track)
 mad_track._use = mad_track.use
 mad_track.use = None
 
-# Install and correct errors
-mad_track.call("modules/module_04_errors.madx")
+# # Install and correct errors
+# mad_track.call("modules/module_04_errors.madx")
 
 # Machine tuning (enables bb)
 mad_track.call("modules/module_05_tuning.madx")
 
-# Switch on crab cavities
-mad_track.globals.on_crab1 = mad_track.globals.par_crab1
-mad_track.globals.on_crab5 = mad_track.globals.par_crab5
+# # Switch on crab cavities
+# mad_track.globals.on_crab1 = mad_track.globals.par_crab1
+# mad_track.globals.on_crab5 = mad_track.globals.par_crab5
 
 # Generate sixtrack
 if enable_bb_legacy:
