@@ -77,32 +77,25 @@ def set_optics_specific_knobs(mad, mode=None):
 
     from knob_parameters import knob_parameters as kp
 
-    # PATCH!!!!!!! for leveling not working for b4
-    if mode == 'b4_without_bb':
-        kp['par_sep8'] = -0.03425547139366354
-        kp['par_sep2'] = 0.14471680504084292
-
     mad.set_variables_from_dict(params=kp)
 
     # Set IP knobs
     mad.globals['on_x1'] = kp['par_x1']
     mad.globals['on_sep1'] = kp['par_sep1']
-    mad.globals['on_x2'] = kp['par_x2']
-    mad.globals['on_sep2'] = kp['par_sep2']
+
+    mad.globals['on_x2h'] = kp['par_x2h']
+    mad.globals['on_x2v'] = kp['par_x2v']
+    mad.globals['on_sep2h'] = kp['par_sep2h']
+    mad.globals['on_sep2v'] = kp['par_sep2v']
+
     mad.globals['on_x5'] = kp['par_x5']
     mad.globals['on_sep5'] = kp['par_sep5']
-    mad.globals['on_x8'] = kp['par_x8']
-    mad.globals['on_sep8'] = kp['par_sep8']
-    mad.globals['on_a1'] = kp['par_a1']
-    mad.globals['on_o1'] = kp['par_o1']
-    mad.globals['on_a2'] = kp['par_a2']
-    mad.globals['on_o2'] = kp['par_o2']
-    mad.globals['on_a5'] = kp['par_a5']
-    mad.globals['on_o5'] = kp['par_o5']
-    mad.globals['on_a8'] = kp['par_a8']
-    mad.globals['on_o8'] = kp['par_o8']
-    mad.globals['on_crab1'] = kp['par_crab1']
-    mad.globals['on_crab5'] = kp['par_crab5']
+
+    mad.globals['on_x8h'] = kp['par_x8h']
+    mad.globals['on_x8v'] = kp['par_x8v']
+    mad.globals['on_sep8h'] = kp['par_sep8h']
+    mad.globals['on_sep8v'] = kp['par_sep8v']
+
     mad.globals['on_disp'] = kp['par_on_disp']
 
     # A check
@@ -119,7 +112,6 @@ def set_optics_specific_knobs(mad, mode=None):
     mad.globals.on_sol_atlas = kp['par_on_sol_atlas']
     mad.globals.on_sol_cms = kp['par_on_sol_cms']
     mad.globals.on_sol_alice = kp['par_on_sol_alice']
-
 
 def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
         variables_dict, tol):
