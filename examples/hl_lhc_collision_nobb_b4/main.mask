@@ -172,7 +172,7 @@ on_disp = 0;
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
 
-! Switch off crabs
+! Switch on crabs
 on_crab1 = par_crab1;
 on_crab5 = par_crab5;
 
