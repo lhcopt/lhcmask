@@ -6,8 +6,20 @@ print, text="";
 print, text="";
 
 
-
 on_disp = 0;
+
+correct_for_D2 = par_correct_for_D2;
+correct_for_MCBX = par_correct_for_MCBX;
+
+on_errors_LHC   = par_on_errors_LHC;
+on_errors_MBH   = par_on_errors_MBH;
+on_errors_IT    = par_on_errors_IT;
+on_errors_Q4    = par_on_errors_Q4;
+on_errors_Q5    = par_on_errors_Q5;
+on_errors_D1    = par_on_errors_D1;
+on_errors_D2    = par_on_errors_D2;
+on_errors_MCBRD = par_on_errors_MCBRD;
+on_errors_MCBXF = par_on_errors_MCBXF;
 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
