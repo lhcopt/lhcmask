@@ -143,3 +143,18 @@ diff fc.8 ../hl_lhc_collision_nobb_b4/fc.8
 diff fc.16 ../hl_lhc_collision_nobb_b4/fc.16
 diff fc.34 ../hl_lhc_collision_nobb_b4/fc.34
 ```
+
+## Test 5 - b4 from b2 with bb
+We setup the python version:
+```bash
+cd ../hl_lhc_collisions_python
+
+```
+We select:
+```python
+mode = 'b4_from_b2_with_bb'
+```
+We run the python version:
+```
+python 004_pymask.py
+```
