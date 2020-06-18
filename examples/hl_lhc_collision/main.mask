@@ -152,7 +152,7 @@ call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";
 
-! Switch off crabs
+! Install and switch off crabs
 call, file="tools/enable_crabcavities.madx";
 on_crab1 = 0;
 on_crab5 = 0;

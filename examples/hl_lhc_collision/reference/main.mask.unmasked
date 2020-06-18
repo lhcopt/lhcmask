@@ -99,8 +99,6 @@ par_nho_IR2              = 11;           ! number of slices for head-on in IR2 (
 par_nho_IR5              = 11;           ! number of slices for head-on in IR5 (between 0 and 201)
 par_nho_IR8              = 11;           ! number of slices for head-on in IR8 (between 0 and 201)
 
-par_install_crabcavities = 1;
-
 
 !*************************!
 !     Leveling in IP8     !
@@ -154,34 +152,20 @@ call, file="modules/module_01_orbit.madx";
 call, file="modules/module_02_lumilevel.madx";
 call, file="modules/module_03_beambeam.madx";
 
+! Install and switch off crabs
+call, file="tools/enable_crabcavities.madx";
 on_crab1 = 0;
 on_crab5 = 0;
 
-exec, crossing_disable;
-on_disp = 0;
-if(mylhcbeam==1) 
- {exec, check_ip(1)};
-if(mylhcbeam>1) 
- {exec, check_ip(2)};
-exec, crossing_restore;
+!Save references
+call, file="modules/auxiliary_00_savereferences.madx";
 
+! Errors and tuning 
 on_disp = 0;
- !Record the nominal IP position and crossing angle
- if(mylhcbeam==1) {use,  sequence=lhcb1;};
- if(mylhcbeam>1) {use,  sequence=lhcb2;};
- twiss;
- xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
- xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
- xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
- xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
- value,xnom1,xnom2,xnom5,xnom8;
- value,ynom1,ynom2,ynom5,ynom8;
- value,pxnom1,pxnom2,pxnom5,pxnom8;
- value,pynom1,pynom2,pynom5,pynom8;
- 
 call, file="modules/module_04_errors.madx";
 call, file="modules/module_05_tuning.madx";
 
+! Switch off crabs
 on_crab1 = par_crab1;
 on_crab5 = par_crab5;
 

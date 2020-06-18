@@ -17,9 +17,9 @@ import optics_specific_tools as ost
 # Select mode
 #mode = 'b1_without_bb'
 #mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
-mode = 'b4_without_bb'
-mode = 'b4_from_b2_without_bb'
+mode = 'b1_with_bb_legacy_macros'
+#mode = 'b4_without_bb'
+#mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
