@@ -3,7 +3,7 @@
 For pysixtrack we are using the branch: "feature/cc_from_mad_and_sixtrack"
 Sixtracktools is on the master
 
-We test the commit 89ef222ad8371704bb055185358ff133a42be6de
+We test the commit be0aa65dc11c8104d6e4d83957fc93d71f2c052c
 
 ## Test 1 - b1 with bb legacy macros
 
@@ -52,6 +52,15 @@ We execute the reference (can be reused from the previous test):
 ```bash
  cd ../hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
+```
+
+Configure ```t004_compare_pysixtrack_lines.py``` for the test:
+```python
+# Test b1
+path_test = './'
+type_test = 'sixtrack'
+path_ref = '../hl_lhc_collision'
+type_ref = 'sixtrack
 ```
 
 Check using pysixtrack lines:
