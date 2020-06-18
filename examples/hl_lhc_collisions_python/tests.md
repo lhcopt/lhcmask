@@ -112,3 +112,34 @@ diff fc.8 ../hl_lhc_collision_nobb_b4/fc.8
 diff fc.16 ../hl_lhc_collision_nobb_b4/fc.16
 diff fc.34 ../hl_lhc_collision_nobb_b4/fc.34
 ```
+
+## Test 4 - b4 from b2 without bb
+
+We execute the reference:
+```bash
+ cd ../hl_lhc_collision_nobb_b4
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run
+```
+
+We setup the python version:
+```bash
+cd ../hl_lhc_collisions_python
+
+```
+We select:
+```python
+mode = 'b4_from_b2_without_bb'
+```
+We run the python version:
+```
+python 004_pymask.py
+```
+
+We check that the output is identical
+```bash
+diff fc.2 ../hl_lhc_collision_nobb_b4/fc.2
+diff fc.3 ../hl_lhc_collision_nobb_b4/fc.3
+diff fc.8 ../hl_lhc_collision_nobb_b4/fc.8
+diff fc.16 ../hl_lhc_collision_nobb_b4/fc.16
+diff fc.34 ../hl_lhc_collision_nobb_b4/fc.34
+```
