@@ -16,8 +16,7 @@ system, "ln -fns tracking_tools/machines machines";
 system, "ln -fns tracking_tools/tools tools"; 
 
 ! Beam-beam macros folder
-!system, "ln -fns tracking_tools/beambeam_macros beambeam_macros"; 
-system, "ln -fns /home/giadarol/Desktop/20191212_pymask/beambeam_macros beambeam_macros";
+system, "ln -fns tracking_tools/beambeam_macros beambeam_macros"; 
 
 ! Errors folder
 system, "ln -fns tracking_tools/errors errors";  
