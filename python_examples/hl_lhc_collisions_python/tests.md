@@ -198,3 +198,13 @@ phi_weak = Phi
 phi_c_weak = Phi_c
 ```
 
+## To check a mad test againt its reference
+
+```bash
+diff fc.2 reference/fc.2
+diff fc.3 reference/fc.3
+diff fc.8 reference/fc.8
+diff fc.16 reference/fc.16
+diff fc.34 reference/fc.34
+```
+
