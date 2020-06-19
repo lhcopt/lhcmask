@@ -8,7 +8,7 @@ import sixtracktools
 # Test b1 
 path_test = './'
 type_test = 'sixtrack'
-path_ref = '../hl_lhc_collision'
+path_ref = '../../examples/hl_lhc_collision'
 type_ref = 'sixtrack'
 
 # # Test b4 nobb sixtrack
