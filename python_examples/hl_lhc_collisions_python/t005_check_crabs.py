@@ -19,12 +19,12 @@ plane = 'y'
 phi_weak = Phi
 phi_c_weak = Phi_c
 
-# B1 ip1
-beam_track = 'b1'
-ip_choice = 1
-plane = 'x'
-phi_weak = Phi
-phi_c_weak = Phi_c
+# # B1 ip1
+# beam_track = 'b1'
+# ip_choice = 1
+# plane = 'x'
+# phi_weak = Phi
+# phi_c_weak = Phi_c
 
 # # B4 ip5
 # beam_track = 'b4'
@@ -33,12 +33,12 @@ phi_c_weak = Phi_c
 # phi_weak = Phi
 # phi_c_weak = Phi_c
 
-# B4 ip1
-beam_track = 'b4'
-ip_choice = 1
-plane = 'x'
-phi_weak = -Phi
-phi_c_weak = -Phi_c
+# # B4 ip1
+# beam_track = 'b4'
+# ip_choice = 1
+# plane = 'x'
+# phi_weak = -Phi
+# phi_c_weak = -Phi_c
 
 phi_strong = -phi_weak
 phi_c_strong = -phi_c_weak
