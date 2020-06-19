@@ -28,7 +28,7 @@ system, "ln -fns tracking_tools/errors errors";
 !*************************!
 
 ! Choose build machine script (sequence, makethin, optics, optics toolkit, cycle)
-system, "ln -fns hl14_thin.madx make_sequence.madx";
+system, "ln -fns machines/sequences/hl14_thin.madx make_sequence.madx";
 
 ! Choose optics (magnet strengths)
 system, "ln -fns machines/optics/hl14_collision.madx optics.madx";
