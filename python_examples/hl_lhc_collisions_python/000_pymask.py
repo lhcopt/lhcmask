@@ -15,10 +15,10 @@ Madx = pm.Madxp
 # Select mode
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
+mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
-mode = 'b4_from_b2_with_bb'
+#mode = 'b4_from_b2_with_bb'
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
 tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
@@ -26,12 +26,15 @@ tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
 
 pm.make_links(force=True, links_dict={
     'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-    'modules': '/home/giadarol/Desktop/20191212_pymask/lhcmask',
-    #'modules': 'tracking_tools/modules',
+    'modules': 'tracking_tool/slhcmask',
     'tools': 'tracking_tools/tools',
     'beambeam_macros': 'tracking_tools/beambeam_macros',
     'errors': 'tracking_tools/errors'})
 
+# Execute customization script if present
+os.system('bash customization.bash')
+
+# Choose optics file
 optics_file = 'hl14_collision_optics.madx' #15 cm
 
 check_betas_at_ips = True
