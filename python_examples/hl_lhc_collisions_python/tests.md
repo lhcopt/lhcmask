@@ -116,11 +116,11 @@ python 004_pymask.py
 
 We check that the output is identical
 ```bash
-diff fc.2 ../hl_lhc_collision_nobb_b4/fc.2
-diff fc.3 ../hl_lhc_collision_nobb_b4/fc.3
-diff fc.8 ../hl_lhc_collision_nobb_b4/fc.8
-diff fc.16 ../hl_lhc_collision_nobb_b4/fc.16
-diff fc.34 ../hl_lhc_collision_nobb_b4/fc.34
+diff fc.2 ../../examples/hl_lhc_collision_nobb_b4/fc.2
+diff fc.3 ../../examples/hl_lhc_collision_nobb_b4/fc.3
+diff fc.8 ../../examples/hl_lhc_collision_nobb_b4/fc.8
+diff fc.16 ../../examples/hl_lhc_collision_nobb_b4/fc.16
+diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 ```
 
 ## Test 4 - b4 from b2 without bb
@@ -147,11 +147,11 @@ python 004_pymask.py
 
 We check that the output is identical
 ```bash
-diff fc.2 ../hl_lhc_collision_nobb_b4/fc.2
-diff fc.3 ../hl_lhc_collision_nobb_b4/fc.3
-diff fc.8 ../hl_lhc_collision_nobb_b4/fc.8
-diff fc.16 ../hl_lhc_collision_nobb_b4/fc.16
-diff fc.34 ../hl_lhc_collision_nobb_b4/fc.34
+diff fc.2 ../../examples/hl_lhc_collision_nobb_b4/fc.2
+diff fc.3 ../../examples/hl_lhc_collision_nobb_b4/fc.3
+diff fc.8 ../../examples/hl_lhc_collision_nobb_b4/fc.8
+diff fc.16 ../../examples/hl_lhc_collision_nobb_b4/fc.16
+diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 ```
 
 ## Test 5 - b4 from b2 with bb
