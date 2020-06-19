@@ -29,8 +29,7 @@ pm.make_links(force=True, links_dict={
     'modules': '/home/giadarol/Desktop/20191212_pymask/lhcmask',
     #'modules': 'tracking_tools/modules',
     'tools': 'tracking_tools/tools',
-    #'beambeam_macros': 'tracking_tools/beambeam_macros',
-    'beambeam_macros': '/home/giadarol/Desktop/20191212_pymask/beambeam_macros',
+    'beambeam_macros': 'tracking_tools/beambeam_macros',
     'errors': 'tracking_tools/errors'})
 
 optics_file = 'hl14_collision_optics.madx' #15 cm
