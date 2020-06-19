@@ -36,7 +36,7 @@ if (ver_hllhc_optics > 0) { call, file="tools/SelectLHCMonCor_v2.madx"; };
 if (ver_hllhc_optics < 1.3) {
   call, file="errors/HL-LHC/macro_error_v1.madx";   ! macros for error generation in the new IT/D1's
 };
-if (ver_hllhc_optics > 1.2) {
+if (ver_hllhc_optics >= 1.3) {
   call, file="errors/HL-LHC/macro_error_v3.madx";   ! macros for error generation in the new IT/D1's
 };
 
