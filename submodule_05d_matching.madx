@@ -10,12 +10,12 @@ print, text="";
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 matching of orbit, tune and chromaticity
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if(par_on_collision==0) {ON_BB_CHARGE:=1;};    ! W/o head-on Q and Q' are matched with bb
+if(par_match_with_bb==1) {ON_BB_CHARGE:=1;};    ! W/o head-on Q and Q' are matched with bb
 
 !Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
 call, file="tools/rematchCOIP.madx";
 !Rematch the CO in the arc for dispersion correction
-if(ON_DISP<>0) {call, file="tools/rematchCOarc.madx";};
+if(on_disp<>0) {call, file="tools/rematchCOarc.madx";};
 
 if(mylhcbeam==1){
   kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;

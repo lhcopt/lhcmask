@@ -169,6 +169,7 @@ then
   fi
 
   # Make backup of old reference folder, and create new one
+  if [ -d reference_OLD ]; then rm -R reference_OLD; fi
   mv reference reference_OLD
   mkdir reference
   mv fc.* reference/ 2> /dev/null

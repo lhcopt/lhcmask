@@ -19,4 +19,4 @@ RENAME_MACRO(nnnnn) : macro = {
 }
 
 
-exec, RENAME_MACRO($myseed);      
+exec, RENAME_MACRO($par_myseed);      

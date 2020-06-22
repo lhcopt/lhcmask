@@ -1,0 +1,10 @@
+print, text="";
+print, text="";
+print, text="+++++++++++++++++++++++++++++++++++++++++++++++++++++";
+print, text="++ START MODULE 4.1: FINALIZE SEQ. AND STORE REFS +++";
+print, text="+++++++++++++++++++++++++++++++++++++++++++++++++++++";
+print, text="";
+print, text="";
+
+call, file="modules/submodule_04_1a_install_crabs.madx";
+call, file="modules/submodule_04_1b_save_references.madx";

@@ -46,10 +46,6 @@ if (par_on_lhcb==1){
   on_lhcb  = 7000/nrj;
 };
 
-!Avoid crabbing more than the crossing angle
-if ( abs(on_crab1)>abs(par_xing_ang_ip15) && on_crab1 <> 0) {on_crab1 = abs(on_crab1)/on_crab1 * abs(par_xing_ang_ip15);}
-if ( abs(on_crab5)>abs(par_xing_ang_ip15) && on_crab5 <> 0) {on_crab5 = abs(on_crab5)/on_crab5 * abs(par_xing_ang_ip15);}
-
 ! solenoids in experiments
 on_sol_atlas = par_on_sol_atlas;
 on_sol_cms = par_on_sol_cms;
