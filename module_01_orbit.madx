@@ -1,0 +1,20 @@
+print, text="";
+print, text="";
+print, text="++++++++++++++++++++++++++++";
+print, text="++ START MODULE 1: ORBIT +++";
+print, text="++++++++++++++++++++++++++++";
+print, text="";
+print, text="";
+
+
+
+call, file="modules/submodule_01a_preparation.madx";
+call, file="modules/submodule_01b_beam.madx";
+call, file="modules/submodule_01c_phase.madx";
+call, file="modules/submodule_01d_crossing.madx";
+call, file="modules/submodule_01e_final.madx";
+
+!print, text="==================================================";
+!print, text="======  OPTICS PARAMETERS: UNPERTURBED  ==========";
+!print, text="==================================================";
+!call, file="tools/get_optics_params.madx";

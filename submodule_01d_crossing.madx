@@ -1,0 +1,57 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1d: crossing";
+print, text="  --------------------------";
+print, text="";
+print, text="";
+
+
+
+! Set IP knobs
+on_x1 = par_x1;
+on_sep1 = par_sep1;
+on_x2 = par_x2;
+on_sep2 = par_sep2;
+on_x5 = par_x5;
+on_sep5 = par_sep5;
+on_x8 = par_x8;
+on_sep8 = par_sep8;
+on_a1 = par_a1;
+on_o1 = par_o1;
+on_a2 = par_a2;
+on_o2 = par_o2;
+on_a5 = par_a5;
+on_o5 = par_o5;
+on_a8 = par_a8;
+on_o8 = par_o8;
+on_crab1 = par_crab1;
+on_crab5 = par_crab5;           
+
+! Set dispersion correction knob
+if (NRJ<500.0000){
+  if (par_on_disp > 0){
+    print, text="Warning! The dispersion correction should not be used at injection. Aborting..";
+    stop;
+  };
+};
+if (NRJ>499.9999){
+  on_disp = par_on_disp ;
+};
+
+! spectrometers in experiments
+if (par_on_alice==1){
+  on_alice = 7000/nrj;
+};
+if (par_on_lhcb==1){
+  on_lhcb  = 7000/nrj;
+};
+
+! solenoids in experiments
+on_sol_atlas = par_on_sol_atlas;
+on_sol_cms = par_on_sol_cms;
+on_sol_alice = par_on_sol_alice;
+
+! if (par_verbose==1){
+! exec, print_crossing_knobs;
+! };
+exec, crossing_save;

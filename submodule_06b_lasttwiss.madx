@@ -1,0 +1,22 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 6b: lasttwiss";
+print, text="  ---------------------------";
+print, text="";
+print, text="";
+
+
+
+select, flag=twiss, clear;
+
+twiss,file="last_twiss_temp";
+system,"gzip -f last_twiss_temp";
+
+
+! Rename last twiss
+RENAME_MACRO(nnnnn) : macro = {
+   system, "mv last_twiss_temp.gz last_twiss.nnnnn.gz";
+}
+
+
+exec, RENAME_MACRO($par_myseed);      

@@ -1,0 +1,42 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1c: phase";
+print, text="  -----------------------";
+print, text="";
+print, text="";
+
+
+if (par_mux_ip15 <> 0 && par_muy_ip15 <> 0){
+	mux_ip15 = par_mux_ip15;
+	muy_ip15 = par_muy_ip15;
+	if (ver_hllhc_optics==0) {
+		print, text="Phase advance tool is only supported for HiLumi optics. Ignoring phase settings.";
+	} else {
+		if (mylhcbeam<3){
+			if (ver_hllhc_optics < 1.3) {
+				call, file="tools/make_ip15phase_v0.madx";
+			};
+			if (ver_hllhc_optics >= 1.3) {
+	  			call, file="tools/make_ip15phase_v1.madx";
+			};
+		} else {
+			if (ver_hllhc_optics >= 1.3) {
+	  			call, file="tools/make_ip15phase_b4_v1.madx";
+			} else {
+				print, text="Phase advance tool in beam 4 is only supported for HiLumi optics >= v1.3. Ignoring phase settings.";
+			};
+		};
+	};
+};
+
+
+if (mylhcbeam==1){
+	exec, check_ip(b1);
+} else {
+	exec, check_ip(b2);
+};
+mux_ip15_ref=table(twiss,IP1,mux)-table(twiss,IP5,mux);
+muy_ip15_ref=table(twiss,IP1,muy)-table(twiss,IP5,muy);
+if (par_verbose==1){
+  value, mux_ip15_ref, muy_ip15_ref;
+};

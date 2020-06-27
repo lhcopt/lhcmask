@@ -1,0 +1,218 @@
+#! /bin/bash
+trap "exit 1" TERM
+export TOP_PID=$$
+
+extra_files_to_copy_to_reference="main.mask main.mask.unmasked parameters_for_unmask.txt out error_all.tfs bb_lenses.dat"   # all fc.* files are copied by default
+files_to_keep_in_main="main.mask parameters_for_unmask.txt"
+
+# ===================================================================================================
+# ============================================ Functions ============================================
+# ===================================================================================================
+if [ $# -gt 0 ]
+then
+  if [ "$1" == "--force" ]
+  then
+    force_yes=true
+  else
+    echo "This script does not take arguments, except potentially the flag --force (which should be used with caution)."
+    kill -s TERM $TOP_PID
+  fi
+else
+  force_yes=false
+fi
+
+prompt(){
+  if [ "$force_yes" == "true" ]
+  then
+    return 0
+  else
+    YN=""
+    while [[ $YN != "y" && $YN != "Y" && $YN != "n" && $YN != "N" ]]
+    do
+      read -p "Continue? (y/N): " YN
+      YN=${YN:-N}
+    done
+    if [ "$YN" == "y" ] || [ "$YN" == "Y" ] 
+    then
+      return 0
+    elif [ "$YN" == "n" ] || [ "$YN" == "N" ] 
+    then
+      return 1
+    else
+      echo "Error in the script verify.sh! Aborting..."
+      return 1
+    fi
+  fi
+}
+
+stop_q(){
+  if ! prompt
+  then
+    kill -s TERM $TOP_PID
+  fi
+}
+
+generate_mad(){
+  # Do MAD-X run
+  # This function should be ran in the example study folder
+  if [ -f mad_generated ]
+  then
+    echo ""
+    echo "Study "$1" already has a completed MAD-X run."
+    echo "If you are sure the output is still valid, you can directly continue to the verification."
+    if prompt
+    then
+      return 0
+    else
+      rm mad_generated
+    fi
+  fi
+  echo ""
+  echo "Running MAD-X for study "$1".."
+  echo ""
+  python ../../unmask.py main.mask parameters_for_unmask.txt --run | tee out
+  touch mad_generated
+}
+
+
+
+# ===================================================================================================
+# =========================================== Main script ===========================================
+# ===================================================================================================
+echo "==================================================================================================="
+echo "====================================== Verify Tracking Tools ======================================"
+echo "==================================================================================================="
+echo "This script verifies whether the current state of the modules reproduces the same output for the"
+echo "example studies. If successful, it will overwrite the reference folders, rename the old reference"
+echo "folders into reference_OLD (overwriting the latter if it already exists), and clean the output."
+echo "Only folders that are named reference* are kept."
+echo "Please make a backup of the examples folder before starting."
+stop_q
+
+
+cd examples
+for study in */
+do
+if [ -d $study ]
+then
+  cd $study
+  # Check if study is already verified
+  if [ -f verified ] || [ -f ignore_verification ]
+  then
+    echo ""
+    echo "Study "${study%/}" has been verified in a previous run of this script."
+    echo "If you are sure nothing has changed since, you can skip this study by continuing."
+    if [ -f ignore_verification ] || prompt
+    then
+      cd ..
+      continue
+    else
+      rm verified
+    fi
+  fi
+  # Check if reference folder and files exist
+  if [ ! -d reference ] || ! ls reference/fc.* > /dev/null 2>&1
+  then
+    echo ""
+    echo "Warning! Study "${study%/}" has no reference folder, or the reference has no fc.* files!"
+    echo "Only continue if you are aware of this and it is intentionally."
+    echo "No verification will hence be done for this study..."
+    stop_q
+    generate_mad ${study%/}
+    mkdir -p reference
+  else
+    generate_mad ${study%/}
+    # Check if output files are generated
+    if ! ls fc.* > /dev/null 2>&1
+    then
+      echo ""
+      echo "Warning! MAD-X run for study "${study%/}" did not create any SixTrack input files!"
+      echo "Only continue if you are aware of this and it is intentionally."
+      echo "No verification will hence be done for this study..."
+      stop_q
+    else
+      # Verify the generated result for this study by comparing it to its reference results
+      echo ""
+      echo "Verifying study "${study%/}"..."
+      echo ""
+      six_input_files=()
+      for f in fc.*
+      do
+        if [ -f reference/$f ]
+        then
+          six_input_files+=($f)
+        else
+          echo "Warning! MAD-X generated the file "$f", but this file is not present in the reference!"
+          stop_q
+        fi
+      done
+      for f in reference/fc.*
+      do
+        if [ ! -f ${f#reference/} ]
+        then
+          echo "Warning! The file "${f#reference/}" exists in the reference but is not generated by MAD-X!"
+          stop_q
+        fi
+      done
+      for f in "${six_input_files[@]}"
+      do
+        if ! cmp $f reference/$f > /dev/null 2>&1
+        then
+          echo "The file "$f" as generated from MAD-X differs from the reference!"
+          echo "However, this might be only a small numerical difference."
+          echo "Verify this file manually, e.g. with meld, and if acceptable continue verification."
+          stop_q
+        fi
+      done
+
+    fi
+  fi
+
+  # Make backup of old reference folder, and create new one
+  if [ -d reference_OLD ]; then rm -R reference_OLD; fi
+  mv reference reference_OLD
+  mkdir reference
+  mv fc.* reference/ 2> /dev/null
+  for f in $( eval echo $extra_files_to_copy_to_reference )
+  do
+    if [ -f $f ]
+    then
+      mv $f reference/
+    fi
+  done
+  # Delete everything except reference folders and files_to_keep_in_main
+  find . -maxdepth 1 -type l -delete
+  mkdir ../${study%/}_TEMP
+  mv reference*/ ../${study%/}_TEMP
+  cd ..
+  rm -r $study
+  mkdir ${study%/}
+  cd $study
+  mv ../${study%/}_TEMP/reference*/ ./
+  rmdir ../${study%/}_TEMP
+  for f in $( eval echo $files_to_keep_in_main )
+  do
+    if [ -f reference/$f ]
+    then
+      cp reference/$f .
+    fi
+  done
+
+  touch verified
+  cd ..
+fi
+done
+
+rm */verified > /dev/null 2>&1
+rm */mad_generated > /dev/null 2>&1
+cd ..
+
+echo ""
+echo "Finished!"
+echo "All studies have been successfully verified."
+echo ""
+echo "Please check and compare the reference and reference_OLD folders (MAD-X output, errortables, ...)."
+echo "If all is fine, the reference_OLD folders can be deleted."
+echo ""
+echo "All the best in this Corona-crisis. Stay home, stay safe, stay healthy."
+

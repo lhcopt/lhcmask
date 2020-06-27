@@ -1,0 +1,67 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1e: final";
+print, text="  ----------------------";
+print, text="";
+print, text="";
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!                        STORE the optics
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+exec, crossing_disable;
+
+if (par_verbose==1){
+  if (mylhcbeam<3){
+    use, sequence=lhcb1;
+    select, flag=twiss,clear;
+    select, flag=twiss, pattern="IP1", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+    select, flag=twiss, pattern="IP2", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+    select, flag=twiss, pattern="IP5", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+    select, flag=twiss, pattern="IP8", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+    twiss, sequence=lhcb1, file=twiss_crossing_disable.b1;
+    twiss, sequence=lhcb1, table=twisscrossingdisableb1; ! handle for further analysis
+    system, "cat twiss_crossing_disable.b1";
+  };
+
+  use, sequence=lhcb2;
+  select, flag=twiss,clear;
+  select, flag=twiss, pattern="IP1", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+  select, flag=twiss, pattern="IP2", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+  select, flag=twiss, pattern="IP5", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+  select, flag=twiss, pattern="IP8", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+  twiss, sequence=lhcb2, file=twiss_crossing_disable.b2;
+  twiss, sequence=lhcb2, table=twisscrossingdisableb2; ! handle for further analysis
+  system, "cat twiss_crossing_disable.b2";
+};
+
+! Switch on the crossing scheme
+exec, crossing_restore;
+
+if (par_verbose==1){
+  if (mylhcbeam<3){
+    use, sequence=lhcb1;
+    select,flag=twiss,clear;
+    select, flag=twiss, pattern="IP1", column=name,s,x,y,px,py;
+    select, flag=twiss, pattern="IP2", column=name,s,x,y,px,py;
+    select, flag=twiss, pattern="IP5", column=name,s,x,y,px,py;
+    select, flag=twiss, pattern="IP8", column=name,s,x,y,px,py;
+    twiss, sequence=lhcb1, file=twiss_crossing_enable.b1;
+    twiss, sequence=lhcb1, table=twisscrossingenableb1; ! handle for further analysis
+    system, "cat twiss_crossing_enable.b1";
+  };
+
+  use, sequence=lhcb2;
+  select, flag=twiss,clear;
+  select, flag=twiss, pattern="IP1", column=name,s,x,y,px,py;
+  select, flag=twiss, pattern="IP2", column=name,s,x,y,px,py;
+  select, flag=twiss, pattern="IP5", column=name,s,x,y,px,py;
+  select, flag=twiss, pattern="IP8", column=name,s,x,y,px,py;
+  twiss, sequence=lhcb2, file=twiss_crossing_enable.b2;
+  twiss, sequence=lhcb2, table=twisscrossingenableb2;  ! handle for further analysis
+  system, "cat twiss_crossing_enable.b2";
+};
+
+if(mylhcbeam==1) {use,  sequence=lhcb1;}; if(mylhcbeam>1) {use,  sequence=lhcb2;};

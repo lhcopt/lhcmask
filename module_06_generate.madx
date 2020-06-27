@@ -1,0 +1,18 @@
+print, text="";
+print, text="";
+print, text="++++++++++++++++++++++++++++++";
+print, text="++ START MODULE 6: GENERATE ++";
+print, text="++++++++++++++++++++++++++++++";
+print, text="";
+print, text="";
+
+
+
+!call, file="tools/BetaBeating.madx";
+!print, text="========================================";
+!print, text="======  OPTICS PARAMETERS: FINAL  ======";
+!print, text="========================================";
+!call, file="tools/get_optics_params.madx";
+
+call, file="modules/submodule_06a_sixtrack.madx";
+call, file="modules/submodule_06b_lasttwiss.madx";

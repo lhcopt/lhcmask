@@ -1,0 +1,11 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 4.1a: install crabs ";
+print, text="  --------------------------------- ";
+print, text="";
+print, text="";
+
+! Install and switch off crabs
+call, file="tools/enable_crabcavities.madx";
+on_crab1 = 0;
+on_crab5 = 0;

@@ -1,0 +1,41 @@
+print, text="";
+print, text="";
+print, text="  --- Submodule 1a: preparation";
+print, text="  -----------------------------";
+print, text="";
+print, text="";
+
+
+
+! Verify if build flags are set correctly
+if ( ver_lhc_run == 0 && ver_hllhc_optics == 0 ) {
+  print, text="Fatal error: Machine version flag not set! Check build_machine file.";
+  stop;
+};
+if ( ver_lhc_run <> 0 && ver_hllhc_optics <> 0 ) {
+  print, text="Fatal error: Machine version flag set for LHC and HL-LHC simultaneously! Check build_machine file.";
+  stop;
+};
+
+system, "if [ -d temp ]; then rm -r temp; fi";
+system, "mkdir temp";
+
+nrj = par_beam_energy_tot; 
+
+
+Nb_0=par_beam_npart; 
+
+! Tunes and chromaticity
+qx0 = par_qx0;
+qy0 = par_qy0;
+qx00 = FLOOR(qx0);
+qy00 = FLOOR(qy0);
+tsplit = qx00 - qy00;
+
+qprime = par_chromaticity;
+
+! Beam settings
+gamma_rel := nrj / pmass;
+epsx := par_beam_norm_emit*1.0e-6 / gamma_rel;
+epsy := par_beam_norm_emit*1.0e-6 / gamma_rel;
+
