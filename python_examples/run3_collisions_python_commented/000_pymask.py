@@ -3,12 +3,22 @@
 # A pythonic approach to run LHC mask for Run 3
 
 In this script, we are going to describe, step-by-step, the 
-approach we propose for  Run 3 masks (and, more in general,for all LHC masks) in python.
+approach we propose for Run 3 mask(s) in python.
+This applies, more in general, to all LHC and HL-LHC masks.
+
+!!! info
+	Here we are using the legacy jargon of the "mask": in reality one could simply 
+	refer to the "mask" as a (python) script. We will discuss here the structure of
+	the script and the rationale we adopted.
+	
 
 The main purpose of the new approach is to profit 
 
 1. from the scripting capability of python and
 2. from beam optics computation of MAD-X.
+
+For example, the luminosity leveling is nothing to do with the computing machine 
+optics (MAD-X domain) and is much more natural to do it in python.
 
 !!! info
 	Our aim is to move as much as possible of the "scripting" logic from MAD-X
@@ -17,23 +27,27 @@ The main purpose of the new approach is to profit
 	on define the correct working-flow based by defining interfaces between MAD-X 
 	and python..
 
-The first application we focus on is the beam-beam, BB, studies of B4 
-(not possible with the legacy approach). 
+The first application we focus on is the beam-beam, BB, studies of B4.
+This study is not possible with the legacy approach and is a good example
+of the gain in the flexibility python can provide. 
 
-To concentrate on the contents and not to waste time to set up on the environment, 
-you can login on a *lxplus* machine and do 
+To concentrate on the contents and not to spend time to setup the environment, 
+you can login on a *lxplus* machine and execute 
 
 ```bash
 source /afs/cern.ch/eng/tracking-tools/python_installations/activate_default_python  
 ```
 
-This sets up a python installation with the required packages and tools.
+This setups a python installation with the required packages and tools.
 
 Then you can clone the *lhcmask* repository on your terminal with
 
 ```bash
 cd
-git clone https://github.com/lhcopt/lhcmask.git
+git clone https://github.com/sterbini/lhcmask.git
+# I will make a pull request later so that you can do
+# git clone https://github.com/lhcopt/lhcmask.git
+# and use the official repository
 ```
 
 then you just go on the folder 
@@ -45,9 +59,8 @@ cd ~/lhcmask/python_examples/run3_collisions_python_commented
 and the file we are commenting is the **000_pymask.py**.
 
 !!! warning
-	The previous folder does not exist yet in the master repository. 
-	For the moment you have only the folder *run3_collisions_python* 
-	(i.e., the version without comments).
+	The previous folder does not exist yet in the official repository. 
+	For the moment you have it only in my fork.
 
 ### Usual import of packages 
 '''
@@ -65,9 +78,9 @@ As we will see, in this script we will use
 modules/packages.
 
 The *pymask* package is optics independent and comes with the *lhcmask*
-repository. It contains
+repository (together with most of the optics independent modules). It contains
 
-- the Madxp utility to access the MAD-X constant or dependent/independent variables 
+- the Madxp module to access the MAD-X variable workspace in a hierarchical way
 - *make_links* to link the different needed folders on the local directory.
 - *checks_on_parameter_dict* 
 - *get_pymask_configuration*
@@ -81,7 +94,7 @@ repository. It contains
 
 !!! info
 	The user defines and takes care of the optics dependent 
-	modules/packages. He can edit the content of this file (the mask file). 
+	modules/packages. He can edit the content of this script (the mask file). 
 	On the other hand, all the MAD-X modules should not be edited by the user and 
 	the user should point to the repository
 	
@@ -89,13 +102,21 @@ repository. It contains
 	/afs/cern.ch/eng/tracking-tools/...
 	```
   
-	This will avoid code duplication and to maintain the code in a centralized 
+	This will avoid code duplication and help to maintain the code in a centralized 
   repository.
 	All folders in **tracking-tools** are git repositories
-  (all but the **python_installations**).
-	The user (to control and freeze at a given point the repository) can clone them
-  locally BUT then is her/his responsibility to check systematically
-  if the local git repositories are up-to-date with the master repository.
+  (all but the **python_installations**, the one that contains the python
+	distribution we suggested to source).
+	
+	Clearly we are aware that the user wants to have the full control of the code, 
+	e.g., to ensure that there are no updates or new realeases in the middle of a simulation.
+	
+	To tackle the problem, the user can clone the corresponding git repositories locally
+  BUT then is her/his responsibility to check systematically
+  if her/his local git repositories are up-to-date with the master repository.
+
+	The user is more than welcome to contribute by forking the repository and 
+	pull-requesting her/his contribution.
 '''
 
 # %%
@@ -104,7 +125,7 @@ import pymask as pm
 Madx = pm.Madxp
 
 # %%
-'''The user has the possibility to provide some optics specific functions and 
+'''The user has to provide the optics specific functions and the 
 dictionaries of parameters and knobs. Namely:
 
 - optics_specific_tools.py: a set of custom functions.
@@ -114,7 +135,7 @@ the simulations.
 
 !!! info
 	A knob of a sequence is a independent variables of MAD-X that changes
-	the attributes of the element of the sequence(s). E.g., $on_x1$ is a knob 
+	the attributes of the element of the sequence. E.g., $on_x1$ is a knob 
 	but $qx0$ is a parameter.
 
 The three files are located in the working folder. 
@@ -146,38 +167,60 @@ The user needs then to select the beam mode. There are
 Their purpose is quite explicit in their names. 
 It is important to note that the B4 has not legacy BB macros (since it is not possible
 to run the B4 with the legacy macros).
+
+A beam mode will set several flags. We operate in the "beam mode space" 
+instead in the "flag space" since not all the flag combinations are physicals. 
 '''
 
 # %%
+# here we consider the b4 built from the b2 and with BB.
 mode = 'b4_from_b2_with_bb'
 
 # %%
 '''
+!!! info
+	We would like to make a digression on the B4. For periodic linear problem we can
+	find the twiss the machine optics for B2 or B4 and find an equivalent solutions.
+	The tracking is differnt: let's assume a kicker introducing a betatronic 
+	oscillation: clearly the direction of the beam is important to describe the
+	beam trajectory.
+	
+	In the optics repository we have B1, B2 and B4 but we miss B3. For the BB 
+	we needs B1 and B2 or B3 and B4. Since we do not have B3, in order
+	to have BB in B4, we compute the B1/B2 BB configuration. We apply the BB lenses
+	in B2, then starting from the B2 elements we populates the attributes of the 
+	B4 sequences (we call it the B2-to-B4 transplant).
+'''
+
+# %%
+'''
 The flexibility in python allows us to make checks during the mask in a more 
-systematic way. The users should introduce them for monitoring
+systematic way. The user should introduce them for monitoring
 the sanity of the code.
 
-As we will show, there are optics independent function that help the assertions.
-The users needs to define some tolerances, e.g., IP dependent tolerances for the
+As we will show, there are optics independent function that help the sanity 
+assertions.
+The user needs to define some tolerances, e.g., IP dependent tolerances for the
 beta-function or the beam separations.
 '''
 
 # %%
-tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
-tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
+tol_beta = [1e-3, 10e-2, 1e-3, 1e-2] # in m
+tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]	 # in m
 
 # %%
 '''
 ### Defining the links
 To define the links to the repository folders one can use the **pymask** function.
-As mentioned, all links should point to /afs/cern.ch/eng/tracking-tools.
+As mentioned, all links should point to /afs/cern.ch/eng/tracking-tools 
+(or to the clones of the relevant git repository).
 
 !!! tip
-	Again: it is important to maintaing a central version of the MAD-X modules and macros 
+	Again: we encourage to maintain a central version of the MAD-X modules and macros 
 	to ease their maintenance and to ensure the natural propagation of the fixes. 
 	So the users should customize this script and the optics-dependent modules but 
-	not the optics independent ones. Clearly is more than welcome to contribure by 
-	pulling a request in the git repository.
+	not the optics independent ones. Clearly the user is more than welcome to
+	contribute by forking, editing and pulling a request in the git repository.
 '''
 
 # %%
@@ -190,7 +233,8 @@ pm.make_links(force=True, links_dict={
 
 # %%
 '''
-Define few additional parameters.
+Define few additional parameters used in the script. The user can custom the
+script as she/he likes.
 '''
 
 # %%
@@ -206,6 +250,26 @@ save_intermediate_twiss = True
 # %%
 '''
 ### Check and load the parameters.
+
+!!! tip
+	Please use the python namespace to associate the fuction to a specific
+	package/modules and use
+	```python
+	import inspect
+	print(''.join(inspect.getsourcelines(pm.checks_on_parameter_dict)[0]))
+	```
+	to inspect the function code or to read the function help (and remember the
+	difficulties to find similar information for MAD-X macros). On the same line,
+	please use the python debugger (pdb) to debug your script.
+	```bash
+	python -m pdb 000_pymask.py 	
+  ```
+	and once you are in the pdb you can go to line 276 by
+  ```python
+	break 276
+	continue
+  ```
+	and then inspect the variables and debug the code.
 '''
 
 # %%
@@ -216,7 +280,8 @@ pm.checks_on_parameter_dict(mask_parameters)
 ### Configuration definition
 
 Depending on the beam mode, different flags will be set accordingly.
-In fact a beam mode is nothing else that a consistent set of flags.
+In fact, as already mentioned, a beam mode is nothing else that a consistent 
+set of flags.
 '''
 
 # %%
@@ -241,7 +306,9 @@ mad = Madx()
 ###  Build the sequence
 
 This is the first example of function that the user need to define and it is 
-optics dependent.
+optics dependent. Tipically the user want to modify the as_built sequence by
+adding special devices, markers, by rotating it or make it thin. All this
+manipulation can be done there.
 '''
 
 # %%
@@ -251,7 +318,8 @@ ost.build_sequence(mad, beam=beam_to_configure)
 '''
 ### Load a specific optics
 
-This is the second example of user's defined function.
+This is the second example of user's defined function. Here the typically call the
+stregth file.
 '''
 
 # %%
@@ -260,6 +328,7 @@ ost.apply_optics(mad, optics_file=optics_file)
 # %%
 '''
 ### Force disable beam-beam when needed
+This as an example when the flag of the script superseed the mask_parameters.
 '''
 
 # %%
@@ -278,6 +347,10 @@ mad.set_variables_from_dict(params=mask_parameters)
 '''
 ### Prepare sequences and attach beam
 Now we start to call the MAD-X modules. They are optics independent.
+
+!!! hint
+	Having a link "module" in the working folder allow us to inspect the code in the 
+	modules. This are in MAD-X code.
 '''
 
 # %%
@@ -286,9 +359,15 @@ mad.call("modules/submodule_01b_beam.madx")
 
 # %%
 '''
-### SANITY CHECK: test the machine from the repository
+### SANITY CHECK: test the machine of the repository
+
 Here is important to note that the user's knob are not yet applied. 
-Therefore the machine has the knob set from the optics repository.
+Therefore the sequence(s) has(have) the knobs set from the optics repository.
+
+To do this check the users can wrire their own function. Here you are an example.
+
+!!! question
+	TODO: Why do we put this function in the *ost*? 
 '''
 
 # %%
@@ -301,7 +380,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 
 # %%
 '''
-### Set phase, apply and save crossing
+### Set IP1/5 phase, apply and save crossing
 '''
 
 # %%
@@ -310,9 +389,10 @@ mad.call("modules/submodule_01c_phase.madx")
 # %%
 '''
 ### Set optics-specific knobs
-Here the user needs to define the good conventions.
-Some of the knobs definition are optics dependent (unfortunately). 
-The user need to make the proper knob conversion.  
+
+Here the user needs to take care of the different conventions for the knob
+definitions: some of the knobs definition are optics dependent (unfortunately). 
+The user needs to make the proper knob conversion.  
 '''
 
 # %%
@@ -342,7 +422,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 
 # %%
 '''
-### Check CO flatness
+### Check closed-orbit flatness
 '''
 
 # %%
@@ -369,7 +449,10 @@ mad.use(f'lhcb{beam_to_configure}')
 
 # %%
 '''
-### Call leveling module
+### Call the luminosity leveling module
+
+!!! info
+	TODO: implement the luminosity leveling in python
 '''
 
 # %%
@@ -381,7 +464,7 @@ mad.input('on_disp = 0')
 
 # %%
 '''
-### Prepare bb dataframes
+### Prepare the BB dataframes
 '''
 
 # %%
@@ -400,12 +483,15 @@ if enable_bb_python:
 # %%
 '''
 !!! info
-	Here the dataframes can be edited, e.g., to set bbb intensity
+	Here the dataframes can be edited, e.g., to set bbb intensity or to 
+	follow the collision schedule of a specific bunch.
 '''
 
 # %%
 '''
 ### Generate mad instance for B4
+
+This is when the B2-B4 trasplant takes place.
 '''
 
 # %%
@@ -433,7 +519,9 @@ if generate_b4_from_b2:
 # %%
 ''' 
 ### From collider to synchrotron
-We working exclusively on the sequence to track.
+
+From now on, we work exclusively on the sequence to track and we
+refer to the *mad_track* handle for MAD-X.
 '''
 
 # %%
@@ -448,7 +536,7 @@ del(mad)
 
 # %%
 '''
-### Twiss machine to track
+### Twiss of the machine to track
 '''
 
 # %%
@@ -460,7 +548,12 @@ twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
 
 # %%
 '''
-### Install the bb lenses
+### Installing the BB lenses
+
+Here we install the BB lenses and depending on the flags we use the BB dataframes 
+or the legacy approach (that is not working for B4).
+
+The lenses are installed but their charge is off.
 '''
 
 # %%
@@ -479,12 +572,6 @@ if enable_bb_python:
 else:
     bb_df_track = None
 
-# %%
-'''
-### Legacy bb macros
-'''
-
-# %%
 if enable_bb_legacy:
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
@@ -494,6 +581,8 @@ if enable_bb_legacy:
 # %%
 '''
 ### Install crab cavities
+
+Clearly this point is skipped for Run 3.
 '''
 
 # %%
@@ -503,6 +592,8 @@ if enable_bb_legacy:
 # %%
 '''
 ### Save references (orbit at IPs)
+
+All orbits references are saved.
 '''
 
 # %%
@@ -534,6 +625,7 @@ mad_track.use = None
 # %%
 '''
 ### Install and correct errors
+For the moment the errors of Run 3 are not implemented.
 '''
 
 # %%
@@ -550,6 +642,8 @@ mad_track.call("modules/module_05_tuning.madx")
 # %%
 '''
 ### Switch on crab cavities
+
+Nothing to do for Run 3.
 '''
 
 # %%
@@ -612,3 +706,8 @@ else:
         closed_orbit_method='from_mad',
         pickle_lines_in_folder=pysix_fol_name,
         skip_mad_use=True)
+
+# %%
+'''
+We hope that it is clear(er).
+'''
