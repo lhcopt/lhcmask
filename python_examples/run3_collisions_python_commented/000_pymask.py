@@ -263,14 +263,18 @@ save_intermediate_twiss = True
 	to inspect the function code or to read the function help (and remember the
 	difficulties to find similar information for MAD-X macros). On the same line,
 	please use the python debugger (pdb) to debug your script.
+	
 	```bash
 	python -m pdb 000_pymask.py 	
   ```
+	
 	and once you are in the pdb you can go to line 276 by
+	
 	```python
 	break 276
 	continue
   ```
+	
 	and then inspect the variables and debug the code.
 '''
 
@@ -506,13 +510,13 @@ print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
 																																	'par_nco_IP2',
 																																	'par_nco_IP5',
 																																	'par_nco_IP8']})
+
 # %%
 '''
-#### Luminosity leveling by separation in IP8. 
+#### Luminosity leveling by separation in IP8 
 
 We separate the beams vertically in IP8.
 '''
-
 
 # %%
 print('\n==== IP8 Luminosity Levelling ====')
@@ -554,13 +558,12 @@ print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
 
 # %%
 '''
-#### Halo collision in IP2. 
+#### Halo collision in IP2 
 
 Here we consider a full horizontal separation of 5 sigmas in IP2.
 '''
 
 # %%
-
 print('\n==== Halo collision in IP2 ====')
 
 sigma_x_b1=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1'].betx*mad.sequence.lhcb1.beam.ex)
@@ -592,6 +595,12 @@ One could also use the old MAD-X approach.
 # else:
 #     mad.call("modules/module_02_lumilevel.madx")
 
+# %%
+'''
+Finally put at zero the dispersions bumps.
+'''
+
+# %%
 mad.input('on_disp = 0')
 
 # %%
