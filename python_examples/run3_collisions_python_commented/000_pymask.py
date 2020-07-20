@@ -120,9 +120,11 @@ repository (together with most of the optics independent modules). It contains
 '''
 
 # %%
-sys.path.append('/afs/cern.ch/eng/tracking-tools/modules/')
+# sys.path.append('/afs/cern.ch/eng/tracking-tools/modules/')
+sys.path.append('../../')
 import pymask as pm
 Madx = pm.Madxp
+lumi = pm.luminosity
 
 # %%
 '''The user has to provide the optics specific functions and the 
@@ -265,7 +267,7 @@ save_intermediate_twiss = True
 	python -m pdb 000_pymask.py 	
   ```
 	and once you are in the pdb you can go to line 276 by
-  ```python
+	```python
 	break 276
 	continue
   ```
@@ -359,7 +361,7 @@ mad.call("modules/submodule_01b_beam.madx")
 
 # %%
 '''
-### SANITY CHECK: test the machine of the repository
+### Check the machine of the repository
 
 Here is important to note that the user's knob are not yet applied. 
 Therefore the sequence(s) has(have) the knobs set from the optics repository.
@@ -451,8 +453,137 @@ mad.use(f'lhcb{beam_to_configure}')
 '''
 ### Call the luminosity leveling module
 
-!!! info
-	TODO: implement the luminosity leveling in python
+In the following we show how to level the luminosity using a pythonic approach.
+'''
+
+def print_luminosity(mad, twiss_dfs, mask_parameters):
+	for ip, number_of_ho_collisions in zip(['ip1', 'ip2', 'ip5', 'ip8'],
+		[mask_parameters['par_nco_IP1'],
+   	 mask_parameters['par_nco_IP2'],
+   	 mask_parameters['par_nco_IP5'],
+   	 mask_parameters['par_nco_IP8']]):
+		myL=lumi.compute_luminosity(mad, twiss_dfs, ip, number_of_ho_collisions)
+		print(f'L in {ip} is {myL} Hz/cm^2')
+
+print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
+																																	'par_nco_IP2',
+																																	'par_nco_IP5',
+																																	'par_nco_IP8']})
+
+# %%
+'''
+#### Luminosity leveling by intensity in IP1/5. 
+
+This is a trivial leveling, we use it just for the sake of the example.
+'''
+
+# %%
+print('\n==== Intensity Luminosity Levelling ====')
+
+from scipy.optimize import least_squares
+L_target=2e+34
+starting_guess=mad.sequence.lhcb1.beam.npart
+
+def function_to_minimize(n_part):
+	my_dict_IP1=lumi.get_luminosity_dict(mad, twiss_dfs,
+ 'ip1', mask_parameters['par_nco_IP1'])  
+	my_dict_IP1['N1']=n_part
+	my_dict_IP1['N2']=n_part
+	my_dict_IP5=lumi.get_luminosity_dict(mad, twiss_dfs, 'ip5', mask_parameters['par_nco_IP5'])  
+	my_dict_IP5['N1']=n_part
+	my_dict_IP5['N2']=n_part
+	return lumi.L(**my_dict_IP1)+lumi.L(**my_dict_IP5)-2*L_target
+
+aux=least_squares(function_to_minimize, starting_guess)
+print(aux)
+print(f"\nLuminosity after levelling: {function_to_minimize(aux['x'][0])+L_target} Hz/cm^2")
+
+mad.sequence.lhcb1.beam.npart=aux['x'][0]
+mad.sequence.lhcb2.beam.npart=aux['x'][0]
+mask_parameters['par_beam_npart']=aux['x'][0]
+
+print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
+																																	'par_nco_IP2',
+																																	'par_nco_IP5',
+																																	'par_nco_IP8']})
+# %%
+'''
+#### Luminosity leveling by separation in IP8. 
+
+We separate the beams vertically in IP8.
+'''
+
+
+# %%
+print('\n==== IP8 Luminosity Levelling ====')
+
+L_target=mask_parameters['par_lumi_ip8']
+# as starting guess it is good practice not to have a vanish derivative. 
+# In fact, if the two beams are too much separated or if they are HO, 
+# the algorithm could assume (wrongly) that the optimization is converging.
+sigma_y_b1=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].bety*mad.sequence.lhcb1.beam.ey)
+starting_guess=sigma_y_b1
+
+def function_to_minimize(on_sep8v):
+	my_dict_IP8=lumi.get_luminosity_dict(mad, twiss_dfs,
+ 'ip8', mask_parameters['par_nco_IP8'])  
+	my_dict_IP8['y_1']=np.abs(on_sep8v)
+	my_dict_IP8['y_2']=-np.abs(on_sep8v)
+	return lumi.L(**my_dict_IP8)-L_target
+
+aux=least_squares(function_to_minimize, starting_guess)
+print(aux)
+print(f"\nLuminosity after levelling: {function_to_minimize(aux['x'][0])+L_target} Hz/cm^2")
+
+mad.globals['on_sep8v']=np.abs(aux['x'][0])*1e3
+
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_after_ip8_leveling',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+
+mad.use(f'lhcb{beam_to_configure}')
+
+mad.input('exec, crossing_save')
+print('After IP8 leveling')
+print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
+																																	'par_nco_IP2',
+																																	'par_nco_IP5',
+																																	'par_nco_IP8']})
+
+# %%
+'''
+#### Halo collision in IP2. 
+
+Here we consider a full horizontal separation of 5 sigmas in IP2.
+'''
+
+# %%
+
+print('\n==== Halo collision in IP2 ====')
+
+sigma_x_b1=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1'].betx*mad.sequence.lhcb1.beam.ex)
+mad.globals['on_sep2h']=sigma_x_b1*5/2*1e3
+
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_after_ip2_halo_offset',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+
+mad.use(f'lhcb{beam_to_configure}')
+
+mad.input('exec, crossing_save')
+print('After IP2 halo offset')
+print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
+																																	'par_nco_IP2',
+																																	'par_nco_IP5',
+																																	'par_nco_IP8']})
+
+# %%
+'''
+One could also use the old MAD-X approach.
 '''
 
 # %%
@@ -460,6 +591,7 @@ mad.use(f'lhcb{beam_to_configure}')
 #     print('Leveling not working in this mode!')
 # else:
 #     mad.call("modules/module_02_lumilevel.madx")
+
 mad.input('on_disp = 0')
 
 # %%
