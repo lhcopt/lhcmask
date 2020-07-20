@@ -17,7 +17,7 @@ The main purpose of the new approach is to profit
 1. from the scripting capability of python and
 2. from beam optics computation of MAD-X.
 
-For example, the luminosity leveling is nothing to do with the computing machine 
+For example, the luminosity levelling is nothing to do with the computing machine 
 optics (MAD-X domain) and is much more natural to do it in python.
 
 !!! info
@@ -94,29 +94,31 @@ repository (together with most of the optics independent modules). It contains
 
 !!! info
 	The user defines and takes care of the optics dependent 
-	modules/packages. He can edit the content of this script (the mask file). 
-	On the other hand, all the MAD-X modules should not be edited by the user and 
-	the user should point to the repository
-	
-	```bash
-	/afs/cern.ch/eng/tracking-tools/...
-	```
-  
-	This will avoid code duplication and help to maintain the code in a centralized 
-  repository.
-	All folders in **tracking-tools** are git repositories
-  (all but the **python_installations**, the one that contains the python
-	distribution we suggested to source).
-	
-	Clearly we are aware that the user wants to have the full control of the code, 
-	e.g., to ensure that there are no updates or new realeases in the middle of a simulation.
-	
-	To tackle the problem, the user can clone the corresponding git repositories locally
-  BUT then is her/his responsibility to check systematically
-  if her/his local git repositories are up-to-date with the master repository.
+	modules/packages. 
 
-	The user is more than welcome to contribute by forking the repository and 
-	pull-requesting her/his contribution.
+The user can edit the content of this script (the mask file). 
+On the other hand, all the MAD-X modules should not be edited by the user and 
+the user should point to the repository
+	
+```bash
+/afs/cern.ch/eng/tracking-tools/...
+```
+  
+This will avoid code duplication and help to maintain the code in a centralized 
+repository.
+All folders in **tracking-tools** are git repositories
+(all but the **python_installations**, the one that contains the python
+distribution we suggested to source).
+	
+Clearly we are aware that the user wants to have the full control of the code, 
+e.g., to ensure that there are no updates or new realeases in the middle of a simulation.
+	
+To tackle the problem, the user can clone the corresponding git repositories locally
+BUT then is her/his responsibility to check systematically
+if her/his local git repositories are up-to-date with the master repository.
+
+The user is more than welcome to contribute by forking the repository and 
+pull-requesting her/his contribution.
 '''
 
 # %%
@@ -255,27 +257,31 @@ save_intermediate_twiss = True
 
 !!! tip
 	Please use the python namespace to associate the fuction to a specific
-	package/modules and use
-	```python
-	import inspect
-	print(''.join(inspect.getsourcelines(pm.checks_on_parameter_dict)[0]))
-	```
-	to inspect the function code or to read the function help (and remember the
-	difficulties to find similar information for MAD-X macros). On the same line,
-	please use the python debugger (pdb) to debug your script.
+	package/modules.
+
+E.g.,:
+
+```python
+import inspect
+print(''.join(inspect.getsourcelines(pm.checks_on_parameter_dict)[0]))
+```
+
+to inspect the function code or to read the function help (and remember the
+difficulties to find similar information for MAD-X macros). On the same line,
+please use the python debugger (pdb) to debug your script.
 	
-	```bash
-	python -m pdb 000_pymask.py 	
-  ```
-	
-	and once you are in the pdb you can go to line 276 by
-	
-	```python
-	break 276
-	continue
-  ```
-	
-	and then inspect the variables and debug the code.
+```bash
+python -m pdb 000_pymask.py 	
+```
+
+and once you are in the pdb you can go to line 276 by
+
+```python
+break 276
+continue
+```
+
+and then inspect the variables and debug the code.
 '''
 
 # %%
@@ -455,11 +461,12 @@ mad.use(f'lhcb{beam_to_configure}')
 
 # %%
 '''
-### Call the luminosity leveling module
+### Call the luminosity levelling module
 
 In the following we show how to level the luminosity using a pythonic approach.
 '''
 
+# %%
 def print_luminosity(mad, twiss_dfs, mask_parameters):
 	for ip, number_of_ho_collisions in zip(['ip1', 'ip2', 'ip5', 'ip8'],
 		[mask_parameters['par_nco_IP1'],
@@ -476,9 +483,9 @@ print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
 
 # %%
 '''
-#### Luminosity leveling by intensity in IP1/5. 
+#### Luminosity levelling by intensity in IP1/5. 
 
-This is a trivial leveling, we use it just for the sake of the example.
+This is a trivial levelling, we use it just for the sake of the example.
 '''
 
 # %%
@@ -513,7 +520,7 @@ print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
 
 # %%
 '''
-#### Luminosity leveling by separation in IP8 
+#### Luminosity levelling by separation in IP8 
 
 We separate the beams vertically in IP8.
 '''
@@ -522,7 +529,7 @@ We separate the beams vertically in IP8.
 print('\n==== IP8 Luminosity Levelling ====')
 
 L_target=mask_parameters['par_lumi_ip8']
-# as starting guess it is good practice not to have a vanish derivative. 
+# as starting guess it is good practice not to have a vanishing derivative. 
 # In fact, if the two beams are too much separated or if they are HO, 
 # the algorithm could assume (wrongly) that the optimization is converging.
 sigma_y_b1=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].bety*mad.sequence.lhcb1.beam.ey)
@@ -543,14 +550,14 @@ mad.globals['on_sep8v']=np.abs(aux['x'][0])*1e3
 
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
-        twiss_fname='twiss_after_ip8_leveling',
+        twiss_fname='twiss_after_ip8_levelling',
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 mad.use(f'lhcb{beam_to_configure}')
 
 mad.input('exec, crossing_save')
-print('After IP8 leveling')
+print('After IP8 levelling')
 print_luminosity(mad, twiss_dfs, {k: mask_parameters[k] for k in ['par_nco_IP1',
 																																	'par_nco_IP2',
 																																	'par_nco_IP5',
