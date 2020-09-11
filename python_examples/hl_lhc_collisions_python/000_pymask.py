@@ -6,6 +6,7 @@ import numpy as np
 # Import pymask
 sys.path.append('../../')
 import pymask as pm
+import pymask.luminosity as lumi
 
 import optics_specific_tools as ost
 from mask_parameters import mask_parameters
@@ -112,12 +113,52 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
-# Call leveling module
-mad.use(f'lhcb{beam_to_configure}')
-if mode=='b4_without_bb':
-    print('Leveling not working in this mode!')
+# Luminosity levelling
+print('Luminosities before leveling:')
+lumi.print_luminosity(mad, twiss_dfs,
+        mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+        mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+
+if enable_bb_legacy:
+    mad.use(f'lhcb{beam_to_configure}')
+    if mode=='b4_without_bb':
+        print('Leveling not working in this mode!')
+    else:
+        mad.call("modules/module_02_lumilevel.madx")
 else:
-    mad.call("modules/module_02_lumilevel.madx")
+    from scipy.optimize import least_squares
+
+    # Leveling in IP8
+    L_target_ip8 = mask_parameters['par_lumi_ip8']
+    def function_to_minimize_ip8(sep8v_m):
+        my_dict_IP8=lumi.get_luminosity_dict(
+            mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
+        my_dict_IP8['y_1']=np.abs(sep8v_m)
+        my_dict_IP8['y_2']=-np.abs(sep8v_m)
+        return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
+    sigma_x_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].betx*mad.sequence.lhcb1.beam.ex)
+    optres_ip8=least_squares(function_to_minimize_ip8, sigma_x_b1_ip8)
+    mad.globals['on_sep8'] = np.sign(mad.globals['on_sep8']) * np.abs(optres_ip8['x'][0])*1e3
+
+    # Halo collision in IP2
+    sigma_y_b1_ip2=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1'].bety*mad.sequence.lhcb1.beam.ey)
+    mad.globals['on_sep2']=np.sign(mad.globals['on_sep2'])*mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_y_b1_ip2/2*1e3
+
+    # Re-save knobs
+    mad.input('exec, crossing_save')
+
+# Check machine after leveling
+mad.input('exec, crossing_restore')
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_after_leveling',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
+
+print('Luminosities after leveling:')
+lumi.print_luminosity(mad, twiss_dfs,
+        mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+        mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
 
 mad.input('on_disp = 0')

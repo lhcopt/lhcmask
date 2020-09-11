@@ -79,11 +79,11 @@ def L(f, nb,
     '''
 
     gamma1 = energy_tot1 / 0.93827231 # To be generalized for ions
-    br_1 = np.sqrt(1-1/gamma1^2)
+    br_1 = np.sqrt(1-1/gamma1**2)
     betagamma_1 = br_1*gamma1
 
     gamma2 = energy_tot2 / 0.93827231 # To be generalized for ions
-    br_2 = np.sqrt(1-1/gamma2^2)
+    br_2 = np.sqrt(1-1/gamma2**2)
     betagamma_2 = br_2*gamma2
 
     q = qe # To be generalized for ions
@@ -114,7 +114,7 @@ def L(f, nb,
     # normalized to get 1 for the ideal case 
     # NB we assume px_1 and py_1 constant along the z-slices 
     # NOT TRUE FOR CC! In any case the Moeller efficiency is almost equal to 1 in most cases...
-    Moeller_efficiency=np.sqrt(c**2*np.dot(diff_v,diff_v)-np.dot(cross_v,cross_v))/c**2/2
+    Moeller_efficiency=np.sqrt(clight**2*np.dot(diff_v,diff_v)-np.dot(cross_v,cross_v))/clight**2/2
 
     def sx1(z):
         '''The sigma_x of B1, quadratic sum of betatronic and dispersive sigma'''
@@ -216,26 +216,32 @@ def get_luminosity_dict(mad, twiss_dfs, ip_name, number_of_ho_collisions):
 	assert b1.freq0==b2.freq0
 	ip_b1=twiss_dfs['lhcb1'].loc[f'{ip_name}:1']
 	ip_b2=twiss_dfs['lhcb2'].loc[f'{ip_name}:1']
-	return {'f':b1.freq0*1e6, 'nb':number_of_ho_collisions,
-  	'N1':b1.npart, 'N2':b2.npart,
-    'energy_tot1':b1.energy, 'energy_tot2':b2.energy,
-    'deltap_p0_1':b1.sige, 'deltap_p0_2':b2.sige,
-    'epsilon_x1':b1.exn, 'epsilon_x2':b2.exn,
-    'epsilon_y1':b1.eyn, 'epsilon_y2':b2.eyn, 
-    'sigma_z1':b1.sigt, 'sigma_z2':b2.sigt,
-    'beta_x1':ip_b1.betx, 'beta_x2':ip_b2.betx,
-    'beta_y1':ip_b1.bety, 'beta_y2':ip_b2.bety,
-    'alpha_x1':ip_b1.alfx, 'alpha_x2':ip_b2.alfx,
-    'alpha_y1':ip_b1.alfy, 'alpha_y2':ip_b2.alfy,
-    'dx_1':ip_b1.dx, 'dx_2':ip_b2.dx,
-    'dpx_1':ip_b1.dpx, 'dpx_2':ip_b2.dpx,
-    'dy_1':ip_b1.dy, 'dy_2':ip_b2.dy,
-    'dpy_1':ip_b1.dpy, 'dpy_2':ip_b2.dpy,
-    'x_1':ip_b1.x, 'x_2':ip_b2.x,
-    'px_1':ip_b1.px, 'px_2':ip_b2.px,
-    'y_1':ip_b1.y, 'y_2':ip_b2.y,
-    'py_1':ip_b1.py, 'py_2':ip_b2.py, 'verbose':False}
+	return {
+            'f':b1.freq0*1e6, 'nb':number_of_ho_collisions,
+            'N1':b1.npart, 'N2':b2.npart,
+            'energy_tot1':b1.energy, 'energy_tot2':b2.energy,
+            'deltap_p0_1':b1.sige, 'deltap_p0_2':b2.sige,
+            'epsilon_x1':b1.exn, 'epsilon_x2':b2.exn,
+            'epsilon_y1':b1.eyn, 'epsilon_y2':b2.eyn,
+            'sigma_z1':b1.sigt, 'sigma_z2':b2.sigt,
+            'beta_x1':ip_b1.betx, 'beta_x2':ip_b2.betx,
+            'beta_y1':ip_b1.bety, 'beta_y2':ip_b2.bety,
+            'alpha_x1':ip_b1.alfx, 'alpha_x2':ip_b2.alfx,
+            'alpha_y1':ip_b1.alfy, 'alpha_y2':ip_b2.alfy,
+            'dx_1':ip_b1.dx, 'dx_2':ip_b2.dx,
+            'dpx_1':ip_b1.dpx, 'dpx_2':ip_b2.dpx,
+            'dy_1':ip_b1.dy, 'dy_2':ip_b2.dy,
+            'dpy_1':ip_b1.dpy, 'dpy_2':ip_b2.dpy,
+            'x_1':ip_b1.x, 'x_2':ip_b2.x,
+            'px_1':ip_b1.px, 'px_2':ip_b2.px,
+            'y_1':ip_b1.y, 'y_2':ip_b2.y,
+            'py_1':ip_b1.py, 'py_2':ip_b2.py, 'verbose':False}
 
 def compute_luminosity(mad, twiss_dfs, ip_name, number_of_ho_collisions):
-	return L(**get_luminosity_dict(mad, twiss_dfs, ip_name, number_of_ho_collisions))
+    return L(**get_luminosity_dict(mad, twiss_dfs, ip_name, number_of_ho_collisions))
 
+def print_luminosity(mad, twiss_dfs, nco_IP1, nco_IP2, nco_IP5, nco_IP8):
+    for ip, number_of_ho_collisions in zip(['ip1', 'ip2', 'ip5', 'ip8'],
+                                           [nco_IP1, nco_IP2, nco_IP5, nco_IP8]):
+        myL=compute_luminosity(mad, twiss_dfs, ip, number_of_ho_collisions)
+        print(f'L in {ip} is {myL} Hz/cm^2')

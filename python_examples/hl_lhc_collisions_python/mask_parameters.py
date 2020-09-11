@@ -27,18 +27,21 @@ mask_parameters = {
     'par_match_with_bb'        : 0,            # should be off at collision
     'par_b_t_dist'             : 25.,          # bunch separation [ns]
     'par_n_inside_D1'          : 5,            # default value for the number of additionnal parasitic encounters inside D1
-    
+
     'par_nho_IR1'              : 11,           # number of slices for head-on in IR1 (between 0 and 201)
     'par_nho_IR2'              : 11,           # number of slices for head-on in IR2 (between 0 and 201)
     'par_nho_IR5'              : 11,           # number of slices for head-on in IR5 (between 0 and 201)
     'par_nho_IR8'              : 11,           # number of slices for head-on in IR8 (between 0 and 201)
 
-    #*************************#
-    #     Leveling in IP8     #
-    #*************************#
+    #*****************************#
+    #     Luminosity parameters   #
+    #*****************************#
 
-    # This variables set the leveled luminosity in IP8 (considered if par_on_collision:1)
+    # This variables set the leveled luminosity in IP8 
     'par_lumi_ip8'             : 2e33,         #[Hz/cm2]
+
+    # This variables set the leveled luminosity in IP8 
+    'par_fullsep_in_sigmas_ip2': 5,
 
     # These variables define the number of Head-On collisions in the 4 IPs
     'par_nco_IP1'              : 2748,
