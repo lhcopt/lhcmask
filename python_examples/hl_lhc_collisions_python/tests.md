@@ -1,9 +1,11 @@
 # Tests performed on pymask
 
-For pysixtrack we are using the branch: "feature/cc_from_mad_and_sixtrack"
 Sixtracktools is on the master
+We test the commit e301c179d937843f15eb4bc01e647e15833fdc09
 
-We test the commit be0aa65dc11c8104d6e4d83957fc93d71f2c052c
+N.B. For the tests to be successful make sure that cpymad and madx correspond to the same (updated!) version.
+
+
 
 ## Test 1 - b1 with bb legacy macros
 
@@ -45,12 +47,12 @@ mode = 'b1_with_bb'
 
 We exeute the python version:
 ```bash
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We execute the reference (can be reused from the previous test):
 ```bash
- cd ../hl_lhc_collision
+ cd ../../examples/hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
@@ -142,7 +144,7 @@ mode = 'b4_from_b2_without_bb'
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
