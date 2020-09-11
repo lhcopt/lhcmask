@@ -47,12 +47,12 @@ mode = 'b1_with_bb'
 
 We exeute the python version:
 ```bash
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We execute the reference (can be reused from the previous test):
 ```bash
- cd ../hl_lhc_collision
+ cd ../../examples/hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
