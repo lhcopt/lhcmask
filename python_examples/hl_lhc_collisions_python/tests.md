@@ -1,9 +1,11 @@
 # Tests performed on pymask
 
-For pysixtrack we are using the branch: "feature/cc_from_mad_and_sixtrack"
 Sixtracktools is on the master
+We test the commit e301c179d937843f15eb4bc01e647e15833fdc09
 
-We test the commit be0aa65dc11c8104d6e4d83957fc93d71f2c052c
+N.B. For the tests to be successful make sure that cpymad and madx correspond to the same version.
+
+
 
 ## Test 1 - b1 with bb legacy macros
 
