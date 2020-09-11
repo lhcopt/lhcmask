@@ -19,12 +19,12 @@ Madx = pm.Madxp
 
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-#mode = 'b4_from_b2_without_bb'
+mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
 
 # Legacy modes
 #mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
+mode = 'b4_without_bb'
 
 
 ########################
@@ -146,20 +146,31 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 # Set luminosity in IP2 and IP8 #
 #################################
 
-# Luminosity levelling
-print('Luminosities before leveling (crab cavities are not considered):')
-lumi.print_luminosity(mad, twiss_dfs,
-        mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-        mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
-if enable_bb_legacy:
+if enable_bb_legacy or mode=='b4_without_bb':
     mad.use(f'lhcb{beam_to_configure}')
     if mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
+        # Luminosity levelling
+        print('Luminosities before leveling (crab cavities are not considered):')
+        lumi.print_luminosity(mad, twiss_dfs,
+                mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+                mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+
         mad.call("modules/module_02_lumilevel.madx")
+
+        print('Luminosities after leveling (crab cavities are not considered):')
+        lumi.print_luminosity(mad, twiss_dfs,
+                mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+                mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 else:
     from scipy.optimize import least_squares
+
+    print('Luminosities before leveling (crab cavities are not considered):')
+    lumi.print_luminosity(mad, twiss_dfs,
+            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
     # Leveling in IP8
     L_target_ip8 = mask_parameters['par_lumi_ip8']
@@ -180,6 +191,11 @@ else:
     # Re-save knobs
     mad.input('exec, crossing_save')
 
+    print('Luminosities after leveling (crab cavities are not considered):')
+    lumi.print_luminosity(mad, twiss_dfs,
+            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+
 # Check machine after leveling
 mad.input('exec, crossing_restore')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -188,10 +204,6 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
-print('Luminosities after leveling (crab cavities are not considered):')
-lumi.print_luminosity(mad, twiss_dfs,
-        mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-        mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
 
 #####################
