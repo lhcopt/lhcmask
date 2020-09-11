@@ -13,13 +13,23 @@ from mask_parameters import mask_parameters
 
 Madx = pm.Madxp
 
-# Select mode
+###############
+# Select mode #
+###############
+
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
 #mode = 'b4_from_b2_without_bb'
 #mode = 'b4_from_b2_with_bb'
+
+# Legacy modes
+#mode = 'b1_with_bb_legacy_macros'
+#mode = 'b4_without_bb'
+
+
+########################
+# Other configurations #
+########################
 
 # Tolarances for checks [ip1, ip2, ip5, ip8]
 tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
@@ -36,11 +46,16 @@ pm.make_links(force=True, links_dict={
 os.system('bash customization.bash')
 
 # Choose optics file
-optics_file = 'hl14_collision_optics.madx' #15 cm
+optics_file = '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx' #15 cm
 
 check_betas_at_ips = True
 check_separations_at_ips = True
 save_intermediate_twiss = True
+
+
+######################################
+# Check parameters and activate mode #
+######################################
 
 # Check and load parameters 
 pm.checks_on_parameter_dict(mask_parameters)
@@ -50,8 +65,17 @@ pm.checks_on_parameter_dict(mask_parameters)
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
     force_disable_check_separations_at_ips,
     ) = pm.get_pymask_configuration(mode)
+
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
+
+if not(enable_bb_legacy) and not(enable_bb_python):
+    mask_parameters['par_on_bb_switch'] = 0.
+
+
+########################
+# Build MAD-X instance #
+########################
 
 # Start mad
 mad = Madx()
@@ -62,15 +86,13 @@ ost.build_sequence(mad, beam=beam_to_configure)
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
 
-# Force disable beam-beam when needed
-if not(enable_bb_legacy) and not(enable_bb_python):
-    mask_parameters['par_on_bb_switch'] = 0.
-
 # Pass parameters to mad
 mad.set_variables_from_dict(params=mask_parameters)
 
-# Prepare sequences and attach beam
+# Prepare auxiliary mad variables
 mad.call("modules/submodule_01a_preparation.madx")
+
+# Attach beams to sequences
 mad.call("modules/submodule_01b_beam.madx")
 
 # Test machine before any change
@@ -81,7 +103,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         check_betas_at_ips=check_betas_at_ips,
         check_separations_at_ips=check_separations_at_ips)
 
-# Set phase, apply and save crossing
+# Set IP1-IP5 phase and store corresponding reference
 mad.call("modules/submodule_01c_phase.madx")
 
 # Set optics-specific knobs
@@ -91,14 +113,20 @@ ost.set_optics_specific_knobs(mad, mode)
 mad.input('exec, crossing_save')
 mad.call("modules/submodule_01e_final.madx")
 
-# Test flat machine
+
+#################################
+# Check bahavior of orbit knobs #
+#################################
+
+# Check flat machine
 mad.input('exec, crossing_disable')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_no_crossing',
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
-# Check flatness
+
+# Check orbit flatness
 flat_tol = 1e-6
 for ss in twiss_dfs.keys():
     tt = twiss_dfs[ss]
@@ -113,8 +141,13 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
+
+#################################
+# Set luminosity in IP2 and IP8 #
+#################################
+
 # Luminosity levelling
-print('Luminosities before leveling:')
+print('Luminosities before leveling (crab cavities are not considered):')
 lumi.print_luminosity(mad, twiss_dfs,
         mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
         mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
@@ -155,13 +188,23 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
-print('Luminosities after leveling:')
+print('Luminosities after leveling (crab cavities are not considered):')
 lumi.print_luminosity(mad, twiss_dfs,
         mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
         mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
 
-mad.input('on_disp = 0')
+#####################
+# Force on_disp = 0 #
+#####################
+
+mad.globals.on_disp = 0.
+# will be restored later
+
+
+###################################
+# Compute beam-beam configuration #
+###################################
 
 # Prepare bb dataframes
 if enable_bb_python:
@@ -178,7 +221,11 @@ if enable_bb_python:
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
 
-# Generate mad instance for b4
+
+###################
+# Generate beam 4 #
+###################
+
 if generate_b4_from_b2:
     mad_b4 = Madx()
     ost.build_sequence(mad_b4, beam=4)
@@ -201,6 +248,9 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 
+##################################################
+# Select mad instance for tracking configuration #
+##################################################
 
 # We working exclusively on the sequence to track
 # Select mad object
@@ -220,7 +270,11 @@ twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 
-# Install bb lenses
+#####################
+# Install bb lenses #
+#####################
+
+# Python approach
 if enable_bb_python:
     if track_from_b4_mad_instance:
         bb_df_track = bb_dfs['b4']
@@ -231,11 +285,10 @@ if enable_bb_python:
 
     pm.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
 
-    # Disable bb
+    # Disable bb (to be activated later)
     mad_track.globals.on_bb_charge = 0
 else:
     bb_df_track = None
-
 
 # Legacy bb macros
 if enable_bb_legacy:
@@ -245,32 +298,56 @@ if enable_bb_legacy:
     mad_track.call("modules/module_03_beambeam.madx")
 
 
-# Install crab cavities
+#########################
+# Install crab cavities #
+#########################
+
 mad_track.call("modules/submodule_04_1a_install_crabs.madx")
 
 # Save references (orbit at IPs)
 mad_track.call('modules/submodule_04_1b_save_references.madx')
 
-# Switch off dipersion correction knob
-mad_track.globals.on_disp = 0.
 
-# Final use
+#####################
+# Force on_disp = 0 #
+#####################
+
+mad_track.globals.on_disp = 0.
+# will be restored later
+
+
+#############
+# Final use #
+#############
+
 mad_track.use(sequence_to_track)
 # Disable use
 mad_track._use = mad_track.use
 mad_track.use = None
 
-# Install and correct errors
+
+##############################
+# Install and correct errors #
+##############################
+
 mad_track.call("modules/module_04_errors.madx")
 
-# Machine tuning (enables bb)
+
+###############################
+# Machine tuning (enables bb) #
+###############################
+
 mad_track.call("modules/module_05_tuning.madx")
 
 # Switch on crab cavities
 mad_track.globals.on_crab1 = mad_track.globals.par_crab1
 mad_track.globals.on_crab5 = mad_track.globals.par_crab5
 
-# Generate sixtrack
+
+#####################
+# Generate sixtrack #
+#####################
+
 if enable_bb_legacy:
     mad_track.call("modules/module_06_generate.madx")
 else:
@@ -295,13 +372,21 @@ else:
         radius_sixtrack_multip_conversion_mad=0.017,
         skip_mad_use=True)
 
-# Get optics and orbit at start ring
+
+#######################################
+# Save optics and orbit at start ring #
+#######################################
+
 optics_orbit_start_ring = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
 with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
     pickle.dump(optics_orbit_start_ring, fid)
 
-# Generate pysixtrack lines
+
+#############################
+# Generate pysixtrack lines #
+#############################
+
 if enable_bb_legacy:
     print('Pysixtrack line is not generated with bb legacy macros')
 else:
