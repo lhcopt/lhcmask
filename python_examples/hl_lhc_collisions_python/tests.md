@@ -24,7 +24,7 @@ mode = 'b1_with_bb_legacy_macros'
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
