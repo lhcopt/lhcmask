@@ -3,7 +3,7 @@
 Sixtracktools is on the master
 We test the commit e301c179d937843f15eb4bc01e647e15833fdc09
 
-N.B. For the tests to be successful make sure that cpymad and madx correspond to the same version.
+N.B. For the tests to be successful make sure that cpymad and madx correspond to the same (updated!) version.
 
 
 
