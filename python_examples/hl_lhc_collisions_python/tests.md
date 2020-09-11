@@ -144,7 +144,7 @@ mode = 'b4_from_b2_without_bb'
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
