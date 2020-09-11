@@ -9,7 +9,7 @@ We test the commit be0aa65dc11c8104d6e4d83957fc93d71f2c052c
 
 We execute the reference:
 ```bash
- cd ../hl_lhc_collision
+ cd ../../examples/hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
