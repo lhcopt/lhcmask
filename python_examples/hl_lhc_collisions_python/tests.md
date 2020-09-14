@@ -98,13 +98,13 @@ Repeat for IP1.
 
 We execute the reference:
 ```bash
- cd ../hl_lhc_collision_nobb_b4
+ cd ../../examples/hl_lhc_collision_nobb_b4
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
 We select:
@@ -113,7 +113,7 @@ mode = 'b4_without_bb'
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
