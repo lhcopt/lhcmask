@@ -13,7 +13,7 @@ from mask_parameters import mask_parameters
 
 Madx = pm.Madxp
 
-force_legacy_leveling = False
+force_leveling = None
 
 ###############
 # Select mode #
@@ -21,13 +21,15 @@ force_legacy_leveling = False
 
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-mode = 'b4_from_b2_without_bb'; force_legacy_leveling = True # (For testing purposes)
+mode = 'b4_from_b2_without_bb';
 #mode = 'b4_from_b2_with_bb'
 
 # Legacy modes
 #mode = 'b1_with_bb_legacy_macros'
 #mode = 'b4_without_bb'
 
+# For testing against madx mask 
+mode = 'b4_from_b2_without_bb'; force_leveling = {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
 
 ########################
 # Other configurations #
@@ -149,7 +151,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 #################################
 
 
-if force_legacy_leveling or enable_bb_legacy or mode=='b4_without_bb':
+if enable_bb_legacy or mode=='b4_without_bb':
     mad.use(f'lhcb{beam_to_configure}')
     if mode=='b4_without_bb':
         print('Leveling not working in this mode!')
@@ -197,6 +199,11 @@ else:
     lumi.print_luminosity(mad, twiss_dfs,
             mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
             mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+
+if force_leveling is not None:
+    for kk in force_leveling.keys():
+        mad.globals[kk] = force_leveling[kk]
+    mad.input('exec, crossing_save')
 
 # Check machine after leveling
 mad.input('exec, crossing_restore')
