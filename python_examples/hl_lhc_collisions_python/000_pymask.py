@@ -13,18 +13,20 @@ from mask_parameters import mask_parameters
 
 Madx = pm.Madxp
 
+force_legacy_leveling = False
+
 ###############
 # Select mode #
 ###############
 
 #mode = 'b1_without_bb'
 mode = 'b1_with_bb'
-mode = 'b4_from_b2_without_bb'
+mode = 'b4_from_b2_without_bb'; force_legacy_leveling = True # (For testing purposes)
 #mode = 'b4_from_b2_with_bb'
 
 # Legacy modes
 #mode = 'b1_with_bb_legacy_macros'
-mode = 'b4_without_bb'
+#mode = 'b4_without_bb'
 
 
 ########################
@@ -147,7 +149,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 #################################
 
 
-if enable_bb_legacy or mode=='b4_without_bb':
+if force_legacy_leveling or enable_bb_legacy or mode=='b4_without_bb':
     mad.use(f'lhcb{beam_to_configure}')
     if mode=='b4_without_bb':
         print('Leveling not working in this mode!')

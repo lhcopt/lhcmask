@@ -11,11 +11,11 @@ type_test = 'sixtrack'
 path_ref = '../../examples/hl_lhc_collision'
 type_ref = 'sixtrack'
 
-# # Test b4 nobb sixtrack
-# path_test = './'
-# type_test = 'sixtrack'
-# path_ref = '../hl_lhc_collision_nobb_b4'
-# type_ref = 'sixtrack'
+# Test b4 nobb sixtrack
+path_test = './'
+type_test = 'sixtrack'
+path_ref = '../../examples/hl_lhc_collision_nobb_b4'
+type_ref = 'sixtrack'
 #
 # # Test b4 nobb pysixtrack (not working for now)
 # path_test = './pysixtrack/line_bb_dipole_not_cancelled.pkl'
@@ -96,10 +96,17 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
             continue
 
         # Exception: correctors involved in lumi leveling
-        if nn_test in ['mcbcv.5l8.b1', 'mcbyv.a4l8.b1', 'mcbxv.3l8',
+        if nn_test in [
+            'mcbcv.5l8.b1', 'mcbyv.a4l8.b1', 'mcbxv.3l8',
             'mcbyv.4r8.b1', 'mcbyv.b5r8.b1',
             'mcbyh.b5l2.b1', 'mcbyh.4l2.b1', 'mcbxh.3l2', 'mcbyh.a4r2.b1',
-            'mcbch.5r2.b1']:
+            'mcbch.5r2.b1',
+            'mcbcv.5l8.b2', 'mcbyv.a4l8.b2', 'mcbxv.3l8',
+            'mcbyv.4r8.b2', 'mcbyv.b5r8.b2',
+            'mcbyh.b5l2.b2', 'mcbyh.4l2.b2', 'mcbxh.3l2', 'mcbyh.a4r2.b2',
+            'mcbch.5r2.b2', 'mcbch.a5r2.b2', 'mcbyh.4r2.b2', 'mcbxh.3r2',
+            'mcbyh.a4l2.b2', 'mcbyh.5l2.b2', 'mcbyv.5r8.b2', 'mcbyv.a4r8.b2',
+            'mcbxv.3r8', 'mcbyv.4l8.b2', 'mcbcv.b5l8.b2']:
             if diff_rel < 1e-2:
                 continue
 
