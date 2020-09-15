@@ -136,7 +136,7 @@ We execute the reference:
 
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
 We select:
