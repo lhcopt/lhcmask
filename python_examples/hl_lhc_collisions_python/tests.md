@@ -1,7 +1,8 @@
 # Tests performed on pymask
 
 Sixtracktools is on the master
-We test the commit e301c179d937843f15eb4bc01e647e15833fdc09
+
+We test the commit 49ce808d77f37f2c670ccf2ac4b1d8222d534118
 
 N.B. For the tests to be successful make sure that cpymad and madx correspond to the same (updated!) version.
 
@@ -129,7 +130,7 @@ diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 
 We execute the reference:
 ```bash
- cd ../hl_lhc_collision_nobb_b4
+ cd ../../examples/hl_lhc_collision_nobb_b4
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
@@ -159,7 +160,7 @@ diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 ## Test 5 - b4 from b2 with bb
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
 We select:
@@ -168,7 +169,7 @@ mode = 'b4_from_b2_with_bb'
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 **As we don't have a reference we can only perform the check on the crab cavities:**
