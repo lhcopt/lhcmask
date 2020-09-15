@@ -141,8 +141,11 @@ cd ../../python_examples/hl_lhc_collisions_python
 ```
 We select:
 ```python
-mode = 'b4_from_b2_without_bb'
+mode = 'b4_from_b2_without_bb'; force_leveling = {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
 ```
+(the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
+
+
 We run the python version:
 ```
 python 000_pymask.py
