@@ -18,8 +18,8 @@ opt_start_ring_fname = './optics_orbit_at_start_ring.pkl'
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
 r_max_sigma = 5.
-N_r_footp = 20.
-N_theta_footp = 10.
+N_r_footp = 20
+N_theta_footp = 10
 
 n_turns = 100
 
