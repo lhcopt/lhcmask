@@ -4,7 +4,7 @@ import shutil
 folder_list = [
     './',
     '../../examples/hl_lhc_collision/',
-    '../../examples/hl_lhc_collision/reference',
+#    '../../examples/hl_lhc_collision/reference',
     '../../examples/hl_lhc_collision_nobb_b4']
 
 for sixtrack_input_folder in folder_list:

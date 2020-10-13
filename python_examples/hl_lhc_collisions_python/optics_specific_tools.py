@@ -8,7 +8,7 @@ def build_sequence(mad, beam):
     mad.call('hl14_thin.madx')
 
 def apply_optics(mad, optics_file):
-    mad.call('hl14_collision_optics.madx')
+    mad.call(optics_file)
 
 def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     twiss_value_checks=[]
