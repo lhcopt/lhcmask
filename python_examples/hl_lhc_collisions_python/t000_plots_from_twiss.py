@@ -17,7 +17,7 @@ axbetx.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
 
 # %%
 axbety = fig.add_subplot(2,2,2, sharex=axbetx, sharey=axbetx)
-axbety.plot(twiss_df['s'], twiss_df['bety'], label='b4')
+axbety.plot(twiss_df['s'], twiss_df['bety'])
 axbety.set_xlabel('s')
 axbety.set_ylabel(r'$\beta_y$ [m]')
 axbety.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
