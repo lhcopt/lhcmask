@@ -1,3 +1,24 @@
+python_paramters = {
+
+    # Mode - choose between:
+    #   Main modes:
+    #    'b1_without_bb'
+    #    'b1_with_bb'
+    #    'b4_from_b2_without_bb'
+    #    'b4_from_b2_with_bb'
+
+    #   Legacy modes
+    #    'b1_with_bb_legacy_macros'
+    #    'b4_without_bb'
+    mode                      : 'b1_with_bb',
+
+
+    # Force separation in IP2 and IP8 if needed
+    force_leveling            : None
+    # Can be used for test against madx mask of b4_from_b2_without_bb:
+    # force_leveling = {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
+
+
 
 mask_parameters = {
     'par_verbose'              : 1,
@@ -71,4 +92,39 @@ mask_parameters = {
     'par_on_errors_MCBRD'      : 0,
     'par_on_errors_MCBXF'      : 0,
 
+}
+
+
+knob_parameters = {
+    #IP specific orbit settings
+
+    'par_x1'                   : 250,        # [urad]  # Could be optics-dependent
+    'par_sep1'                 : 0,            # [mm]  # Could be optics-dependent
+    'par_x2'                   : -170,         # [urad]  # Could be optics-dependent
+    'par_sep2'                 : 0.138,        # [mm]  # Could be optics-dependent
+    'par_x5'                   : 250,       # [urad]  # Could be optics-dependent
+    'par_sep5'                 : 0,            # [mm]  # Could be optics-dependent
+    'par_x8'                   : -250,         # [urad]  # Could be optics-dependent
+    'par_sep8'                 : -0.043,       # [mm]  # Could be optics-dependent
+    'par_a1'                   : 0,            # [urad]  # Could be optics-dependent
+    'par_o1'                   : 0,            # [mm]  # Could be optics-dependent
+    'par_a2'                   : 0,            # [urad]  # Could be optics-dependent
+    'par_o2'                   : 0,            # [mm]  # Could be optics-dependent
+    'par_a5'                   : 0,            # [urad]  # Could be optics-dependent
+    'par_o5'                   : 0,            # [mm]  # Could be optics-dependent
+    'par_a8'                   : 0,            # [urad]  # Could be optics-dependent
+    'par_o8'                   : 0,            # [mm]  # Could be optics-dependent
+    'par_crab1'                : -190,         # [urad]  # Could be optics-dependent
+    'par_crab5'                : -190,    # [urad]  # Could be optics-dependent
+
+    # Dispersion correction knob
+    'par_on_disp'              : 1,            # Could be optics-dependent
+
+    # Magnets of the experiments
+    'par_on_alice'             : 1,
+    'par_on_lhcb'              : 1,
+
+    'par_on_sol_atlas'         : 0,
+    'par_on_sol_cms'           : 0,
+    'par_on_sol_alice'         : 0,
 }
