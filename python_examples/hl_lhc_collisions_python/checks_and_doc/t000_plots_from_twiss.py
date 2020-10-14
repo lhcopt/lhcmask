@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-twiss_df = pd.read_parquet('./twiss_with_crossing_seq_lhcb1.parquet')
+twiss_df = pd.read_parquet('../twiss_with_crossing_seq_lhcb1.parquet')
 
 
 plt.close('all')

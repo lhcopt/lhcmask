@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-twiss_df_b2 = pd.read_parquet('./twiss_b2_for_b4check_seq_lhcb2.parquet')
-twiss_df_b4 = pd.read_parquet('./twiss_b4_for_b4check_seq_lhcb2.parquet')
+twiss_df_b2 = pd.read_parquet('../twiss_b2_for_b4check_seq_lhcb2.parquet')
+twiss_df_b4 = pd.read_parquet('../twiss_b4_for_b4check_seq_lhcb2.parquet')
 
 
 plt.close('all')
