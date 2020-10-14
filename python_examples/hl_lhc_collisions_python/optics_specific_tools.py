@@ -5,7 +5,6 @@ import pymask as pm
 
 def build_sequence(mad, beam):
     mad.input(f'mylhcbeam = {beam}')
-    mad.call('hl14_thin.madx')
 
     mad.input('''
 
@@ -62,14 +61,9 @@ def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     pm.check_twiss_against_madvars(twiss_value_checks, twiss_df, variable_dicts)
 
 
-def set_optics_specific_knobs(mad, mode=None):
+def set_optics_specific_knobs(mad, knob_parameters, mode=None):
 
-    from knob_parameters import knob_parameters as kp
-
-    # PATCH!!!!!!! for leveling not working for b4
-    if mode == 'b4_without_bb':
-        kp['par_sep8'] = -0.03425547139366354
-        kp['par_sep2'] = 0.14471680504084292
+    kp = knob_parameters
 
     mad.set_variables_from_dict(params=kp)
 

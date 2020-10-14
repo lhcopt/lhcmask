@@ -1,61 +1,43 @@
-import sys, os
+import os
+import sys
 import pickle
 
 import numpy as np
 
-# Import pymask
-sys.path.append('../../')
-import pymask as pm
-import pymask.luminosity as lumi
+from config import python_parameters, mask_parameters, knob_parameters
 
-import optics_specific_tools as ost
-from mask_parameters import mask_parameters
 
-Madx = pm.Madxp
+#####################################################
+# Read general configurations and setup envirnoment #
+#####################################################
 
-force_leveling = None
+mode = python_parameters['mode']
+tol_beta = python_parameters['tol_beta']
+tol_sep = python_parameters['tol_sep']
+flat_tol = python_parameters['tol_co_flatness']
+links = python_parameters['links']
+optics_file = python_parameters['optics_file']
+check_betas_at_ips = python_parameters['check_betas_at_ips']
+check_separations_at_ips = python_parameters['check_separations_at_ips']
+save_intermediate_twiss = python_parameters['save_intermediate_twiss']
+force_leveling= python_parameters['force_leveling']
 
-###############
-# Select mode #
-###############
-
-#mode = 'b1_without_bb'
-mode = 'b1_with_bb'
-mode = 'b4_from_b2_without_bb';
-#mode = 'b4_from_b2_with_bb'
-
-# Legacy modes
-#mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
-
-# For testing against madx mask 
-mode = 'b4_from_b2_without_bb'; force_leveling = {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
-
-########################
-# Other configurations #
-########################
-
-# Tolarances for checks [ip1, ip2, ip5, ip8]
-tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
-tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
-
-pm.make_links(force=True, links_dict={
-    'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-    'modules': 'tracking_tools/modules',
-    'tools': 'tracking_tools/tools',
-    'beambeam_macros': 'tracking_tools/beambeam_macros',
-    'errors': 'tracking_tools/errors'})
+# Make links
+for kk in links.keys():
+    if os.path.exists(kk):
+        os.remove(kk)
+    os.symlink(os.path.abspath(links[kk]), kk)
 
 # Execute customization script if present
 os.system('bash customization.bash')
 
-# Choose optics file
-optics_file = '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx' #15 cm
+# Import pymask
+sys.path.append('./modules')
+import pymask as pm
+import pymask.luminosity as lumi
 
-check_betas_at_ips = True
-check_separations_at_ips = True
-save_intermediate_twiss = True
-
+# Import user-defined optics-specific tools
+import optics_specific_tools as ost
 
 ######################################
 # Check parameters and activate mode #
@@ -82,6 +64,7 @@ if not(enable_bb_legacy) and not(enable_bb_python):
 ########################
 
 # Start mad
+Madx = pm.Madxp
 mad = Madx()
 
 # Build sequence
@@ -111,7 +94,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 mad.call("modules/submodule_01c_phase.madx")
 
 # Set optics-specific knobs
-ost.set_optics_specific_knobs(mad, mode)
+ost.set_optics_specific_knobs(mad, knob_parameters, mode)
 
 # Crossing-save and some reference measurements
 mad.input('exec, crossing_save')
@@ -131,7 +114,6 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
 # Check orbit flatness
-flat_tol = 1e-6
 for ss in twiss_dfs.keys():
     tt = twiss_dfs[ss]
     assert np.max(np.abs(tt.x)) < flat_tol
