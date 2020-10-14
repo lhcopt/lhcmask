@@ -13,7 +13,7 @@ track_with = 'Sixtracklib'
 #device = 'opencl:1.0'
 device = None
 
-opt_start_ring_fname = './optics_orbit_at_start_ring.pkl'
+opt_start_ring_fname = '../optics_orbit_at_start_ring.pkl'
 
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
@@ -40,10 +40,10 @@ def prepare_line(path, input_type):
 
     return ltest
 
-line = prepare_line('./', input_type='sixtrack')
+line = prepare_line('../', input_type='sixtrack')
 
 
-with open('./optics_orbit_at_start_ring.pkl', 'rb') as fid:
+with open('../optics_orbit_at_start_ring.pkl', 'rb') as fid:
     ddd = pickle.load(fid)
 ddd['p0c'] =  ddd['p0c_eV']
 

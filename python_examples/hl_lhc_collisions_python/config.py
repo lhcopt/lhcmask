@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b4_from_b2_with_bb',
+    'mode'                      : 'b1_with_bb',
 
     # Force separation in IP2 and IP8 if needed
     'force_leveling'            : None,
