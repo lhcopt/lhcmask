@@ -43,7 +43,8 @@ diff fc.34 ../../examples/hl_lhc_collision/fc.34
 ## Test 2 - b1 with new bb tools
 In config.py we select:
 ```python
-mode : 'b1_with_bb'
+'mode' : 'b1_with_bb',
+'force_leveling' : None,
 ```
 
 We exeute the python version:
@@ -110,7 +111,7 @@ cd ../../python_examples/hl_lhc_collisions_python
 ```
 In config.py we select:
 ```python
-mode : 'b4_without_bb'
+'mode' : 'b4_without_bb',
 force_leveling : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
 ```
 (the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
@@ -144,8 +145,8 @@ cd ../../python_examples/hl_lhc_collisions_python
 ```
 In config.py we select:
 ```python
-mode : 'b4_from_b2_without_bb'
-force_leveling : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
+'mode' : 'b4_from_b2_without_bb',
+'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
 ```
 (the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
 
@@ -172,7 +173,8 @@ cd ../../python_examples/hl_lhc_collisions_python
 ```
 In config.py we select:
 ```python
-mode : 'b4_from_b2_with_bb'
+'mode' : 'b4_from_b2_with_bb',
+'force_leveling' : None,
 ```
 We run the python version:
 ```
