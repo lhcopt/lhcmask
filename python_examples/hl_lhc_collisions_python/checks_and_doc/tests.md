@@ -2,7 +2,7 @@
 
 Sixtracktools is on the master
 
-We test the commit 27267bc9903fe3d0fd4ca5439ed8df319ba15476
+We test the commit 9f6ec4e170da6617576e22ac14f048f9b122f1eb
 
 N.B. For the tests to be successful make sure that cpymad and madx correspond to the same (updated!) version.
 
@@ -57,13 +57,13 @@ We execute the reference (can be reused from the previous test):
  cd ../../examples/hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
-
+In the folder ```checks_and_doc```:
 Configure ```t004_compare_pysixtrack_lines.py``` for the test:
 ```python
 # Test b1
-path_test = './'
+path_test = '../'
 type_test = 'sixtrack'
-path_ref = '../hl_lhc_collision'
+path_ref = '../../examples/hl_lhc_collision'
 type_ref = 'sixtrack
 ```
 
