@@ -214,12 +214,12 @@ if enable_bb_python:
     bb_dfs = pm.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
-        numberOfLRPerIRSide=[25, 20, 25, 20],
-        bunch_spacing_buckets=10,
-        numberOfHOSlices=11,
-        bunch_population_ppb=None,
-        sigmaz_m=None,
-        z_crab_twiss = 0.075,
+        numberOfLRPerIRSide=python_parameters['numberOfLRPerIRSide'],
+        bunch_spacing_buckets=python_parameters['bunch_spacing_buckets'],
+        numberOfHOSlices=python_parameters['numberOfHOSlices'],
+        bunch_population_ppb=python_parameters['bunch_population_ppb'],
+        sigmaz_m=python_parameters['sigmaz_m'],
+        z_crab_twiss=python_parameters['z_crab_twiss'],
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity

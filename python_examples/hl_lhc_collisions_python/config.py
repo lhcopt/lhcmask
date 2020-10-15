@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb',
+    'mode'                      : 'b1_with_bb_legacy_macros',
 
     # Force separation in IP2 and IP8 if needed
     'force_leveling'            : None,
@@ -42,8 +42,15 @@ python_parameters = {
     # Enable checks
     'check_betas_at_ips'       : True,
     'check_separations_at_ips' : True,
-    'save_intermediate_twiss'  : True
+    'save_intermediate_twiss'  : True,
 
+    # Beam-beam parameters (used by python tools - NOT by legacy macros)
+    'numberOfLRPerIRSide'      : [25, 20, 25, 20],
+    'bunch_spacing_buckets'    : 10,
+    'numberOfHOSlices'         : 11,
+    'bunch_population_ppb'     : None,
+    'sigmaz_m'                 : None,
+    'z_crab_twiss'             : 0.075,
     }
 
 
