@@ -304,10 +304,14 @@ if enable_bb_legacy:
 #########################
 # Install crab cavities #
 #########################
+mad_track.call("optics_toolkit/enable_crabcavities.madx")
+# They are left off, they will be swiched on at the end:
+mad_track.globals.on_crab1 = 0
+mad_track.globals.on_crab5 = 0
 
-mad_track.call("modules/submodule_04_1a_install_crabs.madx")
-
-# Save references (orbit at IPs)
+##################################
+# Save references (orbit at IPs) #
+##################################
 mad_track.call('modules/submodule_04_1b_save_references.madx')
 
 

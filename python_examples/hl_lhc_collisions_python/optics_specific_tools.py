@@ -4,7 +4,13 @@ import pymask as pm
 # adapted according to knob definitions
 
 def build_sequence(mad, beam):
+
+    # Select beam
     mad.input(f'mylhcbeam = {beam}')
+
+    # Make link to optics toolkit
+    pm.make_links({'optics_toolkit': '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/toolkit'},
+        force=True)
 
     mad.input('''
 
