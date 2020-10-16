@@ -337,7 +337,81 @@ mad_track.use = None
 # Install and correct errors #
 ##############################
 
-mad_track.call("modules/module_04_errors.madx")
+#mad_track.call("modules/module_04_errors.madx")
+
+# From submodule_04a_preparation.madx
+mad_track.input('''
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!               Prepare nominal twiss tables
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+twiss, table=nominal;   // used by orbit correction
+beta.ip1=table(twiss,IP1,betx);value,beta.ip1;
+
+! print nominal optics parameter at the MB, MQS and MSS for
+! b2, b3, b4, b5, a2 and a3 correction
+select, flag=twiss, clear;
+select, flag=twiss,pattern=MB\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MBH\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.14,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.15,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.16,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.17,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.18,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.19,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.20,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,pattern=MQT\.21,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MQS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MSS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MCO                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MCD                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+select, flag=twiss,class=MCS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+twiss,  file='temp/optics0_MB.mad';
+
+! print nominal optics parameter at the D1, MQX and triplet corrector
+! for triplet correction
+select, flag=twiss, clear;
+select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
+if (correct_for_D2==1){
+  select, flag=twiss, pattern=MBRD , class=multipole, column=name,betx,bety,x,y;
+};
+select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCQSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCDX                  , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCDSX                 , column=name,betx,bety,x,y;
+select, flag=twiss, pattern=MCTSX                 , column=name,betx,bety,x,y;
+if (correct_for_MCBX==1){
+  select, flag=twiss, pattern=MCBXF, class=multipole, column=name,betx,bety,x,y;
+};
+twiss,  file='temp/optics0_inser.mad';
+
+! disable crossing bumps
+exec, crossing_disable;
+
+''')
+
+# From submodule_04e_correction.madx
+mad_track.input('''
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!               correction of field errors in MB (compatible with V6.503 & SLHC)
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+select, flag=error, clear;
+select, flag=error, pattern=MB\.,class=multipole;
+select, flag=error, pattern=MBH\.,class=multipole;
+esave,  file="temp/MB.errors";
+system, "errors/HL-LHC/corr_MB_ats_v4";
+call,   file="temp/MB_corr_setting.mad";
+'''
+)
+
+mad_track.input('exec, crossing_restore;')
 
 
 ###############################
