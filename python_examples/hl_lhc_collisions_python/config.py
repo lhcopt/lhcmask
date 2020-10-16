@@ -51,6 +51,8 @@ python_parameters = {
     'bunch_population_ppb'     : None,
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
+
+    'enable_multipolar_errors' : False,
     }
 
 

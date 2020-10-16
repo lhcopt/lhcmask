@@ -67,7 +67,7 @@ ON_A15s = 1 ; ON_A15r = 1 ; ON_B15s = 1 ; ON_B15r = 1 ;
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
 !               Prepare nominal twiss tables
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
-call, file="submodule_04a_s1_prepare_nom_twiss_table.madx";
+call, file="modules/submodule_04a_s1_prepare_nom_twiss_table.madx";
 
 ! disable crossing bumps
 exec, crossing_disable;
