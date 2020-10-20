@@ -11,7 +11,6 @@ def coupling_measurement(mad, qx_integer, qy_integer,
         qx_fractional, qy_fractional,
         tune_knob1_name, tune_knob2_name,
         sequence_name, skip_use):
-
     print('\n Start coupling measurement...')
     if not skip_use:
         mad.use(sequence_name)
@@ -140,19 +139,25 @@ def coupling_correction(mad, n_iterations,
 
     #Empirical minimisation
     for i_iter in range(n_iterations):
+        # Tolerances changed as in legacy routine
+        if i_iter == 0:
+            exp_tol=6
+        else:
+            exp_tol=7
+
         mad.input(f'''
             match;
             global, q1={qx_diagonal}, q2={qy_diagonal};
             vary,   name={tune_knob1_name}, step=1.E-9;
             vary,   name={tune_knob2_name}, step=1.E-9;
-            lmdif,  calls=200,tolerance=1.E-6;
+            lmdif,  calls=200,tolerance=1.E-{exp_tol};
             endmatch;
 
             match;
             global, q1={qx_diagonal}, q2={qy_diagonal};
             vary,   name={cmr_knob_name}, step=1.E-9;
             vary,   name={cmi_knob_name}, step=1.E-9;
-            simplex,  calls=300, tolerance=2.E-6;
+            simplex,  calls=300, tolerance=2.E-{exp_tol};
             endmatch;
         ''')
 
