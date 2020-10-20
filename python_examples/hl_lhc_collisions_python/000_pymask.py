@@ -309,9 +309,9 @@ mad_track.call("optics_toolkit/enable_crabcavities.madx")
 mad_track.globals.on_crab1 = 0
 mad_track.globals.on_crab5 = 0
 
-##################################
-# Save references (orbit at IPs) #
-##################################
+##############################################
+# Save references for tuning and corrections #
+##############################################
 mad_track.call('modules/submodule_04_1b_save_references.madx')
 
 
@@ -350,7 +350,12 @@ else:
 # Machine tuning (enables bb) #
 ###############################
 
-mad_track.call("modules/module_05_tuning.madx")
+mad_track.call("modules/submodule_05a_MO.madx")
+mad_track.call("modules/submodule_05b_coupling.madx")
+mad_track.call("modules/submodule_05c_limit.madx")
+mad_track.call("modules/submodule_05d_matching.madx")
+mad_track.call("modules/submodule_05e_corrvalue.madx")
+mad_track.call("modules/submodule_05f_final.madx")
 
 # Switch on crab cavities
 mad_track.globals.on_crab1 = mad_track.globals.par_crab1
