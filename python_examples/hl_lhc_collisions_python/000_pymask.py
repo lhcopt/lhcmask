@@ -351,7 +351,25 @@ else:
 ###############################
 
 mad_track.call("modules/submodule_05a_MO.madx")
-mad_track.call("modules/submodule_05b_coupling.madx")
+
+
+# Correct linear coupling
+qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
+qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
+
+# DEBUG
+qx_fractional = .31
+qy_fractional = .32
+beam_name = sequence_to_track[-2:]
+pm.coupling_correction(mad_track, n_iterations=2,
+        qx_integer=qx_integer, qy_integer=qy_integer,
+        qx_fractional=qx_fractional, qy_fractional=qy_fractional,
+        tune_knob1_name='kqtf.'+beam_name, tune_knob2_name='kqtd.'+beam_name,
+        cmr_knob_name = 'cmrskew', cmi_knob_name = 'cmiskew',
+        sequence_name=sequence_to_track, skip_use=True)
+
+
+#mad_track.call("modules/submodule_05b_coupling.madx")
 mad_track.call("modules/submodule_05c_limit.madx")
 mad_track.call("modules/submodule_05d_matching.madx")
 mad_track.call("modules/submodule_05e_corrvalue.madx")
