@@ -402,8 +402,8 @@ qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
 
 #mad_track.call("modules/submodule_05b_coupling.madx")
 # DEBUG
-qx_fractional = .31
-qy_fractional = .32
+#qx_fractional = .31
+#qy_fractional = .32
 beam_name = sequence_to_track[-2:]
 pm.coupling_correction(mad_track, n_iterations=2,
         qx_integer=qx_integer, qy_integer=qy_integer,
