@@ -86,6 +86,11 @@ mad.call("modules/submodule_01b_beam.madx")
 # Set optics-specific knobs
 ost.set_optics_specific_knobs(mad, knob_parameters, mode)
 
+
+
+
+
+
 # Synthesisze knobs
 mad.call('modules/submodule_04_1b_save_references.madx')
 mad.call('modules/submodule_04a_s1_prepare_nom_twiss_table.madx')
@@ -135,3 +140,17 @@ print(f'cmiskew_legacy = {cmiskew_legacy}')
 print(f'cmiskew_new = {cmiskew_new}')
 print(f'cta_legacy = {cta_legacy}')
 print(f'cta_new = {cta_new}')
+
+
+pm.match_tune_and_chromaticity(mad,
+        q1=62.30,
+        q2=60.25,
+        dq1=12.,
+        dq2=14.,
+        tune_knob1_name='kqtf.b1',
+        tune_knob2_name='kqtd.b1',
+        chromaticity_knob1_name='ksf.b1',
+        chromaticity_knob2_name='ksd.b1',
+        sequence_name='lhcb1', skip_use=False)
+
+mad.twiss()

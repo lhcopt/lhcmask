@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb',
+    'mode'                      : 'b1_with_bb_legacy_macros',
 
     # Force separation in IP2 and IP8 if needed
     'force_leveling'            : None,
@@ -148,6 +148,8 @@ knob_names = {
         # Knobs associated to sequences
         'qknob_1': {'lhcb1': 'kqtf.b1',  'lhcb2':'kqtf.b2'},
         'qknob_2': {'lhcb1': 'kqtd.b1',  'lhcb2':'kqtd.b2'},
+        'chromknob_1': {'lhcb1': 'ksf.b1',  'lhcb2':'ksf.b2'},
+        'chromknob_2': {'lhcb1': 'ksd.b1',  'lhcb2':'ksd.b2'},
         'cmrknob': {'lhcb1': 'cmrskew',  'lhcb2':'cmrskew'},
         'cmiknob': {'lhcb1': 'cmiskew',  'lhcb2':'cmiskew'},
         }

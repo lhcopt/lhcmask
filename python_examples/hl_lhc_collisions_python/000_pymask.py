@@ -377,9 +377,29 @@ pm.coupling_correction(mad_track,
         cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
         sequence_name=sequence_to_track, skip_use=True)
 
-
 mad_track.call("modules/submodule_05c_limit.madx")
 mad_track.call("modules/submodule_05d_matching.madx")
+
+if mask_parameters['par_match_with_bb']==1:
+    mad_track.globals['on_bb_charge'] = 1
+
+# Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
+mad_track.call("tools/rematchCOIP.madx")
+# Rematch the CO in the arc for dispersion correction
+if mad.globals.on_disp !=0:
+    mad_track.call("tools/rematchCOarc.madx")
+
+pm.match_tune_and_chromaticity(mad_track,
+        q1=mask_parameters['par_qx0'],
+        q2=mask_parameters['par_qy0'],
+        dq1=mask_parameters['par_chromaticity'],
+        dq2=mask_parameters['par_chromaticity'],
+        tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
+        tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
+        chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
+        chromaticity_knob2_name=knob_names['chromknob_2'][sequence_to_track],
+        sequence_name=sequence_to_track, skip_use=True)
+
 mad_track.call("modules/submodule_05e_corrvalue.madx")
 mad_track.call("modules/submodule_05f_final.madx")
 
