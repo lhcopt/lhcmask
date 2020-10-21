@@ -141,9 +141,9 @@ def coupling_correction(mad, n_iterations,
     for i_iter in range(n_iterations):
         # Tolerances changed as in legacy routine
         if i_iter == 0:
-            exp_tol=6
+            exp_tol = 6
         else:
-            exp_tol=7
+            exp_tol = 7
 
         mad.input(f'''
             match;

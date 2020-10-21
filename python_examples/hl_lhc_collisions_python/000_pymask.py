@@ -133,6 +133,13 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 # Set luminosity in IP2 and IP8 #
 #################################
 
+if len(sequences_to_check) == 2:
+    print('Luminosities before leveling (crab cavities are not considered):')
+    lumi.print_luminosity(mad, twiss_dfs,
+            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+else:
+    print('Warning: Luminosity computation requires two beams')
 
 if enable_bb_legacy or mode=='b4_without_bb':
     mad.use(f'lhcb{beam_to_configure}')
@@ -140,48 +147,39 @@ if enable_bb_legacy or mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
         # Luminosity levelling
-        print('Luminosities before leveling (crab cavities are not considered):')
-        lumi.print_luminosity(mad, twiss_dfs,
-                mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-                mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
-
         mad.call("modules/module_02_lumilevel.madx")
-
-        print('Luminosities after leveling (crab cavities are not considered):')
-        lumi.print_luminosity(mad, twiss_dfs,
-                mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-                mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 else:
     from scipy.optimize import least_squares
-
-    print('Luminosities before leveling (crab cavities are not considered):')
-    lumi.print_luminosity(mad, twiss_dfs,
-            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+    print('Start pythonic leveling:')
 
     # Leveling in IP8
+    sep_plane_ip8 = 'y'
+    xing_plane_ip8 = 'x'
+
     L_target_ip8 = mask_parameters['par_lumi_ip8']
-    def function_to_minimize_ip8(sep8v_m):
+    def function_to_minimize_ip8(sep8_m):
         my_dict_IP8=lumi.get_luminosity_dict(
             mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
-        my_dict_IP8['y_1']=np.abs(sep8v_m)
-        my_dict_IP8['y_2']=-np.abs(sep8v_m)
+        my_dict_IP8[sep_plane_ip8 + '_1']=np.abs(sep8_m)
+        my_dict_IP8[sep_plane_ip8 + '_2']=-np.abs(sep8_m)
         return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
-    sigma_x_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].betx*mad.sequence.lhcb1.beam.ex)
-    optres_ip8=least_squares(function_to_minimize_ip8, sigma_x_b1_ip8)
-    mad.globals['on_sep8'] = np.sign(mad.globals['on_sep8']) * np.abs(optres_ip8['x'][0])*1e3
+    sigma_sep_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1']['bet'+sep_plane_ip8]
+               * mad.sequence.lhcb1.beam['e'+sep_plane_ip8])
+    optres_ip8=least_squares(function_to_minimize_ip8, sigma_sep_b1_ip8)
+    mad.globals['on_sep8'] = (np.sign(mad.globals['on_sep8'])
+                                * np.abs(optres_ip8['x'][0])*1e3)
 
     # Halo collision in IP2
-    sigma_y_b1_ip2=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1'].bety*mad.sequence.lhcb1.beam.ey)
-    mad.globals['on_sep2']=np.sign(mad.globals['on_sep2'])*mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_y_b1_ip2/2*1e3
+    sep_plane_ip2 = 'x'
+    xing_plane_ip2 = 'y'
+    sigma_sep_b1_ip2=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1']['bet'+sep_plane_ip2]
+            * mad.sequence.lhcb1.beam['e'+sep_plane_ip2])
+    mad.globals['on_sep2'] = (np.sign(mad.globals['on_sep2'])
+            * mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_sep_b1_ip2/2*1e3)
 
     # Re-save knobs
     mad.input('exec, crossing_save')
 
-    print('Luminosities after leveling (crab cavities are not considered):')
-    lumi.print_luminosity(mad, twiss_dfs,
-            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
 if force_leveling is not None:
     for kk in force_leveling.keys():
@@ -196,6 +194,13 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
+if len(sequences_to_check) == 2:
+    print('Luminosities after leveling (crab cavities are not considered):')
+    lumi.print_luminosity(mad, twiss_dfs,
+            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
+            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+else:
+    print('Luminosity computation requires two beams')
 
 
 #####################
