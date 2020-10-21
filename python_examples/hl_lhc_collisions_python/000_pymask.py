@@ -363,7 +363,6 @@ else:
 
 mad_track.call("modules/submodule_05a_MO.madx")
 
-
 # Correct linear coupling
 qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
 qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
@@ -378,7 +377,6 @@ pm.coupling_correction(mad_track,
         sequence_name=sequence_to_track, skip_use=True)
 
 mad_track.call("modules/submodule_05c_limit.madx")
-mad_track.call("modules/submodule_05d_matching.madx")
 
 if mask_parameters['par_match_with_bb']==1:
     mad_track.globals['on_bb_charge'] = 1
@@ -386,7 +384,7 @@ if mask_parameters['par_match_with_bb']==1:
 # Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
 mad_track.call("tools/rematchCOIP.madx")
 # Rematch the CO in the arc for dispersion correction
-if mad.globals.on_disp !=0:
+if mad_track.globals.on_disp != 0:
     mad_track.call("tools/rematchCOarc.madx")
 
 pm.match_tune_and_chromaticity(mad_track,
