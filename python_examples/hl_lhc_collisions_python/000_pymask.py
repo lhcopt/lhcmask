@@ -22,6 +22,7 @@ check_betas_at_ips = python_parameters['check_betas_at_ips']
 check_separations_at_ips = python_parameters['check_separations_at_ips']
 save_intermediate_twiss = python_parameters['save_intermediate_twiss']
 force_leveling= python_parameters['force_leveling']
+enable_lumi_control = python_parameters['enable_lumi_control']
 
 # Make links
 for kk in links.keys():
@@ -141,7 +142,10 @@ if len(sequences_to_check) == 2:
 else:
     print('Warning: Luminosity computation requires two beams')
 
-if enable_bb_legacy or mode=='b4_without_bb':
+
+if not enable_lumi_control:
+    print('Separations in IP2 and IP8 are left untouched')
+elif enable_bb_legacy or mode=='b4_without_bb':
     mad.use(f'lhcb{beam_to_configure}')
     if mode=='b4_without_bb':
         print('Leveling not working in this mode!')
@@ -153,8 +157,8 @@ else:
     print('Start pythonic leveling:')
 
     # Leveling in IP8
-    sep_plane_ip8 = 'y'
-    xing_plane_ip8 = 'x'
+    sep_plane_ip8 = python_parameters['sep_plane_ip8']
+    sep_knobname_ip8 = knob_names['sepknob_ip8_mm']
 
     L_target_ip8 = mask_parameters['par_lumi_ip8']
     def function_to_minimize_ip8(sep8_m):
@@ -166,15 +170,16 @@ else:
     sigma_sep_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1']['bet'+sep_plane_ip8]
                * mad.sequence.lhcb1.beam['e'+sep_plane_ip8])
     optres_ip8=least_squares(function_to_minimize_ip8, sigma_sep_b1_ip8)
-    mad.globals['on_sep8'] = (np.sign(mad.globals['on_sep8'])
+    mad.globals[sep_knobname_ip8] = (np.sign(mad.globals[sep_knobname_ip8])
                                 * np.abs(optres_ip8['x'][0])*1e3)
 
     # Halo collision in IP2
-    sep_plane_ip2 = 'x'
-    xing_plane_ip2 = 'y'
-    sigma_sep_b1_ip2=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1']['bet'+sep_plane_ip2]
+    sep_plane_ip2 = python_parameters['sep_plane_ip2']
+    sep_knobname_ip2 = knob_names['sepknob_ip2_mm']
+    sigma_sep_b1_ip2=np.sqrt(
+            twiss_dfs['lhcb1'].loc['ip2:1']['bet'+sep_plane_ip2]
             * mad.sequence.lhcb1.beam['e'+sep_plane_ip2])
-    mad.globals['on_sep2'] = (np.sign(mad.globals['on_sep2'])
+    mad.globals[sep_knobname_ip2] = (np.sign(mad.globals[sep_knobname_ip2])
             * mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_sep_b1_ip2/2*1e3)
 
     # Re-save knobs

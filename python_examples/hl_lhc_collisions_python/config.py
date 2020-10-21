@@ -44,6 +44,12 @@ python_parameters = {
     'check_separations_at_ips' : True,
     'save_intermediate_twiss'  : True,
 
+    # Luminosity control in IP2 and IP8
+    'enable_lumi_control'      : True,
+    'sep_plane_ip2'            : 'x', # used by python tools - NOT by legacy macros
+    'sep_plane_ip8'            : 'y', # used by python tools - NOT by legacy macros
+
+
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20],
     'bunch_spacing_buckets'    : 10,
@@ -135,6 +141,11 @@ mask_parameters = {
 }
 
 knob_names = {
+        # Common knobs
+        'sepknob_ip2_mm': 'on_sep2',
+        'sepknob_ip8_mm': 'on_sep8',
+
+        # Knobs associated to sequences
         'qknob_1': {'lhcb1': 'kqtf.b1',  'lhcb2':'kqtf.b2'},
         'qknob_2': {'lhcb1': 'kqtd.b1',  'lhcb2':'kqtd.b2'},
         'cmrknob': {'lhcb1': 'cmrskew',  'lhcb2':'cmrskew'},
