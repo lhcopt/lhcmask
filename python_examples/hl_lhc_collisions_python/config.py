@@ -61,6 +61,9 @@ python_parameters = {
     # Enable multipolar errors
     'enable_multipolar_errors' : True,
 
+    # Enable crab cavities
+    'enable_crabs'             : True,
+
     # N. iterations coupling correction
     'N_iter_coupling'            : 2,
     }
@@ -78,7 +81,8 @@ mask_parameters = {
 
     # Settings
     'par_oct_current'          : -235,         # [A]
-    'par_chromaticity'         : 5,            # [-] (Q':5 for colliding bunches, Q':15 for non-colliding bunches)
+    'par_chromaticity_x'       : 5,            # [-] 
+    'par_chromaticity_y'       : 5,            # [-] 
     'par_vrf_total'            : 16.,          # [MV]
 
     # Tunes

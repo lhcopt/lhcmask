@@ -23,6 +23,8 @@ check_separations_at_ips = python_parameters['check_separations_at_ips']
 save_intermediate_twiss = python_parameters['save_intermediate_twiss']
 force_leveling= python_parameters['force_leveling']
 enable_lumi_control = python_parameters['enable_lumi_control']
+enable_crabs= python_parameters['enable_crabs']
+
 
 # Make links
 for kk in links.keys():
@@ -60,6 +62,9 @@ if force_disable_check_separations_at_ips:
 if not(enable_bb_legacy) and not(enable_bb_python):
     mask_parameters['par_on_bb_switch'] = 0.
 
+if not(enable_crabs):
+    knob_parameters['par_crab1'] = 0.
+    knob_parameters['par_crab5'] = 0.
 
 ########################
 # Build MAD-X instance #
@@ -230,7 +235,7 @@ if enable_bb_python:
         numberOfHOSlices=python_parameters['numberOfHOSlices'],
         bunch_population_ppb=python_parameters['bunch_population_ppb'],
         sigmaz_m=python_parameters['sigmaz_m'],
-        z_crab_twiss=python_parameters['z_crab_twiss'],
+        z_crab_twiss=python_parameters['z_crab_twiss']*float(enable_crabs),
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
@@ -315,10 +320,11 @@ if enable_bb_legacy:
 #########################
 # Install crab cavities #
 #########################
-mad_track.call("optics_toolkit/enable_crabcavities.madx")
-# They are left off, they will be swiched on at the end:
-mad_track.globals.on_crab1 = 0
-mad_track.globals.on_crab5 = 0
+if enable_crabs:
+    mad_track.call("optics_toolkit/enable_crabcavities.madx")
+    # They are left off, they will be swiched on at the end:
+    mad_track.globals.on_crab1 = 0
+    mad_track.globals.on_crab5 = 0
 
 ##############################################
 # Save references for tuning and corrections #
@@ -376,6 +382,7 @@ pm.coupling_correction(mad_track,
         cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
         sequence_name=sequence_to_track, skip_use=True)
 
+# Check strength limits
 mad_track.call("modules/submodule_05c_limit.madx")
 
 if mask_parameters['par_match_with_bb']==1:
@@ -383,27 +390,38 @@ if mask_parameters['par_match_with_bb']==1:
 
 # Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
 mad_track.call("tools/rematchCOIP.madx")
+
 # Rematch the CO in the arc for dispersion correction
 if mad_track.globals.on_disp != 0:
     mad_track.call("tools/rematchCOarc.madx")
 
+# Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,
         q1=mask_parameters['par_qx0'],
         q2=mask_parameters['par_qy0'],
-        dq1=mask_parameters['par_chromaticity'],
-        dq2=mask_parameters['par_chromaticity'],
+        dq1=mask_parameters['par_chromaticity_x'],
+        dq2=mask_parameters['par_chromaticity_y'],
         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
         chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
         chromaticity_knob2_name=knob_names['chromknob_2'][sequence_to_track],
         sequence_name=sequence_to_track, skip_use=True)
 
+# Check strength limits
 mad_track.call("modules/submodule_05e_corrvalue.madx")
-mad_track.call("modules/submodule_05f_final.madx")
+
+# Switch on bb lenses
+mad_track.globals.on_bb_charge = 1.
+
+# Switch on RF cavities
+mad_track.globals['lagrf400.b1'] = 0.5
+mad_track.globals['lagrf400.b2'] = 0.
+mad_track.globals['vrf400'] = mask_parameters['par_vrf_total']
 
 # Switch on crab cavities
-mad_track.globals.on_crab1 = mad_track.globals.par_crab1
-mad_track.globals.on_crab5 = mad_track.globals.par_crab5
+if enable_crabs:
+    mad_track.globals.on_crab1 = mad_track.globals.par_crab1
+    mad_track.globals.on_crab5 = mad_track.globals.par_crab5
 
 
 #####################
