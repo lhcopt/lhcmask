@@ -36,7 +36,7 @@ python_parameters = {
     'tol_co_flatness'          : 1e-6,
 
 
-    # Choose optics file
+    # Optics file
     'optics_file'              : '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
 
     # Enable checks
@@ -52,7 +52,11 @@ python_parameters = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
 
+    # Enable multipolar errors
     'enable_multipolar_errors' : True,
+
+    # N. iterations coupling correction
+    'N_iter_coupling'            : 2,
     }
 
 
@@ -130,6 +134,12 @@ mask_parameters = {
 
 }
 
+knob_names = {
+        'qknob_1': {'lhcb1': 'kqtf.b1',  'lhcb2':'kqtf.b2'},
+        'qknob_2': {'lhcb1': 'kqtd.b1',  'lhcb2':'kqtd.b2'},
+        'cmrknob': {'lhcb1': 'cmrskew',  'lhcb2':'cmrskew'},
+        'cmiknob': {'lhcb1': 'cmiskew',  'lhcb2':'cmiskew'},
+        }
 
 knob_parameters = {
     #IP specific orbit settings

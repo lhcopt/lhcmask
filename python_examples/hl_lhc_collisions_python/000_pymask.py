@@ -4,7 +4,8 @@ import pickle
 
 import numpy as np
 
-from config import python_parameters, mask_parameters, knob_parameters
+from config import python_parameters, mask_parameters
+from config import knob_parameters, knob_names
 
 
 #####################################################
@@ -356,13 +357,14 @@ mad_track.call("modules/submodule_05a_MO.madx")
 # Correct linear coupling
 qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
 qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
-beam_name = sequence_to_track[-2:]
-pm.coupling_correction(mad_track, n_iterations=2,
+pm.coupling_correction(mad_track,
+        n_iterations=python_parameters['N_iter_coupling'],
         qx_integer=qx_integer, qy_integer=qy_integer,
         qx_fractional=qx_fractional, qy_fractional=qy_fractional,
-        tune_knob1_name='kqtf.'+beam_name,
-        tune_knob2_name='kqtd.'+beam_name,
-        cmr_knob_name = 'cmrskew', cmi_knob_name = 'cmiskew',
+        tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
+        tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
+        cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
+        cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
         sequence_name=sequence_to_track, skip_use=True)
 
 
