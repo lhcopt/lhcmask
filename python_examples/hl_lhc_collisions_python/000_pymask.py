@@ -352,58 +352,10 @@ else:
 
 mad_track.call("modules/submodule_05a_MO.madx")
 
-# cmrskew_0 = mad_track.globals.cmrskew
-# cmiskew_0 = mad_track.globals.cmiskew
-# 
-# # Test old approach
-# mad_track.call('modules/submodule_05b_coupling.madx')
-# cmrskew_legacy = mad_track.globals.cmrskew
-# cmiskew_legacy = mad_track.globals.cmiskew
-# cta_legacy = pm.coupling_measurement(mad_track,
-#         qx_integer=62., qy_integer=60.,
-#         qx_fractional=.31, qy_fractional=.32,
-#         tune_knob1_name='kqtf.b1', tune_knob2_name='kqtd.b1',
-#         sequence_name='lhcb1', skip_use=True)
-# 
-# 
-# 
-# # Test new approach
-# mad_track.globals.cmrskew = cmrskew_0
-# mad_track.globals.cmiskew = cmiskew_0
-# 
-# pm.coupling_correction(mad_track, n_iterations=2,
-#         qx_integer=62., qy_integer=60.,
-#         qx_fractional=.31, qy_fractional=.32,
-#         tune_knob1_name='kqtf.b1', tune_knob2_name='kqtd.b1',
-#         cmr_knob_name = 'cmrskew', cmi_knob_name = 'cmiskew',
-#         sequence_name='lhcb1', skip_use=True)
-# cmrskew_new = mad_track.globals.cmrskew
-# cmiskew_new = mad_track.globals.cmiskew
-# cta_new = pm.coupling_measurement(mad_track,
-#         qx_integer=62., qy_integer=60.,
-#         qx_fractional=.31, qy_fractional=.32,
-#         tune_knob1_name='kqtf.b1', tune_knob2_name='kqtd.b1',
-#         sequence_name='lhcb1', skip_use=True)
-# 
-# print(f'cmrskew_legacy = {cmrskew_legacy}')
-# print(f'cmrskew_new = {cmrskew_new}')
-# print(f'cmiskew_legacy = {cmiskew_legacy}')
-# print(f'cmiskew_new = {cmiskew_new}')
-# print(f'cta_legacy = {cta_legacy}')
-# print(f'cta_new = {cta_new}')
-# 
-# prrrrrr
-
-
 
 # Correct linear coupling
 qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
 qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
-
-#mad_track.call("modules/submodule_05b_coupling.madx")
-# DEBUG
-#qx_fractional = .31
-#qy_fractional = .32
 beam_name = sequence_to_track[-2:]
 pm.coupling_correction(mad_track, n_iterations=2,
         qx_integer=qx_integer, qy_integer=qy_integer,
