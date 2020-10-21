@@ -1,4 +1,4 @@
-__version__ = "2020.1"
+__version__ = "v0.2"
 
 from .beambeam import *
 from .madpoint import *
