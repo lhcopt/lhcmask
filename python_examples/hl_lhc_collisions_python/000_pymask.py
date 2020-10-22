@@ -334,9 +334,10 @@ if python_parameters['enable_multipolar_errors']:
 else:
     # Synthesize knobs
     mad_track.call('modules/submodule_04a_s1_prepare_nom_twiss_table.madx')
-    mad_track.input('exec, crossing_disable;')
-    mad_track.call('modules/submodule_04e_s1_synthesize_knobs.madx')
-    mad_track.input('exec, crossing_restore;')
+    if python_parameters['enable_knob_synthesis']:
+        mad_track.input('exec, crossing_disable;')
+        mad_track.call('modules/submodule_04e_s1_synthesize_knobs.madx')
+        mad_track.input('exec, crossing_restore;')
 
 ###############################
 # Machine tuning (enables bb) #

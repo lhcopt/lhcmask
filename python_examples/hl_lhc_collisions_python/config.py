@@ -61,6 +61,9 @@ python_parameters = {
     # Enable multipolar errors
     'enable_multipolar_errors' : True,
 
+    # Enable knob synthesis (for coupling correction, if no errors)
+    'enable_knob_synthesis'    : True,
+
     # Enable crab cavities
     'enable_crabs'             : True,
 
