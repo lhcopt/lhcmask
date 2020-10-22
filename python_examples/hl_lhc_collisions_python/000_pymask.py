@@ -38,7 +38,6 @@ os.system('bash customization.bash')
 # Import pymask
 sys.path.append('./modules')
 import pymask as pm
-import pymask.luminosity as lumi
 
 # Import user-defined optics-specific tools
 import optics_specific_tools as ost
@@ -159,7 +158,8 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         mad.call("modules/module_02_lumilevel.madx")
 else:
     print('Start pythonic leveling:')
-    ost.lumi_control(mad, python_parameters, mask_parameters, knob_names)
+    ost.lumi_control(mad, twiss_dfs, python_parameters,
+            mask_parameters, knob_names)
 
 # Re-save knobs
 mad.input('exec, crossing_save')

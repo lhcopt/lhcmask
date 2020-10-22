@@ -113,7 +113,7 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
 
     return twiss_dfs, other_data
 
-def lumi_control(mad, python_parameters, mask_parameters, knob_names):
+def lumi_control(mad, twiss_dfs, python_parameters, mask_parameters, knob_names):
     from scipy.optimize import least_squares
 
     # Leveling in IP8
@@ -126,7 +126,7 @@ def lumi_control(mad, python_parameters, mask_parameters, knob_names):
             mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
         my_dict_IP8[sep_plane_ip8 + '_1']=np.abs(sep8_m)
         my_dict_IP8[sep_plane_ip8 + '_2']=-np.abs(sep8_m)
-        return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
+        return np.abs(pm.luminosity(**my_dict_IP8) - L_target_ip8)
     sigma_sep_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1']['bet'+sep_plane_ip8]
                * mad.sequence.lhcb1.beam['e'+sep_plane_ip8])
     optres_ip8=least_squares(function_to_minimize_ip8, sigma_sep_b1_ip8)
