@@ -122,7 +122,7 @@ def lumi_control(mad, twiss_dfs, python_parameters, mask_parameters, knob_names)
 
     L_target_ip8 = mask_parameters['par_lumi_ip8']
     def function_to_minimize_ip8(sep8_m):
-        my_dict_IP8=lumi.get_luminosity_dict(
+        my_dict_IP8=pm.get_luminosity_dict(
             mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
         my_dict_IP8[sep_plane_ip8 + '_1']=np.abs(sep8_m)
         my_dict_IP8[sep_plane_ip8 + '_2']=-np.abs(sep8_m)

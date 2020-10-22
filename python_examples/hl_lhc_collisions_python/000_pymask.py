@@ -140,7 +140,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 
 if len(sequences_to_check) == 2:
     print('Luminosities before leveling (crab cavities are not considered):')
-    lumi.print_luminosity(mad, twiss_dfs,
+    pm.print_luminosity(mad, twiss_dfs,
             mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
             mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 else:
@@ -181,7 +181,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 
 if len(sequences_to_check) == 2:
     print('Luminosities after leveling (crab cavities are not considered):')
-    lumi.print_luminosity(mad, twiss_dfs,
+    pm.print_luminosity(mad, twiss_dfs,
             mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
             mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 else:
