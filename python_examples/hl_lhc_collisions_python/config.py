@@ -158,36 +158,36 @@ knob_names = {
         'cmiknob': {'lhcb1': 'cmiskew',  'lhcb2':'cmiskew'},
         }
 
-knob_parameters = {
+knob_settings = {
     #IP specific orbit settings
 
-    'par_x1'                   : 250,        # [urad]  # Could be optics-dependent
-    'par_sep1'                 : 0,            # [mm]  # Could be optics-dependent
-    'par_x2'                   : -170,         # [urad]  # Could be optics-dependent
-    'par_sep2'                 : 0.138,        # [mm]  # Could be optics-dependent
-    'par_x5'                   : 250,       # [urad]  # Could be optics-dependent
-    'par_sep5'                 : 0,            # [mm]  # Could be optics-dependent
-    'par_x8'                   : -250,         # [urad]  # Could be optics-dependent
-    'par_sep8'                 : -0.043,       # [mm]  # Could be optics-dependent
-    'par_a1'                   : 0,            # [urad]  # Could be optics-dependent
-    'par_o1'                   : 0,            # [mm]  # Could be optics-dependent
-    'par_a2'                   : 0,            # [urad]  # Could be optics-dependent
-    'par_o2'                   : 0,            # [mm]  # Could be optics-dependent
-    'par_a5'                   : 0,            # [urad]  # Could be optics-dependent
-    'par_o5'                   : 0,            # [mm]  # Could be optics-dependent
-    'par_a8'                   : 0,            # [urad]  # Could be optics-dependent
-    'par_o8'                   : 0,            # [mm]  # Could be optics-dependent
-    'par_crab1'                : -190,         # [urad]  # Could be optics-dependent
-    'par_crab5'                : -190,    # [urad]  # Could be optics-dependent
+    'on_x1'                   : 250,          # [urad]  
+    'on_sep1'                 : 0,            # [mm]   
+    'on_x2'                   : -170,         # [urad] 
+    'on_sep2'                 : 0.138,        # [mm]   
+    'on_x5'                   : 250,          # [urad] 
+    'on_sep5'                 : 0,            # [mm]   
+    'on_x8'                   : -250,         # [urad] 
+    'on_sep8'                 : -0.043,       # [mm]   
+    'on_a1'                   : 0,            # [urad] 
+    'on_o1'                   : 0,            # [mm]   
+    'on_a2'                   : 0,            # [urad] 
+    'on_o2'                   : 0,            # [mm]   
+    'on_a5'                   : 0,            # [urad] 
+    'on_o5'                   : 0,            # [mm]   
+    'on_a8'                   : 0,            # [urad] 
+    'on_o8'                   : 0,            # [mm]   
+    'on_crab1'                : -190,         # [urad] 
+    'on_crab5'                : -190,         # [urad]  
 
     # Dispersion correction knob
-    'par_on_disp'              : 1,            # Could be optics-dependent
+    'on_disp'                 : 1,            # Could be optics-dependent
 
     # Magnets of the experiments
-    'par_on_alice'             : 1,
-    'par_on_lhcb'              : 1,
+    'on_alice_normalized'     : 1,
+    'on_lhcb_normalized'      : 1,
 
-    'par_on_sol_atlas'         : 0,
-    'par_on_sol_cms'           : 0,
-    'par_on_sol_alice'         : 0,
+    'on_sol_atlas'            : 0,
+    'on_sol_cms'              : 0,
+    'on_sol_alice'            : 0,
 }

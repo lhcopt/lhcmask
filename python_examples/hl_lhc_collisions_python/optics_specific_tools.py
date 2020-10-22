@@ -67,48 +67,18 @@ def check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     pm.check_twiss_against_madvars(twiss_value_checks, twiss_df, variable_dicts)
 
 
-def set_optics_specific_knobs(mad, knob_parameters, mode=None):
+def set_optics_specific_knobs(mad, knob_settings, mode=None):
 
-    kp = knob_parameters
-
-    mad.set_variables_from_dict(params=kp)
-
-    # Set IP knobs
-    mad.globals['on_x1'] = kp['par_x1']
-    mad.globals['on_sep1'] = kp['par_sep1']
-    mad.globals['on_x2'] = kp['par_x2']
-    mad.globals['on_sep2'] = kp['par_sep2']
-    mad.globals['on_x5'] = kp['par_x5']
-    mad.globals['on_sep5'] = kp['par_sep5']
-    mad.globals['on_x8'] = kp['par_x8']
-    mad.globals['on_sep8'] = kp['par_sep8']
-    mad.globals['on_a1'] = kp['par_a1']
-    mad.globals['on_o1'] = kp['par_o1']
-    mad.globals['on_a2'] = kp['par_a2']
-    mad.globals['on_o2'] = kp['par_o2']
-    mad.globals['on_a5'] = kp['par_a5']
-    mad.globals['on_o5'] = kp['par_o5']
-    mad.globals['on_a8'] = kp['par_a8']
-    mad.globals['on_o8'] = kp['par_o8']
-    mad.globals['on_crab1'] = kp['par_crab1']
-    mad.globals['on_crab5'] = kp['par_crab5']
-    mad.globals['on_disp'] = kp['par_on_disp']
+    # Copy knob settings to mad variable space
+    mad.set_variables_from_dict(params=knob_settings)
 
     # A check
     if mad.globals.nrj < 500:
-        assert kp['par_on_disp'] == 0
+        assert knob_settings['on_disp'] == 0
 
-    # Spectrometers at experiments
-    if kp['par_on_alice'] == 1:
-        mad.globals.on_alice = 7000./mad.globals.nrj
-    if kp['par_on_lhcb'] == 1:
-        mad.globals.on_lhcb = 7000./mad.globals.nrj
-
-    # Solenoids at experiments
-    mad.globals.on_sol_atlas = kp['par_on_sol_atlas']
-    mad.globals.on_sol_cms = kp['par_on_sol_cms']
-    mad.globals.on_sol_alice = kp['par_on_sol_alice']
-
+    # A knob redefinition
+    mad.input('on_alice := on_alice_normalized * 7000./nrj;')
+    mad.input('on_lhcb := on_lhcb_normalized * 7000./nrj;')
 
 def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
         variables_dict, tol):

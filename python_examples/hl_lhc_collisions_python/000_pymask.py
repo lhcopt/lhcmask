@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 
 from config import python_parameters, mask_parameters
-from config import knob_parameters, knob_names
+from config import knob_settings, knob_names
 
 
 #####################################################
@@ -63,8 +63,8 @@ if not(enable_bb_legacy) and not(enable_bb_python):
     mask_parameters['par_on_bb_switch'] = 0.
 
 if not(enable_crabs):
-    knob_parameters['par_crab1'] = 0.
-    knob_parameters['par_crab5'] = 0.
+    knob_settings['par_crab1'] = 0.
+    knob_settings['par_crab5'] = 0.
 
 ########################
 # Build MAD-X instance #
@@ -101,7 +101,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 mad.call("modules/submodule_01c_phase.madx")
 
 # Set optics-specific knobs
-ost.set_optics_specific_knobs(mad, knob_parameters, mode)
+ost.set_optics_specific_knobs(mad, knob_settings, mode)
 
 # Crossing-save and some reference measurements
 mad.input('exec, crossing_save')
@@ -420,8 +420,8 @@ mad_track.globals['vrf400'] = mask_parameters['par_vrf_total']
 
 # Switch on crab cavities
 if enable_crabs:
-    mad_track.globals.on_crab1 = mad_track.globals.par_crab1
-    mad_track.globals.on_crab5 = mad_track.globals.par_crab5
+    mad_track.globals.on_crab1 = knob_settings['on_crab1']
+    mad_track.globals.on_crab5 = knob_settings['on_crab5']
 
 
 #####################
