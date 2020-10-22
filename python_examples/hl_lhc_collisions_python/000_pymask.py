@@ -158,37 +158,11 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         # Luminosity levelling
         mad.call("modules/module_02_lumilevel.madx")
 else:
-    from scipy.optimize import least_squares
     print('Start pythonic leveling:')
+    ost.lumi_control(mad, python_parameters, mask_parameters, knob_names)
 
-    # Leveling in IP8
-    sep_plane_ip8 = python_parameters['sep_plane_ip8']
-    sep_knobname_ip8 = knob_names['sepknob_ip8_mm']
-
-    L_target_ip8 = mask_parameters['par_lumi_ip8']
-    def function_to_minimize_ip8(sep8_m):
-        my_dict_IP8=lumi.get_luminosity_dict(
-            mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
-        my_dict_IP8[sep_plane_ip8 + '_1']=np.abs(sep8_m)
-        my_dict_IP8[sep_plane_ip8 + '_2']=-np.abs(sep8_m)
-        return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
-    sigma_sep_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1']['bet'+sep_plane_ip8]
-               * mad.sequence.lhcb1.beam['e'+sep_plane_ip8])
-    optres_ip8=least_squares(function_to_minimize_ip8, sigma_sep_b1_ip8)
-    mad.globals[sep_knobname_ip8] = (np.sign(mad.globals[sep_knobname_ip8])
-                                * np.abs(optres_ip8['x'][0])*1e3)
-
-    # Halo collision in IP2
-    sep_plane_ip2 = python_parameters['sep_plane_ip2']
-    sep_knobname_ip2 = knob_names['sepknob_ip2_mm']
-    sigma_sep_b1_ip2=np.sqrt(
-            twiss_dfs['lhcb1'].loc['ip2:1']['bet'+sep_plane_ip2]
-            * mad.sequence.lhcb1.beam['e'+sep_plane_ip2])
-    mad.globals[sep_knobname_ip2] = (np.sign(mad.globals[sep_knobname_ip2])
-            * mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_sep_b1_ip2/2*1e3)
-
-    # Re-save knobs
-    mad.input('exec, crossing_save')
+# Re-save knobs
+mad.input('exec, crossing_save')
 
 
 if force_leveling is not None:
@@ -202,7 +176,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_after_leveling',
         save_twiss_files=save_intermediate_twiss,
-        check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
+        check_betas_at_ips=check_betas_at_ips,
+        check_separations_at_ips=check_separations_at_ips)
 
 if len(sequences_to_check) == 2:
     print('Luminosities after leveling (crab cavities are not considered):')
