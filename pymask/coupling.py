@@ -61,6 +61,7 @@ def coupling_correction(mad, n_iterations,
         cmr_knob_name, cmi_knob_name,
         sequence_name, skip_use):
 
+    info_dict = {}
     print('\n Start coupling correction...')
 
     if not skip_use:
@@ -94,11 +95,13 @@ def coupling_correction(mad, n_iterations,
     qx_tw= mad.table.summ.q1
     qy_tw= mad.table.summ.q2
     cta0 = float(np.abs(2*(qx_tw-qy_tw)-np.round(2*(qx_tw-qy_tw)))/2)
-
+    info_dict['closest_tune_appr_before_correction'] = cta0
 
     # Quick minimization based on linear machine
     cmrskew0 = mad.globals[cmr_knob_name]
     cmiskew0 = mad.globals[cmi_knob_name]
+    info_dict['cmrknob_before_correction'] = cmrskew0
+    info_dict['cmiknob_before_correction'] = cmiskew0
 
     # Optimization wrt to cmr
     mad.globals[cmr_knob_name] = cmrskew0 + cta0/2.;
@@ -162,8 +165,18 @@ def coupling_correction(mad, n_iterations,
         ''')
 
 
+    cta_after = coupling_measurement(mad, qx_integer, qy_integer,
+        qx_fractional, qy_fractional,
+        tune_knob1_name, tune_knob2_name,
+        sequence_name, skip_use)
+    info_dict['closest_tune_appr_after_correction'] = cta_after
+    info_dict['cmrknob_after_correction'] = mad.globals[cmr_knob_name]
+    info_dict['cmiknob_after_correction'] = mad.globals[cmi_knob_name]
+
     # Restore intial values of tune knobs
     for kk in [tune_knob1_name, tune_knob2_name]:
         mad.globals[kk] = init_value[kk]
 
-    print('\n Done coupling correction...')
+    print('\n Done coupling correction.')
+
+    return info_dict

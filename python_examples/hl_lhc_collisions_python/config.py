@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb',
+    'mode'                      : 'b1_with_bb_legacy_macros',
 
     # Force separation in IP2 and IP8 if needed
     'force_leveling'            : None,
@@ -69,6 +69,10 @@ python_parameters = {
 
     # N. iterations coupling correction
     'N_iter_coupling'            : 2,
+
+    # Value to be added to linear coupling knobs (on sequence_to_track)
+    'delta_cmr'                 : 0.,
+    'delta_cmi'                 : 0.,
     }
 
 

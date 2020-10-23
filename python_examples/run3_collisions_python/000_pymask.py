@@ -347,7 +347,7 @@ mad_track.call("modules/submodule_05a_MO.madx")
 # Correct linear coupling
 qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
 qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
-pm.coupling_correction(mad_track,
+coupl_corr_info = pm.coupling_correction(mad_track,
         n_iterations=python_parameters['N_iter_coupling'],
         qx_integer=qx_integer, qy_integer=qy_integer,
         qx_fractional=qx_fractional, qy_fractional=qy_fractional,
@@ -356,6 +356,10 @@ pm.coupling_correction(mad_track,
         cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
         cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
         sequence_name=sequence_to_track, skip_use=True)
+
+# Add custom values to coupling knobs
+mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += python_parameters['delta_cmr']
+mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += python_parameters['delta_cmi']
 
 # Check strength limits
 mad_track.call("modules/submodule_05c_limit.madx")

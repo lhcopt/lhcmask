@@ -65,6 +65,10 @@ python_parameters = {
 
     # N. iterations coupling correction
     'N_iter_coupling'            : 2,
+
+    # Value to be added to linear coupling knobs (on sequence_to_track)
+    'delta_cmr'                 : 1e-3,
+    'delta_cmi'                 : 0.,
     }
 
 
