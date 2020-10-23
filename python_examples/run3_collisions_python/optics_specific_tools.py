@@ -7,8 +7,8 @@ import pymask as pm
 
 def build_sequence(mad, beam):
 
-    slicefactor = 2 # For testing
-    # slicefactor = 8 # For production
+    #slicefactor = 2 # For testing
+    slicefactor = 8 # For production
 
     pm.make_links(force=True, links_dict={
         'optics_runII': '/afs/cern.ch/eng/lhc/optics/runII',
@@ -49,7 +49,7 @@ def build_sequence(mad, beam):
         for my_sequence in ['lhcb1','lhcb2']:
             if my_sequence in list(mad.sequence):
                 mad.input(f'use, sequence={my_sequence}; makethin,'
-                     'sequence={my_sequence}, style=teapot, makedipedge=true;')
+                     f'sequence={my_sequence}, style=teapot, makedipedge=true;')
     else:
         warnings.warn('The sequences are not thin!')
 
@@ -119,9 +119,6 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
     other_data['summ_dfs'] = summ_dfs
 
     return twiss_dfs, other_data
-
-
-ARRIVATI QUA
 
 def lumi_control(mad, twiss_dfs, python_parameters, mask_parameters, knob_names):
     from scipy.optimize import least_squares
@@ -214,7 +211,7 @@ def _check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
     twiss_value_checks=[]
     for iip, ip in enumerate([1,2,5,8]):
         for plane in ['x', 'y']:
-            # (*) Adapet based on knob definitions
+            # (*) Adapt based on knob definitions
             twiss_value_checks.append({
                     'element_name': f'ip{ip}:1',
                     'keyword': f'bet{plane}',
@@ -227,15 +224,32 @@ def _check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
         variables_dict, tol):
 
     separations_to_check = []
-    for iip, ip in enumerate([1,2,5,8]):
+    # IP1
+    separations_to_check.append({
+            'element_name': f'ip1:1',
+            'plane': 'x',
+            'varname': 'on_sep1',
+            'scale_factor': -2*1e-3,
+            'tol': tol[0]})
+    # IP5
+    separations_to_check.append({
+            'element_name': f'ip5:1',
+            'plane': 'y',
+            'varname': 'on_sep5',
+            'scale_factor': -2*1e-3,
+            'tol': tol[2]})
+    # IP2 and IP8
+    for iip, ip in enumerate([2,8]):
         for plane in ['x', 'y']:
-            # (*) Adapet based on knob definitions
+            # (*) Adapt based on knob definitions
             separations_to_check.append({
                     'element_name': f'ip{ip}:1',
-                    'scale_factor': -2*1e-3,
                     'plane': plane,
                     # knobs like on_sep1h, onsep8v etc
                     'varname': f'on_sep{ip}'+{'x':'h', 'y':'v'}[plane],
+                    'scale_factor': -2*1e-3,
                     'tol': tol[iip]})
+
     pm.check_separations_against_madvars(separations_to_check,
             twiss_df_b1, twiss_df_b2, variables_dict)
+

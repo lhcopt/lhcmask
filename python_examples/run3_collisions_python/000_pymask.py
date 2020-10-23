@@ -195,7 +195,6 @@ else:
 mad.globals.on_disp = 0.
 # will be restored later
 
-
 ###################################
 # Compute beam-beam configuration #
 ###################################
@@ -365,7 +364,7 @@ if mask_parameters['par_match_with_bb']==1:
     mad_track.globals['on_bb_charge'] = 1
 
 # Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
-mad_track.call("tools/rematchCOIP.madx")
+mad_track.input('call, file="tools/rematchCOIP.madx";')
 
 # Rematch the CO in the arc for dispersion correction
 if mad_track.globals.on_disp != 0:

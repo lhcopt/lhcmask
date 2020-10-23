@@ -33,7 +33,7 @@ python_parameters = {
     'tol_co_flatness'          : 1e-6,
 
     # Optics file
-    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.29';
+    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.29',
 
     # Enable checks
     'check_betas_at_ips'       : True,
