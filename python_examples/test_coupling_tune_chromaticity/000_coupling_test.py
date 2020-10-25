@@ -35,7 +35,6 @@ os.system('bash customization.bash')
 sys.path.append('./modules')
 import pymask as pm
 import pymask.coupling as pc
-import pymask.luminosity as lumi
 
 # Import user-defined optics-specific tools
 import optics_specific_tools as ost
