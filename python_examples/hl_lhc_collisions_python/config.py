@@ -80,7 +80,8 @@ mask_parameters = {
     'par_verbose'              : 1,
 
     # Beam parameters
-    'par_beam_norm_emit'       : 2.5,   # [um]
+    'par_beam_norm_emit_x'     : 2.5,          # [um]
+    'par_beam_norm_emit_y'     : 2.5,          # [um]
     'par_beam_sigt'            : 0.076,        # [m]
     'par_beam_sige'            : 1.1e-4,       # [-]
     'par_beam_npart'           : 2.2e11,       # [-]

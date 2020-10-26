@@ -110,8 +110,8 @@ for ss in mad.sequence.keys():
         bv={ss_beam_bv},
         npart={mask_parameters['par_beam_npart']},
         sige={mask_parameters['par_beam_sige']},
-        ex={mask_parameters['par_beam_norm_emit'] * 1e-6 / gamma_rel},
-        ey={mask_parameters['par_beam_norm_emit'] * 1e-6 / gamma_rel},
+        ex={mask_parameters['par_beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={mask_parameters['par_beam_norm_emit_y'] * 1e-6 / gamma_rel},
     ''')
 
 

@@ -54,8 +54,8 @@ python_parameters = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.,
 
-    # Enable multipolar errors
-    'enable_multipolar_errors' : False,
+    # Enable machine imperfections
+    'enable_imperfections'     : False,
 
     # Enable knob synthesis (for coupling correction, if no errors)
     'enable_knob_synthesis'    : False,
@@ -76,7 +76,8 @@ mask_parameters = {
     'par_verbose'              : 1,
 
     # Beam parameters
-    'par_beam_norm_emit'       : 2.5,          # [um]
+    'par_beam_norm_emit_x'     : 2.5,          # [um]
+    'par_beam_norm_emit_y'     : 2.5,          # [um]
     'par_beam_sigt'            : 0.076,        # [m]
     'par_beam_sige'            : 1.1e-4,       # [-]
     'par_beam_npart'           : 1.8e11,       # [-]

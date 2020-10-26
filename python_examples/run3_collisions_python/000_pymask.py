@@ -23,14 +23,18 @@ check_separations_at_ips = python_parameters['check_separations_at_ips']
 save_intermediate_twiss = python_parameters['save_intermediate_twiss']
 force_leveling= python_parameters['force_leveling']
 enable_lumi_control = python_parameters['enable_lumi_control']
-enable_crabs= python_parameters['enable_crabs']
-
+enable_imperfections = python_parameters['enable_imperfections']
+enable_crabs = python_parameters['enable_crabs']
 
 # Make links
 for kk in links.keys():
     if os.path.exists(kk):
         os.remove(kk)
     os.symlink(os.path.abspath(links[kk]), kk)
+
+# Create empty temp folder
+os.system('rm -r temp')
+os.system('mkdir temp')
 
 # Execute customization script if present
 os.system('bash customization.bash')
@@ -71,10 +75,13 @@ if not(enable_crabs):
 
 # Start mad
 Madx = pm.Madxp
-mad = Madx()
+mad = Madx(command_log="mad_collider.log")
 
-# Build sequence
+# Build sequence (alse creates link to optics_toolkit and calls it)
 ost.build_sequence(mad, beam=beam_to_configure)
+
+# Set twiss formats for MAD-X parts (macro from opt. toolkit)
+mad.input('exec, twiss_opt;')
 
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
@@ -82,11 +89,31 @@ ost.apply_optics(mad, optics_file=optics_file)
 # Pass parameters to mad
 mad.set_variables_from_dict(params=mask_parameters)
 
-# Prepare auxiliary mad variables
-mad.call("modules/submodule_01a_preparation.madx")
+# Attach beam to sequences
+mad.globals.nrj = mask_parameters['par_beam_energy_tot']
+gamma_rel = mask_parameters['par_beam_energy_tot']/mad.globals.pmass
+for ss in mad.sequence.keys():
+    # bv and bv_aux flags
+    if ss == 'lhcb1':
+        ss_beam_bv, ss_bv_aux = 1, 1
+    elif ss == 'lhcb2':
+        if int(beam_to_configure) == 4:
+            ss_beam_bv, ss_bv_aux = 1, -1
+        else:
+            ss_beam_bv, ss_bv_aux = -1, 1
 
-# Attach beams to sequences
-mad.call("modules/submodule_01b_beam.madx")
+    mad.globals['bv_aux'] = ss_bv_aux
+    mad.input(f'''
+    beam, particle=proton,sequence={ss},
+        energy={mask_parameters['par_beam_energy_tot']},
+        sigt={mask_parameters['par_beam_sigt']},
+        bv={ss_beam_bv},
+        npart={mask_parameters['par_beam_npart']},
+        sige={mask_parameters['par_beam_sige']},
+        ex={mask_parameters['par_beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={mask_parameters['par_beam_norm_emit_y'] * 1e-6 / gamma_rel},
+    ''')
+
 
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -97,14 +124,14 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         check_separations_at_ips=check_separations_at_ips)
 
 # Set IP1-IP5 phase and store corresponding reference
-mad.call("modules/submodule_01c_phase.madx")
+mad.input("call, file='modules/submodule_01c_phase.madx';")
 
 # Set optics-specific knobs
 ost.set_optics_specific_knobs(mad, knob_settings, mode)
 
 # Crossing-save and some reference measurements
-mad.input('exec, crossing_save')
-mad.call("modules/submodule_01e_final.madx")
+mad.input('exec, crossing_save;')
+mad.input("call, file='modules/submodule_01e_final.madx';")
 
 
 #################################
@@ -112,7 +139,7 @@ mad.call("modules/submodule_01e_final.madx")
 #################################
 
 # Check flat machine
-mad.input('exec, crossing_disable')
+mad.input('exec, crossing_disable;')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_no_crossing',
@@ -126,7 +153,7 @@ for ss in twiss_dfs.keys():
     assert np.max(np.abs(tt.y)) < flat_tol
 
 # Check machine after crossing restore
-mad.input('exec, crossing_restore')
+mad.input('exec, crossing_restore;')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_with_crossing',
@@ -155,23 +182,22 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
         # Luminosity levelling
-        mad.call("modules/module_02_lumilevel.madx")
+        mad.input("call, file='modules/module_02_lumilevel.madx';")
 else:
     print('Start pythonic leveling:')
     ost.lumi_control(mad, twiss_dfs, python_parameters,
             mask_parameters, knob_names)
 
-# Re-save knobs
-mad.input('exec, crossing_save')
-
-
+# Force leveling
 if force_leveling is not None:
     for kk in force_leveling.keys():
         mad.globals[kk] = force_leveling[kk]
-    mad.input('exec, crossing_save')
+
+# Re-save knobs (for the last time!)
+mad.input('exec, crossing_save;')
 
 # Check machine after leveling
-mad.input('exec, crossing_restore')
+mad.input('exec, crossing_restore;')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_after_leveling',
@@ -220,7 +246,7 @@ if enable_bb_python:
 ###################
 
 if generate_b4_from_b2:
-    mad_b4 = Madx()
+    mad_b4 = Madx(command_log="mad_b4.log")
     ost.build_sequence(mad_b4, beam=4)
     ost.apply_optics(mad_b4, optics_file=optics_file)
 
@@ -245,7 +271,7 @@ if generate_b4_from_b2:
 # Select mad instance for tracking configuration #
 ##################################################
 
-# We working exclusively on the sequence to track
+# We will be working exclusively on the sequence to track
 # Select mad object
 if track_from_b4_mad_instance:
     mad_track = mad_b4
@@ -288,14 +314,14 @@ if enable_bb_legacy:
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
     assert(not(enable_bb_python))
-    mad_track.call("modules/module_03_beambeam.madx")
+    mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
 
 #########################
 # Install crab cavities #
 #########################
 if enable_crabs:
-    mad_track.call("optics_toolkit/enable_crabcavities.madx")
+    mad_track.input("call, file='optics_toolkit/enable_crabcavities.madx';")
     # They are left off, they will be swiched on at the end:
     mad_track.globals.on_crab1 = 0
     mad_track.globals.on_crab5 = 0
@@ -303,7 +329,7 @@ if enable_crabs:
 ##############################################
 # Save references for tuning and corrections #
 ##############################################
-mad_track.call('modules/submodule_04_1b_save_references.madx')
+mad_track.input("call, file='modules/submodule_04_1b_save_references.madx';")
 
 
 #####################
@@ -328,21 +354,28 @@ mad_track.use = None
 # Install and correct errors #
 ##############################
 
-if python_parameters['enable_multipolar_errors']:
-    mad_track.call('modules/module_04_errors.madx')
+if enable_imperfections:
+    mad_track.input("call, file='modules/module_04_errors.madx';")
 else:
     # Synthesize knobs
-    mad_track.call('modules/submodule_04a_s1_prepare_nom_twiss_table.madx')
+    mad_track.input('call, file="modules/submodule_04a_s1_prepare_nom_twiss_table.madx";')
     if python_parameters['enable_knob_synthesis']:
         mad_track.input('exec, crossing_disable;')
-        mad_track.call('modules/submodule_04e_s1_synthesize_knobs.madx')
+        mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
         mad_track.input('exec, crossing_restore;')
 
-###############################
-# Machine tuning (enables bb) #
-###############################
+##################
+# Machine tuning #
+##################
 
-mad_track.call("modules/submodule_05a_MO.madx")
+# Enable bb for matchings
+if mask_parameters['par_match_with_bb'] == 1:
+    mad_track.globals['on_bb_charge'] = 1
+else:
+    mad_track.globals['on_bb_charge'] = 0
+
+# Switch on octupoles
+mad_track.input("call, file='modules/submodule_05a_MO.madx';")
 
 # Correct linear coupling
 qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
@@ -362,17 +395,15 @@ mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += python_parameters
 mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += python_parameters['delta_cmi']
 
 # Check strength limits
-mad_track.call("modules/submodule_05c_limit.madx")
+if enable_imperfections:
+    mad_track.input('call, file="errors/HL-LHC/corr_limit.madx";')
 
-if mask_parameters['par_match_with_bb']==1:
-    mad_track.globals['on_bb_charge'] = 1
-
-# Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
-mad_track.input('call, file="tools/rematchCOIP.madx";')
+# Rematch the orbit at IPs
+mad_track.input("call, file='tools/rematchCOIP.madx';")
 
 # Rematch the CO in the arc for dispersion correction
 if mad_track.globals.on_disp != 0:
-    mad_track.call("tools/rematchCOarc.madx")
+    mad_track.input("call, file='tools/rematchCOarc.madx';")
 
 # Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,
@@ -387,28 +418,30 @@ pm.match_tune_and_chromaticity(mad_track,
         sequence_name=sequence_to_track, skip_use=True)
 
 # Check strength limits
-mad_track.call("modules/submodule_05e_corrvalue.madx")
+if enable_imperfections:
+    mad_track.input("call, file='errors/HL-LHC/corr_value_limit.madx';")
 
 # Switch on bb lenses
 mad_track.globals.on_bb_charge = 1.
 
 # Switch on RF cavities
-mad_track.globals['lagrf400.b1'] = 0.5
-mad_track.globals['lagrf400.b2'] = 0.
 mad_track.globals['vrf400'] = mask_parameters['par_vrf_total']
+if sequence_to_track == 'lhcb1':
+    mad_track.globals['lagrf400.b1'] = 0.5
+elif sequence_to_track == 'lhcb2':
+    mad_track.globals['lagrf400.b2'] = 0.
 
 # Switch on crab cavities
 if enable_crabs:
     mad_track.globals.on_crab1 = knob_settings['on_crab1']
     mad_track.globals.on_crab5 = knob_settings['on_crab5']
 
-
 #####################
 # Generate sixtrack #
 #####################
 
 if enable_bb_legacy:
-    mad_track.call("modules/module_06_generate.madx")
+    mad_track.input("call, file='modules/module_06_generate.madx'")
 else:
     pm.generate_sixtrack_input(mad_track,
         seq_name=sequence_to_track,
