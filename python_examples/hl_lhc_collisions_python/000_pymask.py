@@ -89,28 +89,19 @@ ost.apply_optics(mad, optics_file=optics_file)
 # Pass parameters to mad
 mad.set_variables_from_dict(params=mask_parameters)
 
-# Prepare auxiliary mad variables
-#mad.input("call, file='modules/submodule_01a_preparation.madx';")
-
-
-# Attach beams to sequences
-#mad.input("call, file='modules/submodule_01b_beam.madx';")
-
-# Set energy
+# Attach beam to sequences
 mad.globals.nrj = mask_parameters['par_beam_energy_tot']
 gamma_rel = mask_parameters['par_beam_energy_tot']/mad.globals.pmass
-
 for ss in mad.sequence.keys():
+    # bv and bv_aux flags
     if ss == 'lhcb1':
-        ss_beam_bv = 1
-        ss_bv_aux = 1
+        ss_beam_bv, ss_bv_aux = 1, 1
     elif ss == 'lhcb2':
         if int(beam_to_configure) == 4:
-            ss_beam_bv = 1
-            ss_bv_aux = -1
+            ss_beam_bv, ss_bv_aux = 1, -1
         else:
-            ss_beam_bv = -1
-            ss_bv_aux = 1
+            ss_beam_bv, ss_bv_aux = -1, 1
+
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
     beam, particle=proton,sequence={ss},
