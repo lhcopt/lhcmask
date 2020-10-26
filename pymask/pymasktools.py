@@ -157,8 +157,6 @@ def configure_b4_from_b2(mad_b4, mad_b2):
 def checks_on_parameter_dict(params):
 
     assert params['par_nco_IP5']==params['par_nco_IP1']
-    assert 'par_beam_norm_emit_x' in params
-    assert 'par_beam_norm_emit_y' in params
     print('Checks on paramter dict passed!')
 
 def check_twiss_value(twiss_df, element_name, keyword, target, tol):
