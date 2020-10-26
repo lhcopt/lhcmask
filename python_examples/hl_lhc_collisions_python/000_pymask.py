@@ -90,8 +90,8 @@ ost.apply_optics(mad, optics_file=optics_file)
 mad.set_variables_from_dict(params=mask_parameters)
 
 # Attach beam to sequences
-mad.globals.nrj = mask_parameters['par_beam_energy_tot']
-gamma_rel = mask_parameters['par_beam_energy_tot']/mad.globals.pmass
+mad.globals.nrj = python_parameters['beam_energy_tot']
+gamma_rel = python_parameters['beam_energy_tot']/mad.globals.pmass
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
     if ss == 'lhcb1':
@@ -105,13 +105,13 @@ for ss in mad.sequence.keys():
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
     beam, particle=proton,sequence={ss},
-        energy={mask_parameters['par_beam_energy_tot']},
-        sigt={mask_parameters['par_beam_sigt']},
+        energy={python_parameters['beam_energy_tot']},
+        sigt={python_parameters['beam_sigt']},
         bv={ss_beam_bv},
-        npart={mask_parameters['par_beam_npart']},
-        sige={mask_parameters['par_beam_sige']},
-        ex={mask_parameters['par_beam_norm_emit_x'] * 1e-6 / gamma_rel},
-        ey={mask_parameters['par_beam_norm_emit_y'] * 1e-6 / gamma_rel},
+        npart={python_parameters['beam_npart']},
+        sige={python_parameters['beam_sige']},
+        ex={python_parameters['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={python_parameters['beam_norm_emit_y'] * 1e-6 / gamma_rel},
     ''')
 
 
@@ -376,10 +376,17 @@ else:
 
 # Switch on octupoles
 mad_track.input("call, file='modules/submodule_05a_MO.madx';")
+brho =
+i_oct = python_parameters['oct_current']
+beam_str = {'lhcb1':'b1', 'lhcb2':b2}
+for ss in '12 23 34 45 56 67 78 81'.split():
+   madi_track.input(f'kof.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
+   madi_track.input(f'kod.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
+
 
 # Correct linear coupling
-qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
-qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
+qx_fractional, qx_integer = np.modf(python_parameters['qx0'])
+qy_fractional, qy_integer = np.modf(python_parameters['qy0'])
 coupl_corr_info = pm.coupling_correction(mad_track,
         n_iterations=python_parameters['N_iter_coupling'],
         qx_integer=qx_integer, qy_integer=qy_integer,
@@ -407,10 +414,10 @@ if mad_track.globals.on_disp != 0:
 
 # Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,
-        q1=mask_parameters['par_qx0'],
-        q2=mask_parameters['par_qy0'],
-        dq1=mask_parameters['par_chromaticity_x'],
-        dq2=mask_parameters['par_chromaticity_y'],
+        q1=mask_parameters['qx0'],
+        q2=mask_parameters['qy0'],
+        dq1=mask_parameters['chromaticity_x'],
+        dq2=mask_parameters['chromaticity_y'],
         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
         chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
@@ -425,7 +432,7 @@ if enable_imperfections:
 mad_track.globals.on_bb_charge = 1.
 
 # Switch on RF cavities
-mad_track.globals['vrf400'] = mask_parameters['par_vrf_total']
+mad_track.globals['vrf400'] = python_parameters['vrf_total']
 if sequence_to_track == 'lhcb1':
     mad_track.globals['lagrf400.b1'] = 0.5
 elif sequence_to_track == 'lhcb2':

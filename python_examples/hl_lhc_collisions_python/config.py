@@ -49,6 +49,22 @@ python_parameters = {
     'sep_plane_ip2'            : 'x', # used by python tools - NOT by legacy macros
     'sep_plane_ip8'            : 'y', # used by python tools - NOT by legacy macros
 
+    # Beam parameters
+    'beam_norm_emit_x'     : 2.5,          # [um]
+    'beam_norm_emit_y'     : 2.5,          # [um]
+    'beam_sigt'            : 0.076,        # [m]
+    'beam_sige'            : 1.1e-4,       # [-]
+    'beam_npart'           : 2.2e11,       # [-]
+    'beam_energy_tot'      : 7000,         # [GeV]
+
+    # Settings
+    'chromaticity_x'       : 5,            # [-] 
+    'chromaticity_y'       : 5,            # [-] 
+    'vrf_total'            : 16.,          # [MV]
+
+    # Tunes
+    'qx0'                  : 62.31,
+    'qy0'                  : 60.32,
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20],
@@ -79,24 +95,10 @@ python_parameters = {
 mask_parameters = {
     'par_verbose'              : 1,
 
-    # Beam parameters
-    'par_beam_norm_emit_x'     : 2.5,          # [um]
-    'par_beam_norm_emit_y'     : 2.5,          # [um]
-    'par_beam_sigt'            : 0.076,        # [m]
-    'par_beam_sige'            : 1.1e-4,       # [-]
-    'par_beam_npart'           : 2.2e11,       # [-]
-    'par_beam_energy_tot'      : 7000,         # [GeV]
-
-    # Settings
-    'par_oct_current'          : -235,         # [A]
-    'par_chromaticity_x'       : 5,            # [-] 
-    'par_chromaticity_y'       : 5,            # [-] 
-    'par_vrf_total'            : 16.,          # [MV]
-
-    # Tunes
-    'par_qx0'                  : 62.31,
-    'par_qy0'                  : 60.32,
-
+    #*************************#
+    #        Octupoles        #
+    #*************************#
+    'oct_current'          : -235,         # [A]
 
     #*************************#
     # Beam-beam configuration #
