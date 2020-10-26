@@ -98,10 +98,12 @@ mad.set_variables_from_dict(params=mask_parameters)
 
 # Set energy
 mad.globals.nrj = mask_parameters['par_beam_energy_tot']
+gamma_rel = mask_parameters['par_beam_energy_tot']/mad.globals.pmass
+
 for ss in mad.sequence.keys():
     if ss == 'lhcb1':
-        beam_bv = 1
-        bv_aux = 1
+        ss_beam_bv = 1
+        ss_bv_aux = 1
     elif ss == 'lhcb2':
         if int(beam_to_configure) == 4:
             ss_beam_bv = 1
@@ -111,13 +113,15 @@ for ss in mad.sequence.keys():
             ss_bv_aux = 1
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
-    beam, particle=proton,sequence={ff},
-    energy={mask_parameters['par_beam_energy_tot']},
-    sigt={mask_parameters['par_beam_sigt']},
-    bv={ss_beam_bv},
-    npart={mask_parameters['par_beam_npart'],
-    sige={mask_parameters['par_beam_sige'],
-    ex=epsx,ey=epsy;
+    beam, particle=proton,sequence={ss},
+        energy={mask_parameters['par_beam_energy_tot']},
+        sigt={mask_parameters['par_beam_sigt']},
+        bv={ss_beam_bv},
+        npart={mask_parameters['par_beam_npart']},
+        sige={mask_parameters['par_beam_sige']},
+        ex={mask_parameters['par_beam_norm_emit'] * 1e-6 / gamma_rel},
+        ey={mask_parameters['par_beam_norm_emit'] * 1e-6 / gamma_rel},
+    ''')
 
 
 # Test machine before any change
