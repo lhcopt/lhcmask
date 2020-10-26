@@ -375,13 +375,12 @@ else:
     mad_track.globals['on_bb_charge'] = 0
 
 # Switch on octupoles
-mad_track.input("call, file='modules/submodule_05a_MO.madx';")
-brho =
+brho = mad_track.globals.nrj*1e9/mad_track.globals.clight
 i_oct = python_parameters['oct_current']
-beam_str = {'lhcb1':'b1', 'lhcb2':b2}
+beam_str = {'lhcb1':'b1', 'lhcb2':'b2'}[sequence_to_track]
 for ss in '12 23 34 45 56 67 78 81'.split():
-   madi_track.input(f'kof.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
-   madi_track.input(f'kod.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
+   mad_track.input(f'kof.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
+   mad_track.input(f'kod.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
 
 
 # Correct linear coupling

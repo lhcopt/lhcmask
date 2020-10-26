@@ -61,6 +61,7 @@ python_parameters = {
     'chromaticity_x'       : 5,            # [-] 
     'chromaticity_y'       : 5,            # [-] 
     'vrf_total'            : 16.,          # [MV]
+    'oct_current'          : -235,         # [A]
 
     # Tunes
     'qx0'                  : 62.31,
@@ -94,11 +95,6 @@ python_parameters = {
 
 mask_parameters = {
     'par_verbose'              : 1,
-
-    #*************************#
-    #        Octupoles        #
-    #*************************#
-    'oct_current'          : -235,         # [A]
 
     #*************************#
     # Beam-beam configuration #
