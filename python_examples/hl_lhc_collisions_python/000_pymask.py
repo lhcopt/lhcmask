@@ -23,7 +23,7 @@ check_separations_at_ips = python_parameters['check_separations_at_ips']
 save_intermediate_twiss = python_parameters['save_intermediate_twiss']
 force_leveling= python_parameters['force_leveling']
 enable_lumi_control = python_parameters['enable_lumi_control']
-enable_multipolar_errors = python_parameters['enable_multipolar_errors']
+enable_imperfections = python_parameters['enable_imperfections']
 enable_crabs = python_parameters['enable_crabs']
 
 # Make links
@@ -354,7 +354,7 @@ mad_track.use = None
 # Install and correct errors #
 ##############################
 
-if enable_multipolar_errors:
+if enable_imperfections:
     mad_track.input("call, file='modules/module_04_errors.madx';")
 else:
     # Synthesize knobs
@@ -395,7 +395,7 @@ mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += python_parameters
 mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += python_parameters['delta_cmi']
 
 # Check strength limits
-if enable_multipolar_errors:
+if enable_imperfections:
     mad_track.input('call, file="errors/HL-LHC/corr_limit.madx";')
 
 # Rematch the orbit at IPs
@@ -418,7 +418,7 @@ pm.match_tune_and_chromaticity(mad_track,
         sequence_name=sequence_to_track, skip_use=True)
 
 # Check strength limits
-if enable_multipolar_errors:
+if enable_imperfections:
     mad_track.input("call, file='errors/HL-LHC/corr_value_limit.madx';")
 
 # Switch on bb lenses

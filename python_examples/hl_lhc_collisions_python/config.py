@@ -58,8 +58,8 @@ python_parameters = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
 
-    # Enable multipolar errors
-    'enable_multipolar_errors' : True,
+    # Enable machine imperfections
+    'enable_imperfections'     : True,
 
     # Enable knob synthesis (for coupling correction, if no errors)
     'enable_knob_synthesis'    : True,
