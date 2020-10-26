@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b4_without_bb',
+    'mode'                      : 'b1_with_bb_legacy_macros',
 
     # Force separation in IP2 and IP8 if needed
     # 'force_leveling'            : None,
@@ -34,7 +34,6 @@ python_parameters = {
 
     # Tolerance for check on flat machine
     'tol_co_flatness'          : 1e-6,
-
 
     # Optics file
     'optics_file'              : '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
@@ -57,15 +56,17 @@ python_parameters = {
     'beam_npart'           : 2.2e11,       # [-]
     'beam_energy_tot'      : 7000,         # [GeV]
 
-    # Settings
-    'chromaticity_x'       : 5,            # [-] 
-    'chromaticity_y'       : 5,            # [-] 
-    'vrf_total'            : 16.,          # [MV]
-    'oct_current'          : -235,         # [A]
-
-    # Tunes
+    # Tunes and chromaticities
     'qx0'                  : 62.31,
     'qy0'                  : 60.32,
+    'chromaticity_x'       : 5,            # [-] 
+    'chromaticity_y'       : 5,            # [-] 
+
+    # RF voltage
+    'vrf_total'            : 16.,          # [MV]
+
+    # Octupole current
+    'oct_current'          : -235,         # [A]
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20],
