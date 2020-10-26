@@ -379,8 +379,8 @@ brho = mad_track.globals.nrj*1e9/mad_track.globals.clight
 i_oct = python_parameters['oct_current']
 beam_str = {'lhcb1':'b1', 'lhcb2':'b2'}[sequence_to_track]
 for ss in '12 23 34 45 56 67 78 81'.split():
-   mad_track.input(f'kof.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
-   mad_track.input(f'kod.a{ss}{beam_str} = kmax_mo*{i_oct}/imax_mo/{brho};')
+   mad_track.input(f'kof.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
+   mad_track.input(f'kod.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
 
 
 # Correct linear coupling
@@ -413,10 +413,10 @@ if mad_track.globals.on_disp != 0:
 
 # Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,
-        q1=mask_parameters['qx0'],
-        q2=mask_parameters['qy0'],
-        dq1=mask_parameters['chromaticity_x'],
-        dq2=mask_parameters['chromaticity_y'],
+        q1=python_parameters['qx0'],
+        q2=python_parameters['qy0'],
+        dq1=python_parameters['chromaticity_x'],
+        dq2=python_parameters['chromaticity_y'],
         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
         chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
