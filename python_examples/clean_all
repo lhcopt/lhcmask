@@ -1,4 +1,5 @@
 rm fc.* 
+rm *.log
 rm bb_lenses.dat
 rm *.parquet
 rm *.pkl
