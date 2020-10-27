@@ -23,10 +23,10 @@ python_parameters = {
     'mode'                      : 'b1_with_bb_legacy_macros',
 
     # Force separation in IP2 and IP8 if needed
-    # 'force_leveling'            : None,
+    'force_leveling'            : None,
 
     # For test against madx mask for modes 'b4_from_b2_without_bb' and 'b4_without_bb':
-    'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
+    # 'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
 
     # Tolerances for checks [ip1, ip2, ip5, ip8]
     'tol_beta'                 : [1e-3, 10e-2, 1e-3, 1e-2],
