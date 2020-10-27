@@ -26,7 +26,7 @@ python_parameters = {
     'force_leveling'            : None,
 
     # For test against madx mask for modes 'b4_from_b2_without_bb' and 'b4_without_bb':
-    #'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
+    # 'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
 
     # Tolerances for checks [ip1, ip2, ip5, ip8]
     'tol_beta'                 : [1e-3, 10e-2, 1e-3, 1e-2],
@@ -34,7 +34,6 @@ python_parameters = {
 
     # Tolerance for check on flat machine
     'tol_co_flatness'          : 1e-6,
-
 
     # Optics file
     'optics_file'              : '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
@@ -49,6 +48,25 @@ python_parameters = {
     'sep_plane_ip2'            : 'x', # used by python tools - NOT by legacy macros
     'sep_plane_ip8'            : 'y', # used by python tools - NOT by legacy macros
 
+    # Beam parameters
+    'beam_norm_emit_x'     : 2.5,          # [um]
+    'beam_norm_emit_y'     : 2.5,          # [um]
+    'beam_sigt'            : 0.076,        # [m]
+    'beam_sige'            : 1.1e-4,       # [-]
+    'beam_npart'           : 2.2e11,       # [-]
+    'beam_energy_tot'      : 7000,         # [GeV]
+
+    # Tunes and chromaticities
+    'qx0'                  : 62.31,
+    'qy0'                  : 60.32,
+    'chromaticity_x'       : 5,            # [-] 
+    'chromaticity_y'       : 5,            # [-] 
+
+    # RF voltage
+    'vrf_total'            : 16.,          # [MV]
+
+    # Octupole current
+    'oct_current'          : -235,         # [A]
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20],
@@ -58,8 +76,8 @@ python_parameters = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
 
-    # Enable multipolar errors
-    'enable_multipolar_errors' : True,
+    # Enable machine imperfections
+    'enable_imperfections'     : True,
 
     # Enable knob synthesis (for coupling correction, if no errors)
     'enable_knob_synthesis'    : True,
@@ -78,24 +96,6 @@ python_parameters = {
 
 mask_parameters = {
     'par_verbose'              : 1,
-
-    # Beam parameters
-    'par_beam_norm_emit'       : 2.5,   # [um]
-    'par_beam_sigt'            : 0.076,        # [m]
-    'par_beam_sige'            : 1.1e-4,       # [-]
-    'par_beam_npart'           : 2.2e11,       # [-]
-    'par_beam_energy_tot'      : 7000,         # [GeV]
-
-    # Settings
-    'par_oct_current'          : -235,         # [A]
-    'par_chromaticity_x'       : 5,            # [-] 
-    'par_chromaticity_y'       : 5,            # [-] 
-    'par_vrf_total'            : 16.,          # [MV]
-
-    # Tunes
-    'par_qx0'                  : 62.31,
-    'par_qy0'                  : 60.32,
-
 
     #*************************#
     # Beam-beam configuration #

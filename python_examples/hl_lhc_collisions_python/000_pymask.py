@@ -23,7 +23,7 @@ check_separations_at_ips = python_parameters['check_separations_at_ips']
 save_intermediate_twiss = python_parameters['save_intermediate_twiss']
 force_leveling= python_parameters['force_leveling']
 enable_lumi_control = python_parameters['enable_lumi_control']
-enable_multipolar_errors = python_parameters['enable_multipolar_errors']
+enable_imperfections = python_parameters['enable_imperfections']
 enable_crabs = python_parameters['enable_crabs']
 
 # Make links
@@ -31,6 +31,10 @@ for kk in links.keys():
     if os.path.exists(kk):
         os.remove(kk)
     os.symlink(os.path.abspath(links[kk]), kk)
+
+# Create empty temp folder
+os.system('rm -r temp')
+os.system('mkdir temp')
 
 # Execute customization script if present
 os.system('bash customization.bash')
@@ -73,8 +77,11 @@ if not(enable_crabs):
 Madx = pm.Madxp
 mad = Madx(command_log="mad_collider.log")
 
-# Build sequence
+# Build sequence (alse creates link to optics_toolkit and calls it)
 ost.build_sequence(mad, beam=beam_to_configure)
+
+# Set twiss formats for MAD-X parts (macro from opt. toolkit)
+mad.input('exec, twiss_opt;')
 
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
@@ -82,11 +89,31 @@ ost.apply_optics(mad, optics_file=optics_file)
 # Pass parameters to mad
 mad.set_variables_from_dict(params=mask_parameters)
 
-# Prepare auxiliary mad variables
-mad.input("call, file='modules/submodule_01a_preparation.madx';")
+# Attach beam to sequences
+mad.globals.nrj = python_parameters['beam_energy_tot']
+gamma_rel = python_parameters['beam_energy_tot']/mad.globals.pmass
+for ss in mad.sequence.keys():
+    # bv and bv_aux flags
+    if ss == 'lhcb1':
+        ss_beam_bv, ss_bv_aux = 1, 1
+    elif ss == 'lhcb2':
+        if int(beam_to_configure) == 4:
+            ss_beam_bv, ss_bv_aux = 1, -1
+        else:
+            ss_beam_bv, ss_bv_aux = -1, 1
 
-# Attach beams to sequences
-mad.input("call, file='modules/submodule_01b_beam.madx';")
+    mad.globals['bv_aux'] = ss_bv_aux
+    mad.input(f'''
+    beam, particle=proton,sequence={ss},
+        energy={python_parameters['beam_energy_tot']},
+        sigt={python_parameters['beam_sigt']},
+        bv={ss_beam_bv},
+        npart={python_parameters['beam_npart']},
+        sige={python_parameters['beam_sige']},
+        ex={python_parameters['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={python_parameters['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+    ''')
+
 
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -194,6 +221,7 @@ else:
 mad.globals.on_disp = 0.
 # will be restored later
 
+
 ###################################
 # Compute beam-beam configuration #
 ###################################
@@ -293,15 +321,18 @@ if enable_bb_legacy:
 #########################
 # Install crab cavities #
 #########################
+
 if enable_crabs:
     mad_track.input("call, file='optics_toolkit/enable_crabcavities.madx';")
     # They are left off, they will be swiched on at the end:
     mad_track.globals.on_crab1 = 0
     mad_track.globals.on_crab5 = 0
 
+
 ##############################################
 # Save references for tuning and corrections #
 ##############################################
+
 mad_track.input("call, file='modules/submodule_04_1b_save_references.madx';")
 
 
@@ -327,7 +358,7 @@ mad_track.use = None
 # Install and correct errors #
 ##############################
 
-if enable_multipolar_errors:
+if enable_imperfections:
     mad_track.input("call, file='modules/module_04_errors.madx';")
 else:
     # Synthesize knobs
@@ -336,6 +367,7 @@ else:
         mad_track.input('exec, crossing_disable;')
         mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
         mad_track.input('exec, crossing_restore;')
+
 
 ##################
 # Machine tuning #
@@ -348,11 +380,17 @@ else:
     mad_track.globals['on_bb_charge'] = 0
 
 # Switch on octupoles
-mad_track.input("call, file='modules/submodule_05a_MO.madx';")
+brho = mad_track.globals.nrj*1e9/mad_track.globals.clight
+i_oct = python_parameters['oct_current']
+beam_str = {'lhcb1':'b1', 'lhcb2':'b2'}[sequence_to_track]
+for ss in '12 23 34 45 56 67 78 81'.split():
+   mad_track.input(f'kof.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
+   mad_track.input(f'kod.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
+
 
 # Correct linear coupling
-qx_fractional, qx_integer = np.modf(mask_parameters['par_qx0'])
-qy_fractional, qy_integer = np.modf(mask_parameters['par_qy0'])
+qx_fractional, qx_integer = np.modf(python_parameters['qx0'])
+qy_fractional, qy_integer = np.modf(python_parameters['qy0'])
 coupl_corr_info = pm.coupling_correction(mad_track,
         n_iterations=python_parameters['N_iter_coupling'],
         qx_integer=qx_integer, qy_integer=qy_integer,
@@ -368,7 +406,7 @@ mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += python_parameters
 mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += python_parameters['delta_cmi']
 
 # Check strength limits
-if enable_multipolar_errors:
+if enable_imperfections:
     mad_track.input('call, file="errors/HL-LHC/corr_limit.madx";')
 
 # Rematch the orbit at IPs
@@ -380,10 +418,10 @@ if mad_track.globals.on_disp != 0:
 
 # Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,
-        q1=mask_parameters['par_qx0'],
-        q2=mask_parameters['par_qy0'],
-        dq1=mask_parameters['par_chromaticity_x'],
-        dq2=mask_parameters['par_chromaticity_y'],
+        q1=python_parameters['qx0'],
+        q2=python_parameters['qy0'],
+        dq1=python_parameters['chromaticity_x'],
+        dq2=python_parameters['chromaticity_y'],
         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
         chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
@@ -391,14 +429,14 @@ pm.match_tune_and_chromaticity(mad_track,
         sequence_name=sequence_to_track, skip_use=True)
 
 # Check strength limits
-if enable_multipolar_errors:
+if enable_imperfections:
     mad_track.input("call, file='errors/HL-LHC/corr_value_limit.madx';")
 
 # Switch on bb lenses
 mad_track.globals.on_bb_charge = 1.
 
 # Switch on RF cavities
-mad_track.globals['vrf400'] = mask_parameters['par_vrf_total']
+mad_track.globals['vrf400'] = python_parameters['vrf_total']
 if sequence_to_track == 'lhcb1':
     mad_track.globals['lagrf400.b1'] = 0.5
 elif sequence_to_track == 'lhcb2':
@@ -408,6 +446,7 @@ elif sequence_to_track == 'lhcb2':
 if enable_crabs:
     mad_track.globals.on_crab1 = knob_settings['on_crab1']
     mad_track.globals.on_crab5 = knob_settings['on_crab5']
+
 
 #####################
 # Generate sixtrack #

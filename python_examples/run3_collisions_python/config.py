@@ -45,6 +45,25 @@ python_parameters = {
     'sep_plane_ip2'            : 'x', # used by python tools - NOT by legacy macros
     'sep_plane_ip8'            : 'y', # used by python tools - NOT by legacy macros
 
+    # Beam parameters
+    'beam_norm_emit_x'     : 2.5,          # [um]
+    'beam_norm_emit_y'     : 2.5,          # [um]
+    'beam_sigt'            : 0.076,        # [m]
+    'beam_sige'            : 1.1e-4,       # [-]
+    'beam_npart'           : 1.8e11,       # [-]
+    'beam_energy_tot'      : 7000,         # [GeV]
+
+    # Tunes and chromaticities
+    'qx0'                  : 62.313,
+    'qy0'                  : 60.318,
+    'chromaticity_x'       : 15,            # [-] 
+    'chromaticity_y'       : 15,            # [-] 
+
+    # RF voltage
+    'vrf_total'            : 12.,          # [MV]
+
+    # Octupole current
+    'oct_current'          : -350,         # [A]
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20],
@@ -54,8 +73,8 @@ python_parameters = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.,
 
-    # Enable multipolar errors
-    'enable_multipolar_errors' : False,
+    # Enable machine imperfections
+    'enable_imperfections'     : False,
 
     # Enable knob synthesis (for coupling correction, if no errors)
     'enable_knob_synthesis'    : False,
@@ -74,24 +93,6 @@ python_parameters = {
 
 mask_parameters = {
     'par_verbose'              : 1,
-
-    # Beam parameters
-    'par_beam_norm_emit'       : 2.5,          # [um]
-    'par_beam_sigt'            : 0.076,        # [m]
-    'par_beam_sige'            : 1.1e-4,       # [-]
-    'par_beam_npart'           : 1.8e11,       # [-]
-    'par_beam_energy_tot'      : 7000,         # [GeV]
-
-    # Settings
-    'par_oct_current'          : -350,         # [A]
-    'par_chromaticity_x'       : 15,            # [-] 
-    'par_chromaticity_y'       : 15,           # [-] 
-    'par_vrf_total'            : 12.,          # [MV]
-
-    # Tunes
-    'par_qx0'                  : 62.313,
-    'par_qy0'                  : 60.318,
-
 
     #*************************#
     # Beam-beam configuration #
