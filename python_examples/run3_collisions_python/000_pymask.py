@@ -221,6 +221,7 @@ else:
 mad.globals.on_disp = 0.
 # will be restored later
 
+
 ###################################
 # Compute beam-beam configuration #
 ###################################
@@ -320,15 +321,18 @@ if enable_bb_legacy:
 #########################
 # Install crab cavities #
 #########################
+
 if enable_crabs:
     mad_track.input("call, file='optics_toolkit/enable_crabcavities.madx';")
     # They are left off, they will be swiched on at the end:
     mad_track.globals.on_crab1 = 0
     mad_track.globals.on_crab5 = 0
 
+
 ##############################################
 # Save references for tuning and corrections #
 ##############################################
+
 mad_track.input("call, file='modules/submodule_04_1b_save_references.madx';")
 
 
@@ -363,6 +367,7 @@ else:
         mad_track.input('exec, crossing_disable;')
         mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
         mad_track.input('exec, crossing_restore;')
+
 
 ##################
 # Machine tuning #
@@ -441,6 +446,7 @@ elif sequence_to_track == 'lhcb2':
 if enable_crabs:
     mad_track.globals.on_crab1 = knob_settings['on_crab1']
     mad_track.globals.on_crab5 = knob_settings['on_crab5']
+
 
 #####################
 # Generate sixtrack #
