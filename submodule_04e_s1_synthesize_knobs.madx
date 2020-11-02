@@ -1,0 +1,10 @@
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!             synthesize knobs
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+select, flag=error, clear;
+select, flag=error, pattern=MB\.,class=multipole;
+select, flag=error, pattern=MBH\.,class=multipole;
+esave,  file="temp/MB.errors";
+system, "errors/HL-LHC/corr_MB_ats_v4";
+call,   file="temp/MB_corr_setting.mad";
+!exec, reset_MB_corr;

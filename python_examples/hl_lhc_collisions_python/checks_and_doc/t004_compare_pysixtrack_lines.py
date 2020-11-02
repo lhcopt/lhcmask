@@ -6,17 +6,17 @@ import pysixtrack
 import sixtracktools
 
 # Test b1 
-path_test = './'
+path_test = '../'
 type_test = 'sixtrack'
-path_ref = '../../examples/hl_lhc_collision'
+path_ref = '../../../examples/hl_lhc_collision'
 type_ref = 'sixtrack'
 
-# Test b4 nobb sixtrack
-path_test = './'
-type_test = 'sixtrack'
-path_ref = '../../examples/hl_lhc_collision_nobb_b4'
-type_ref = 'sixtrack'
-#
+# # Test b4 nobb sixtrack
+# path_test = '../../'
+# type_test = 'sixtrack'
+# path_ref = '../../../examples/hl_lhc_collision_nobb_b4'
+# type_ref = 'sixtrack'
+
 # # Test b4 nobb pysixtrack (not working for now)
 # path_test = './pysixtrack/line_bb_dipole_not_cancelled.pkl'
 # type_test = 'pysixtrack'

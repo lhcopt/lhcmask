@@ -1,0 +1,17 @@
+rm fc.* 
+rm *.log
+rm bb_lenses.dat
+rm *.parquet
+rm *.pkl
+rm twiss_*.b1
+rm twiss_*.b2
+rm twiss_bb
+rm last_twiss.*.gz
+rm fort.*
+rm *.tfs
+rm -r pysixtrack
+rm -r temp
+rm -r __pycache__ 
+
+# Remove all links
+find -type l -exec rm {} \;

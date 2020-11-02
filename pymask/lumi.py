@@ -16,7 +16,7 @@ def sigma(beta, epsilon0, betagamma):
     '''Betatronic sigma'''
     return np.sqrt(beta*epsilon0/betagamma)
 
-def L(f, nb,
+def luminosity(f, nb,
       N1, N2,
       x_1, x_2,
       y_1, y_2,
@@ -238,7 +238,8 @@ def get_luminosity_dict(mad, twiss_dfs, ip_name, number_of_ho_collisions):
             'py_1':ip_b1.py, 'py_2':ip_b2.py, 'verbose':False}
 
 def compute_luminosity(mad, twiss_dfs, ip_name, number_of_ho_collisions):
-    return L(**get_luminosity_dict(mad, twiss_dfs, ip_name, number_of_ho_collisions))
+    return luminosity(**get_luminosity_dict(
+        mad, twiss_dfs, ip_name, number_of_ho_collisions))
 
 def print_luminosity(mad, twiss_dfs, nco_IP1, nco_IP2, nco_IP5, nco_IP8):
     for ip, number_of_ho_collisions in zip(['ip1', 'ip2', 'ip5', 'ip8'],

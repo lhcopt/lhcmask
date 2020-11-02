@@ -43,7 +43,7 @@ phi_c_weak = Phi_c
 phi_strong = -phi_weak
 phi_c_strong = -phi_c_weak
 
-path_test = './'
+path_test = '../'
 type_test = 'sixtrack'
 
 def prepare_line(path, input_type):
@@ -116,7 +116,7 @@ plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula'
 
 # Chek crabs in weak beam
 import pickle
-with open('./optics_orbit_at_start_ring.pkl', 'rb') as fid:
+with open('../optics_orbit_at_start_ring.pkl', 'rb') as fid:
     ddd = pickle.load(fid)
 
 ddd['p0c'] =  ddd['p0c_eV']
@@ -196,7 +196,7 @@ import pandas as pd
 z_crab_twiss = 0.075
 
 if beam_track == 'b1':
-    crab_df = pd.read_parquet(f'./twiss_z_crab_{z_crab_twiss:.5f}_seq_lhcb1.parquet')
+    crab_df = pd.read_parquet(f'../twiss_z_crab_{z_crab_twiss:.5f}_seq_lhcb1.parquet')
     s_twiss = crab_df.s.values
     x_twiss = crab_df.x.values
     y_twiss = crab_df.y.values
@@ -204,7 +204,7 @@ if beam_track == 'b1':
     py_twiss = crab_df.py.values
     z_crab_track = z_crab_twiss
 elif beam_track == 'b4':
-    crab_df = pd.read_parquet(f'./twiss_z_crab_{z_crab_twiss:.5f}_seq_lhcb2.parquet')
+    crab_df = pd.read_parquet(f'../twiss_z_crab_{z_crab_twiss:.5f}_seq_lhcb2.parquet')
     s_twiss = -crab_df.s.values[::-1]
     s_twiss -= s_twiss[0]
     x_twiss = -crab_df.x.values[::-1]
