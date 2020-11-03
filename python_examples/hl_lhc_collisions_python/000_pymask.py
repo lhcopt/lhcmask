@@ -86,6 +86,12 @@ ost.apply_optics(mad, optics_file=optics_file)
 mad.set_variables_from_dict(params={
     'par_verbose': int(python_parameters['verbose_mad_parts']),
     })
+mad.globals['par_on_bb_switch'] = 1
+mad.set_variables_from_dict(
+   params=python_parameters['pars_for_legacy_bb_macros'])
+mad.set_variables_from_dict(
+        params={f'par_nho_ir{ir}':python_parameters['numberOfHOSlices']
+            for ir in [1,2,5,8]})
 
 # Attach beam to sequences
 mad.globals.nrj = python_parameters['beam_energy_tot']
@@ -313,12 +319,6 @@ if enable_bb_legacy:
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
     assert(not(enable_bb_python))
-    mad_track.globals['par_on_bb_switch'] = 1
-    mad_track.set_variables_from_dict(
-            params=python_parameters['pars_for_legacy_bb_macros'])
-    mad_track.set_variables_from_dict(
-            params={f'par_nho_ir{ir}':python_parameters['numberOfHOSlices']
-                for ir in [1,2,5,8]})
     mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
 
