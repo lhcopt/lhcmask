@@ -91,25 +91,22 @@ python_parameters = {
     # Value to be added to linear coupling knobs (on sequence_to_track)
     'delta_cmr'                 : 0.,
     'delta_cmi'                 : 0.,
+
+    # Verbose flag for MAD-X parts
+    'verbose_mad_parts'         : True,
+
+    # Match tunes and chromatucities including beam-beam effects
+    'match_q_dq_with_bb'        : False,            # should be off at collision
+
+    # Parameters for legacy beam-beam macros (not used in default modes)
+    'pars_for_legacy_bb_macros' : {
+                                    'par_b_t_dist' : 25.,  # bunch spacing [ns]
+                                    'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
+                                  },
     }
 
 
 mask_parameters = {
-    'par_verbose'              : 1,
-
-    #*************************#
-    # Beam-beam configuration #
-    #*************************#
-
-    'par_on_bb_switch'         : 1,
-    'par_match_with_bb'        : 0,            # should be off at collision
-    'par_b_t_dist'             : 25.,          # bunch separation [ns]
-    'par_n_inside_D1'          : 5,            # default value for the number of additionnal parasitic encounters inside D1
-
-    'par_nho_IR1'              : 11,           # number of slices for head-on in IR1 (between 0 and 201)
-    'par_nho_IR2'              : 11,           # number of slices for head-on in IR2 (between 0 and 201)
-    'par_nho_IR5'              : 11,           # number of slices for head-on in IR5 (between 0 and 201)
-    'par_nho_IR8'              : 11,           # number of slices for head-on in IR8 (between 0 and 201)
 
     #*****************************#
     #     Luminosity parameters   #

@@ -154,11 +154,6 @@ def configure_b4_from_b2(mad_b4, mad_b2):
         if nn not in b2_dep.keys():
             print(f'Warning: b4 dep {nn}={str(b4_dep[nn])} is not in b2.')
 
-def checks_on_parameter_dict(params):
-
-    assert params['par_nco_IP5']==params['par_nco_IP1']
-    print('Checks on paramter dict passed!')
-
 def check_twiss_value(twiss_df, element_name, keyword, target, tol):
     assert abs(twiss_df.loc[element_name][keyword] - target) < tol,\
                 f'Check not passed on {keyword} at {element_name}'

@@ -25,6 +25,8 @@ force_leveling= python_parameters['force_leveling']
 enable_lumi_control = python_parameters['enable_lumi_control']
 enable_imperfections = python_parameters['enable_imperfections']
 enable_crabs = python_parameters['enable_crabs']
+match_q_dq_with_bb = python_parameters['match_q_dq_with_bb']
+
 
 # Make links
 for kk in links.keys():
@@ -50,9 +52,6 @@ import optics_specific_tools as ost
 # Check parameters and activate mode #
 ######################################
 
-# Check and load parameters 
-pm.checks_on_parameter_dict(mask_parameters)
-
 # Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
@@ -61,9 +60,6 @@ pm.checks_on_parameter_dict(mask_parameters)
 
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
-
-if not(enable_bb_legacy) and not(enable_bb_python):
-    mask_parameters['par_on_bb_switch'] = 0.
 
 if not(enable_crabs):
     knob_settings['par_crab1'] = 0.
@@ -87,7 +83,9 @@ mad.input('exec, twiss_opt;')
 ost.apply_optics(mad, optics_file=optics_file)
 
 # Pass parameters to mad
-mad.set_variables_from_dict(params=mask_parameters)
+mad.set_variables_from_dict(params={
+    'par_verbose': int(python_parameters['verbose_mad_parts']),
+    })
 
 # Attach beam to sequences
 mad.globals.nrj = python_parameters['beam_energy_tot']
@@ -315,6 +313,12 @@ if enable_bb_legacy:
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
     assert(not(enable_bb_python))
+    mad_track.globals['par_on_bb_switch'] = 1
+    mad_track.set_variables_from_dict(
+            params=python_parameters['pars_for_legacy_bb_macros'])
+    mad_track.set_variables_from_dict(
+            params={f'par_nho_ir{ir}':python_parameters['numberOfHOSlices']
+                for ir in [1,2,5,8]})
     mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
 
@@ -374,7 +378,7 @@ else:
 ##################
 
 # Enable bb for matchings
-if mask_parameters['par_match_with_bb'] == 1:
+if match_q_dq_with_bb:
     mad_track.globals['on_bb_charge'] = 1
 else:
     mad_track.globals['on_bb_charge'] = 0
