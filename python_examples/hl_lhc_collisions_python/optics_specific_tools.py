@@ -113,7 +113,7 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
 
     return twiss_dfs, other_data
 
-def lumi_control(mad, twiss_dfs, python_parameters, mask_parameters, knob_names):
+def lumi_control(mad, twiss_dfs, python_parameters, knob_names):
     from scipy.optimize import least_squares
 
     # Leveling in IP8

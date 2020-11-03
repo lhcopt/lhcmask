@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb',
+    'mode'                      : 'b1_with_bb_legacy_macros',
 
     # Force separation in IP2 and IP8 if needed
     'force_leveling'            : None,
@@ -104,51 +104,33 @@ python_parameters = {
                                     'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
                                   },
 
-    #*****************************#
-    #     Luminosity parameters   #
-    #*****************************#
-
-    # This variables set the leveled luminosity in IP8 
-    'lumi_ip8'             : 2e33,         #[Hz/cm2]
-
-    # This variables set the leveled luminosity in IP8 
+    # Luminosity parameters
+    'lumi_ip8'             : 2e33, # [Hz/cm2] leveled luminosity in IP8 
     'fullsep_in_sigmas_ip2': 5,
+    'nco_IP1'              : 2748, # number of Head-On collisions in IP1
+    'nco_IP2'              : 2494, # number of Head-On collisions in IP1
+    'nco_IP5'              : 2748, # number of Head-On collisions in IP1
+    'nco_IP8'              : 2572, # number of Head-On collisions in IP1
 
-    # These variables define the number of Head-On collisions in the 4 IPs
-    'nco_IP1'              : 2748,
-    'nco_IP2'              : 2494,
-    'nco_IP5'              : 2748,
-    'nco_IP8'              : 2572,
-
+    # Parameters for machine imperfections
+    'pars_for_imperfections': {
+        'par_myseed'               : 1,
+        'par_correct_for_D2'       : 0,
+        'par_correct_for_MCBX'     : 0,
+        'par_on_errors_LHC'        : 1,
+        'par_on_errors_MBH'        : 1,
+        'par_on_errors_Q5'         : 1,
+        'par_on_errors_Q4'         : 1,
+        'par_on_errors_D2'         : 1,
+        'par_on_errors_D1'         : 1,
+        'par_on_errors_IT'         : 1,
+        'par_on_errors_MCBRD'      : 0,
+        'par_on_errors_MCBXF'      : 0,
+        },
     }
 
 
-mask_parameters = {
 
-
-    #*************************#
-    #  Errors and corrections #
-    #*************************#
-
-    # Select seed for errors
-    'par_myseed'               : 1,
-
-    # Set this flag to correct the errors of D2 in the NLC (warning: for now only correcting b3 of D2, still in development)
-    'par_correct_for_D2'       : 0,
-    # Set this flag to correct the errors of MCBXF in the NLC (warning: this might be less reproducable in reality, use with care)
-    'par_correct_for_MCBX'     : 0,
-
-    'par_on_errors_LHC'        : 1,
-    'par_on_errors_MBH'        : 1,
-    'par_on_errors_Q5'         : 1,
-    'par_on_errors_Q4'         : 1,
-    'par_on_errors_D2'         : 1,
-    'par_on_errors_D1'         : 1,
-    'par_on_errors_IT'         : 1,
-    'par_on_errors_MCBRD'      : 0,
-    'par_on_errors_MCBXF'      : 0,
-
-}
 
 knob_names = {
         # Common knobs
@@ -187,7 +169,7 @@ knob_settings = {
     'on_crab5'                : -190,         # [urad]  
 
     # Dispersion correction knob
-    'on_disp'                 : 1,            # Could be optics-dependent
+    'on_disp'                 : 1,            # Value to choose could be optics-dependent
 
     # Magnets of the experiments
     'on_alice_normalized'     : 1,

@@ -4,7 +4,7 @@ import pickle
 
 import numpy as np
 
-from config import python_parameters, mask_parameters
+from config import python_parameters
 from config import knob_settings, knob_names
 
 
@@ -83,7 +83,6 @@ mad.input('exec, twiss_opt;')
 ost.apply_optics(mad, optics_file=optics_file)
 
 # Pass parameters to mad
-mad.set_variables_from_dict(params=mask_parameters)
 mad.set_variables_from_dict(params={
     'par_verbose': int(python_parameters['verbose_mad_parts']),
     })
@@ -188,8 +187,7 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         mad.input("call, file='modules/module_02_lumilevel.madx';")
 else:
     print('Start pythonic leveling:')
-    ost.lumi_control(mad, twiss_dfs, python_parameters,
-            mask_parameters, knob_names)
+    ost.lumi_control(mad, twiss_dfs, python_parameters, knob_names)
 
 # Force leveling
 if force_leveling is not None:
@@ -368,6 +366,8 @@ mad_track.use = None
 ##############################
 
 if enable_imperfections:
+    mad_track.set_variables_from_dict(
+            python_parameters['pars_for_imperfections'])
     mad_track.input("call, file='modules/module_04_errors.madx';")
 else:
     # Synthesize knobs
