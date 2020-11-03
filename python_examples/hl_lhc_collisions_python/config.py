@@ -22,18 +22,8 @@ configuration = {
 
     'mode'                      : 'b1_with_bb_legacy_macros',
 
-    # Force separation in IP2 and IP8 if needed
-    'force_leveling'            : None,
-
     # For test against madx mask for modes 'b4_from_b2_without_bb' and 'b4_without_bb':
     # 'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
-
-    # Tolerances for checks [ip1, ip2, ip5, ip8]
-    'tol_beta'                 : [1e-3, 10e-2, 1e-3, 1e-2],
-    'tol_sep'                  : [1e-6, 1e-6, 1e-6, 1e-6],
-
-    # Tolerance for check on flat machine
-    'tol_co_flatness'          : 1e-6,
 
     # Optics file
     'optics_file'              : '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
@@ -43,10 +33,12 @@ configuration = {
     'check_separations_at_ips' : True,
     'save_intermediate_twiss'  : True,
 
-    # Luminosity control in IP2 and IP8
-    'enable_lumi_control'      : True,
-    'sep_plane_ip2'            : 'x', # used by python tools - NOT by legacy macros
-    'sep_plane_ip8'            : 'y', # used by python tools - NOT by legacy macros
+    # Tolerances for checks [ip1, ip2, ip5, ip8]
+    'tol_beta'                 : [1e-3, 10e-2, 1e-3, 1e-2],
+    'tol_sep'                  : [1e-6, 1e-6, 1e-6, 1e-6],
+
+    # Tolerance for check on flat machine
+    'tol_co_flatness'          : 1e-6,
 
     # Beam parameters
     'beam_norm_emit_x'     : 2.5,          # [um]
@@ -68,6 +60,17 @@ configuration = {
     # Octupole current
     'oct_current'          : -235,         # [A]
 
+    # Luminosity parameters
+    'enable_lumi_control'      : True,
+    'sep_plane_ip2'            : 'x', # used by python tools - NOT by legacy macros
+    'sep_plane_ip8'            : 'y', # used by python tools - NOT by legacy macros
+    'lumi_ip8'             : 2e33, # [Hz/cm2] leveled luminosity in IP8 
+    'fullsep_in_sigmas_ip2': 5,
+    'nco_IP1'              : 2748, # number of Head-On collisions in IP1
+    'nco_IP2'              : 2494, # number of Head-On collisions in IP1
+    'nco_IP5'              : 2748, # number of Head-On collisions in IP1
+    'nco_IP8'              : 2572, # number of Head-On collisions in IP1
+
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20],
     'bunch_spacing_buckets'    : 10,
@@ -76,10 +79,13 @@ configuration = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
 
+    # Match tunes and chromatucities including beam-beam effects
+    'match_q_dq_with_bb'        : False,            # should be off at collision
+
     # Enable crab cavities
     'enable_crabs'             : True,
 
-    # N. iterations coupling correction
+    # N. iterations for coupling correction
     'N_iter_coupling'            : 2,
 
     # Value to be added to linear coupling knobs (on sequence_to_track)
@@ -88,18 +94,6 @@ configuration = {
 
     # Verbose flag for MAD-X parts
     'verbose_mad_parts'         : True,
-
-    # Match tunes and chromatucities including beam-beam effects
-    'match_q_dq_with_bb'        : False,            # should be off at collision
-
-
-    # Luminosity parameters
-    'lumi_ip8'             : 2e33, # [Hz/cm2] leveled luminosity in IP8 
-    'fullsep_in_sigmas_ip2': 5,
-    'nco_IP1'              : 2748, # number of Head-On collisions in IP1
-    'nco_IP2'              : 2494, # number of Head-On collisions in IP1
-    'nco_IP5'              : 2748, # number of Head-On collisions in IP1
-    'nco_IP8'              : 2572, # number of Head-On collisions in IP1
 
     # Optics-specific knob namings
     'knob_names' : {
@@ -155,7 +149,7 @@ configuration = {
     # Enable machine imperfections
     'enable_imperfections'     : True,
 
-    # Enable knob synthesis (for coupling correction, if no errors)
+    # Enable knob synthesis (for coupling correction, if no imperfections)
     'enable_knob_synthesis'    : True,
 
     # Parameters for machine imperfections
