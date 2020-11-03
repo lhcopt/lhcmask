@@ -20,7 +20,6 @@ optics_file = configuration['optics_file']
 check_betas_at_ips = configuration['check_betas_at_ips']
 check_separations_at_ips = configuration['check_separations_at_ips']
 save_intermediate_twiss = configuration['save_intermediate_twiss']
-force_leveling= configuration['force_leveling']
 enable_lumi_control = configuration['enable_lumi_control']
 enable_imperfections = configuration['enable_imperfections']
 enable_crabs = configuration['enable_crabs']
@@ -191,7 +190,8 @@ else:
     ost.lumi_control(mad, twiss_dfs, configuration, knob_names)
 
 # Force leveling
-if force_leveling is not None:
+if 'force_leveling' in configuration.keys():
+    force_leveling  = configuration['force_leveling']
     for kk in force_leveling.keys():
         mad.globals[kk] = force_leveling[kk]
 
