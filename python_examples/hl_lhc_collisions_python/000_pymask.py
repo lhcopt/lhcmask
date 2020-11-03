@@ -83,6 +83,7 @@ mad.input('exec, twiss_opt;')
 ost.apply_optics(mad, optics_file=optics_file)
 
 # Pass parameters to mad
+mad.set_variables_from_dict(params=mask_parameters)
 mad.set_variables_from_dict(params={
     'par_verbose': int(python_parameters['verbose_mad_parts']),
     })
