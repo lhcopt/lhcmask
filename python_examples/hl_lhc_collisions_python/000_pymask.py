@@ -73,6 +73,9 @@ if not(enable_crabs):
 Madx = pm.Madxp
 mad = Madx(command_log="mad_collider.log")
 
+# Set verbose flag
+mad.globals.par_verbose = int(configuration['verbose_mad_parts'])
+
 # Build sequence (alse creates link to optics_toolkit and calls it)
 ost.build_sequence(mad, beam=beam_to_configure)
 
@@ -81,11 +84,6 @@ mad.input('exec, twiss_opt;')
 
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
-
-# Pass parameters to mad
-mad.set_variables_from_dict(params={
-    'par_verbose': int(configuration['verbose_mad_parts']),
-    })
 
 # Attach beam to sequences
 mad.globals.nrj = configuration['beam_energy_tot']
