@@ -1,4 +1,4 @@
-python_parameters = {
+configuration = {
 
     # Links to be made for tools and scripts
     'links'                    : {
@@ -76,12 +76,6 @@ python_parameters = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
 
-    # Enable machine imperfections
-    'enable_imperfections'     : True,
-
-    # Enable knob synthesis (for coupling correction, if no errors)
-    'enable_knob_synthesis'    : True,
-
     # Enable crab cavities
     'enable_crabs'             : True,
 
@@ -98,11 +92,6 @@ python_parameters = {
     # Match tunes and chromatucities including beam-beam effects
     'match_q_dq_with_bb'        : False,            # should be off at collision
 
-    # Parameters for legacy beam-beam macros (not used in default modes)
-    'pars_for_legacy_bb_macros' : {
-                                    'par_b_t_dist' : 25.,  # bunch spacing [ns]
-                                    'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
-                                  },
 
     # Luminosity parameters
     'lumi_ip8'             : 2e33, # [Hz/cm2] leveled luminosity in IP8 
@@ -111,6 +100,63 @@ python_parameters = {
     'nco_IP2'              : 2494, # number of Head-On collisions in IP1
     'nco_IP5'              : 2748, # number of Head-On collisions in IP1
     'nco_IP8'              : 2572, # number of Head-On collisions in IP1
+
+    # Optics-specific knob namings
+    'knob_names' : {
+        # Common knobs
+        'sepknob_ip2_mm': 'on_sep2',
+        'sepknob_ip8_mm': 'on_sep8',
+
+        # Knobs associated to sequences
+        'qknob_1': {'lhcb1': 'kqtf.b1',  'lhcb2':'kqtf.b2'},
+        'qknob_2': {'lhcb1': 'kqtd.b1',  'lhcb2':'kqtd.b2'},
+        'chromknob_1': {'lhcb1': 'ksf.b1',  'lhcb2':'ksf.b2'},
+        'chromknob_2': {'lhcb1': 'ksd.b1',  'lhcb2':'ksd.b2'},
+        'cmrknob': {'lhcb1': 'cmrskew',  'lhcb2':'cmrskew'},
+        'cmiknob': {'lhcb1': 'cmiskew',  'lhcb2':'cmiskew'},
+        },
+
+    # Optics specific knob values
+    # (only on_disp, on_crab1 and on_crab5 are used directly by the mask,
+    # the other values are used only throught the optics_specific_tools file)
+    'knob_settings':  {
+        #IP specific orbit settings
+        'on_x1'                   : 250,          # [urad]  
+        'on_sep1'                 : 0,            # [mm]   
+        'on_x2'                   : -170,         # [urad] 
+        'on_sep2'                 : 0.138,        # [mm]   
+        'on_x5'                   : 250,          # [urad] 
+        'on_sep5'                 : 0,            # [mm]   
+        'on_x8'                   : -250,         # [urad] 
+        'on_sep8'                 : -0.043,       # [mm]   
+        'on_a1'                   : 0,            # [urad] 
+        'on_o1'                   : 0,            # [mm]   
+        'on_a2'                   : 0,            # [urad] 
+        'on_o2'                   : 0,            # [mm]   
+        'on_a5'                   : 0,            # [urad] 
+        'on_o5'                   : 0,            # [mm]   
+        'on_a8'                   : 0,            # [urad] 
+        'on_o8'                   : 0,            # [mm]   
+        'on_crab1'                : -190,         # [urad] 
+        'on_crab5'                : -190,         # [urad]  
+
+        # Dispersion correction knob
+        'on_disp'                 : 1,            # Value to choose could be optics-dependent
+
+        # Magnets of the experiments
+        'on_alice_normalized'     : 1,
+        'on_lhcb_normalized'      : 1,
+
+        'on_sol_atlas'            : 0,
+        'on_sol_cms'              : 0,
+        'on_sol_alice'            : 0,
+        },
+
+    # Enable machine imperfections
+    'enable_imperfections'     : True,
+
+    # Enable knob synthesis (for coupling correction, if no errors)
+    'enable_knob_synthesis'    : True,
 
     # Parameters for machine imperfections
     'pars_for_imperfections': {
@@ -127,55 +173,10 @@ python_parameters = {
         'par_on_errors_MCBRD'      : 0,
         'par_on_errors_MCBXF'      : 0,
         },
+
+    # Parameters for legacy beam-beam macros (not used in default modes)
+    'pars_for_legacy_bb_macros' : {
+                                    'par_b_t_dist' : 25.,  # bunch spacing [ns]
+                                    'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
+                                  },
     }
-
-
-
-
-knob_names = {
-        # Common knobs
-        'sepknob_ip2_mm': 'on_sep2',
-        'sepknob_ip8_mm': 'on_sep8',
-
-        # Knobs associated to sequences
-        'qknob_1': {'lhcb1': 'kqtf.b1',  'lhcb2':'kqtf.b2'},
-        'qknob_2': {'lhcb1': 'kqtd.b1',  'lhcb2':'kqtd.b2'},
-        'chromknob_1': {'lhcb1': 'ksf.b1',  'lhcb2':'ksf.b2'},
-        'chromknob_2': {'lhcb1': 'ksd.b1',  'lhcb2':'ksd.b2'},
-        'cmrknob': {'lhcb1': 'cmrskew',  'lhcb2':'cmrskew'},
-        'cmiknob': {'lhcb1': 'cmiskew',  'lhcb2':'cmiskew'},
-        }
-
-knob_settings = {
-    #IP specific orbit settings
-
-    'on_x1'                   : 250,          # [urad]  
-    'on_sep1'                 : 0,            # [mm]   
-    'on_x2'                   : -170,         # [urad] 
-    'on_sep2'                 : 0.138,        # [mm]   
-    'on_x5'                   : 250,          # [urad] 
-    'on_sep5'                 : 0,            # [mm]   
-    'on_x8'                   : -250,         # [urad] 
-    'on_sep8'                 : -0.043,       # [mm]   
-    'on_a1'                   : 0,            # [urad] 
-    'on_o1'                   : 0,            # [mm]   
-    'on_a2'                   : 0,            # [urad] 
-    'on_o2'                   : 0,            # [mm]   
-    'on_a5'                   : 0,            # [urad] 
-    'on_o5'                   : 0,            # [mm]   
-    'on_a8'                   : 0,            # [urad] 
-    'on_o8'                   : 0,            # [mm]   
-    'on_crab1'                : -190,         # [urad] 
-    'on_crab5'                : -190,         # [urad]  
-
-    # Dispersion correction knob
-    'on_disp'                 : 1,            # Value to choose could be optics-dependent
-
-    # Magnets of the experiments
-    'on_alice_normalized'     : 1,
-    'on_lhcb_normalized'      : 1,
-
-    'on_sol_atlas'            : 0,
-    'on_sol_cms'              : 0,
-    'on_sol_alice'            : 0,
-}

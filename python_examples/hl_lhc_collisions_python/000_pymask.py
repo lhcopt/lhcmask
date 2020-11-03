@@ -4,28 +4,29 @@ import pickle
 
 import numpy as np
 
-from config import python_parameters
-from config import knob_settings, knob_names
-
 
 #####################################################
 # Read general configurations and setup envirnoment #
 #####################################################
 
-mode = python_parameters['mode']
-tol_beta = python_parameters['tol_beta']
-tol_sep = python_parameters['tol_sep']
-flat_tol = python_parameters['tol_co_flatness']
-links = python_parameters['links']
-optics_file = python_parameters['optics_file']
-check_betas_at_ips = python_parameters['check_betas_at_ips']
-check_separations_at_ips = python_parameters['check_separations_at_ips']
-save_intermediate_twiss = python_parameters['save_intermediate_twiss']
-force_leveling= python_parameters['force_leveling']
-enable_lumi_control = python_parameters['enable_lumi_control']
-enable_imperfections = python_parameters['enable_imperfections']
-enable_crabs = python_parameters['enable_crabs']
-match_q_dq_with_bb = python_parameters['match_q_dq_with_bb']
+from config import configuration
+
+mode = configuration['mode']
+tol_beta = configuration['tol_beta']
+tol_sep = configuration['tol_sep']
+flat_tol = configuration['tol_co_flatness']
+links = configuration['links']
+optics_file = configuration['optics_file']
+check_betas_at_ips = configuration['check_betas_at_ips']
+check_separations_at_ips = configuration['check_separations_at_ips']
+save_intermediate_twiss = configuration['save_intermediate_twiss']
+force_leveling= configuration['force_leveling']
+enable_lumi_control = configuration['enable_lumi_control']
+enable_imperfections = configuration['enable_imperfections']
+enable_crabs = configuration['enable_crabs']
+match_q_dq_with_bb = configuration['match_q_dq_with_bb']
+knob_settings = configuration['knob_settings']
+knob_names = configuration['knob_names']
 
 
 # Make links
@@ -84,12 +85,12 @@ ost.apply_optics(mad, optics_file=optics_file)
 
 # Pass parameters to mad
 mad.set_variables_from_dict(params={
-    'par_verbose': int(python_parameters['verbose_mad_parts']),
+    'par_verbose': int(configuration['verbose_mad_parts']),
     })
 
 # Attach beam to sequences
-mad.globals.nrj = python_parameters['beam_energy_tot']
-gamma_rel = python_parameters['beam_energy_tot']/mad.globals.pmass
+mad.globals.nrj = configuration['beam_energy_tot']
+gamma_rel = configuration['beam_energy_tot']/mad.globals.pmass
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
     if ss == 'lhcb1':
@@ -103,13 +104,13 @@ for ss in mad.sequence.keys():
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
     beam, particle=proton,sequence={ss},
-        energy={python_parameters['beam_energy_tot']},
-        sigt={python_parameters['beam_sigt']},
+        energy={configuration['beam_energy_tot']},
+        sigt={configuration['beam_sigt']},
         bv={ss_beam_bv},
-        npart={python_parameters['beam_npart']},
-        sige={python_parameters['beam_sige']},
-        ex={python_parameters['beam_norm_emit_x'] * 1e-6 / gamma_rel},
-        ey={python_parameters['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+        npart={configuration['beam_npart']},
+        sige={configuration['beam_sige']},
+        ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
     ''')
 
 
@@ -166,8 +167,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 if len(sequences_to_check) == 2:
     print('Luminosities before leveling (crab cavities are not considered):')
     pm.print_luminosity(mad, twiss_dfs,
-            python_parameters['nco_IP1'], python_parameters['nco_IP2'],
-            python_parameters['nco_IP5'], python_parameters['nco_IP8'])
+            configuration['nco_IP1'], configuration['nco_IP2'],
+            configuration['nco_IP5'], configuration['nco_IP8'])
 else:
     print('Warning: Luminosity computation requires two beams')
 
@@ -183,11 +184,11 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         vars_for_legacy_level = ['lumi_ip8',
             'nco_IP1', 'nco_IP2', 'nco_IP5', 'nco_IP8']
         mad.set_variables_from_dict({
-            'par_'+kk: python_parameters[kk] for kk in vars_for_legacy_level})
+            'par_'+kk: configuration[kk] for kk in vars_for_legacy_level})
         mad.input("call, file='modules/module_02_lumilevel.madx';")
 else:
     print('Start pythonic leveling:')
-    ost.lumi_control(mad, twiss_dfs, python_parameters, knob_names)
+    ost.lumi_control(mad, twiss_dfs, configuration, knob_names)
 
 # Force leveling
 if force_leveling is not None:
@@ -209,8 +210,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 if len(sequences_to_check) == 2:
     print('Luminosities after leveling (crab cavities are not considered):')
     pm.print_luminosity(mad, twiss_dfs,
-            python_parameters['nco_IP1'], python_parameters['nco_IP2'],
-            python_parameters['nco_IP5'], python_parameters['nco_IP8'])
+            configuration['nco_IP1'], configuration['nco_IP2'],
+            configuration['nco_IP5'], configuration['nco_IP8'])
 else:
     print('Luminosity computation requires two beams')
 
@@ -232,12 +233,12 @@ if enable_bb_python:
     bb_dfs = pm.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
-        numberOfLRPerIRSide=python_parameters['numberOfLRPerIRSide'],
-        bunch_spacing_buckets=python_parameters['bunch_spacing_buckets'],
-        numberOfHOSlices=python_parameters['numberOfHOSlices'],
-        bunch_population_ppb=python_parameters['bunch_population_ppb'],
-        sigmaz_m=python_parameters['sigmaz_m'],
-        z_crab_twiss=python_parameters['z_crab_twiss']*float(enable_crabs),
+        numberOfLRPerIRSide=configuration['numberOfLRPerIRSide'],
+        bunch_spacing_buckets=configuration['bunch_spacing_buckets'],
+        numberOfHOSlices=configuration['numberOfHOSlices'],
+        bunch_population_ppb=configuration['bunch_population_ppb'],
+        sigmaz_m=configuration['sigmaz_m'],
+        z_crab_twiss=configuration['z_crab_twiss']*float(enable_crabs),
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
@@ -318,9 +319,9 @@ if enable_bb_legacy:
     assert(not(enable_bb_python))
     mad_track.globals['par_on_bb_switch'] = 1
     mad_track.set_variables_from_dict(
-       params=python_parameters['pars_for_legacy_bb_macros'])
+       params=configuration['pars_for_legacy_bb_macros'])
     mad_track.set_variables_from_dict(
-            params={f'par_nho_ir{ir}':python_parameters['numberOfHOSlices']
+            params={f'par_nho_ir{ir}':configuration['numberOfHOSlices']
             for ir in [1,2,5,8]})
     mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
@@ -367,12 +368,12 @@ mad_track.use = None
 
 if enable_imperfections:
     mad_track.set_variables_from_dict(
-            python_parameters['pars_for_imperfections'])
+            configuration['pars_for_imperfections'])
     mad_track.input("call, file='modules/module_04_errors.madx';")
 else:
     # Synthesize knobs
     mad_track.input('call, file="modules/submodule_04a_s1_prepare_nom_twiss_table.madx";')
-    if python_parameters['enable_knob_synthesis']:
+    if configuration['enable_knob_synthesis']:
         mad_track.input('exec, crossing_disable;')
         mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
         mad_track.input('exec, crossing_restore;')
@@ -390,7 +391,7 @@ else:
 
 # Switch on octupoles
 brho = mad_track.globals.nrj*1e9/mad_track.globals.clight
-i_oct = python_parameters['oct_current']
+i_oct = configuration['oct_current']
 beam_str = {'lhcb1':'b1', 'lhcb2':'b2'}[sequence_to_track]
 for ss in '12 23 34 45 56 67 78 81'.split():
    mad_track.input(f'kof.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
@@ -398,10 +399,10 @@ for ss in '12 23 34 45 56 67 78 81'.split():
 
 
 # Correct linear coupling
-qx_fractional, qx_integer = np.modf(python_parameters['qx0'])
-qy_fractional, qy_integer = np.modf(python_parameters['qy0'])
+qx_fractional, qx_integer = np.modf(configuration['qx0'])
+qy_fractional, qy_integer = np.modf(configuration['qy0'])
 coupl_corr_info = pm.coupling_correction(mad_track,
-        n_iterations=python_parameters['N_iter_coupling'],
+        n_iterations=configuration['N_iter_coupling'],
         qx_integer=qx_integer, qy_integer=qy_integer,
         qx_fractional=qx_fractional, qy_fractional=qy_fractional,
         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
@@ -411,8 +412,8 @@ coupl_corr_info = pm.coupling_correction(mad_track,
         sequence_name=sequence_to_track, skip_use=True)
 
 # Add custom values to coupling knobs
-mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += python_parameters['delta_cmr']
-mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += python_parameters['delta_cmi']
+mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
+mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
 
 # Check strength limits
 if enable_imperfections:
@@ -427,10 +428,10 @@ if mad_track.globals.on_disp != 0:
 
 # Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,
-        q1=python_parameters['qx0'],
-        q2=python_parameters['qy0'],
-        dq1=python_parameters['chromaticity_x'],
-        dq2=python_parameters['chromaticity_y'],
+        q1=configuration['qx0'],
+        q2=configuration['qy0'],
+        dq1=configuration['chromaticity_x'],
+        dq2=configuration['chromaticity_y'],
         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
         chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
@@ -445,7 +446,7 @@ if enable_imperfections:
 mad_track.globals.on_bb_charge = 1.
 
 # Switch on RF cavities
-mad_track.globals['vrf400'] = python_parameters['vrf_total']
+mad_track.globals['vrf400'] = configuration['vrf_total']
 if sequence_to_track == 'lhcb1':
     mad_track.globals['lagrf400.b1'] = 0.5
 elif sequence_to_track == 'lhcb2':
