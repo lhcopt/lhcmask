@@ -79,7 +79,7 @@ configuration = {
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.075,
 
-    # Match tunes and chromatucities including beam-beam effects
+    # Match tunes and chromaticities including beam-beam effects
     'match_q_dq_with_bb'        : False,            # should be off at collision
 
     # Enable crab cavities
