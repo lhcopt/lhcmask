@@ -20,7 +20,7 @@ python_parameters = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb_legacy_macros',
+    'mode'                      : 'b1_with_bb',
 
     # Force separation in IP2 and IP8 if needed
     'force_leveling'            : None,
@@ -103,26 +103,28 @@ python_parameters = {
                                     'par_b_t_dist' : 25.,  # bunch spacing [ns]
                                     'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
                                   },
-    }
-
-
-mask_parameters = {
 
     #*****************************#
     #     Luminosity parameters   #
     #*****************************#
 
     # This variables set the leveled luminosity in IP8 
-    'par_lumi_ip8'             : 2e33,         #[Hz/cm2]
+    'lumi_ip8'             : 2e33,         #[Hz/cm2]
 
     # This variables set the leveled luminosity in IP8 
-    'par_fullsep_in_sigmas_ip2': 5,
+    'fullsep_in_sigmas_ip2': 5,
 
     # These variables define the number of Head-On collisions in the 4 IPs
-    'par_nco_IP1'              : 2748,
-    'par_nco_IP2'              : 2494,
-    'par_nco_IP5'              : 2748,
-    'par_nco_IP8'              : 2572,
+    'nco_IP1'              : 2748,
+    'nco_IP2'              : 2494,
+    'nco_IP5'              : 2748,
+    'nco_IP8'              : 2572,
+
+    }
+
+
+mask_parameters = {
+
 
     #*************************#
     #  Errors and corrections #

@@ -167,8 +167,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 if len(sequences_to_check) == 2:
     print('Luminosities before leveling (crab cavities are not considered):')
     pm.print_luminosity(mad, twiss_dfs,
-            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+            python_parameters['nco_IP1'], python_parameters['nco_IP2'],
+            python_parameters['nco_IP5'], python_parameters['nco_IP8'])
 else:
     print('Warning: Luminosity computation requires two beams')
 
@@ -181,6 +181,10 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
         # Luminosity levelling
+        vars_for_legacy_level = ['lumi_ip8',
+            'nco_IP1', 'nco_IP2', 'nco_IP5', 'nco_IP8']
+        mad.set_variables_from_dict({
+            'par_'+kk: python_parameters[kk] for kk in vars_for_legacy_level})
         mad.input("call, file='modules/module_02_lumilevel.madx';")
 else:
     print('Start pythonic leveling:')
@@ -207,8 +211,8 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 if len(sequences_to_check) == 2:
     print('Luminosities after leveling (crab cavities are not considered):')
     pm.print_luminosity(mad, twiss_dfs,
-            mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
-            mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
+            python_parameters['nco_IP1'], python_parameters['nco_IP2'],
+            python_parameters['nco_IP5'], python_parameters['nco_IP8'])
 else:
     print('Luminosity computation requires two beams')
 
