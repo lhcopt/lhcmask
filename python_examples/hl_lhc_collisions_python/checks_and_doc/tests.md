@@ -44,7 +44,6 @@ diff fc.34 ../../examples/hl_lhc_collision/fc.34
 In config.py we select:
 ```python
 'mode' : 'b1_with_bb',
-'force_leveling' : None,
 ```
 
 We exeute the python version:
@@ -174,7 +173,7 @@ cd ../../python_examples/hl_lhc_collisions_python
 In config.py we select:
 ```python
 'mode' : 'b4_from_b2_with_bb',
-'force_leveling' : None,
+
 ```
 We run the python version:
 ```
