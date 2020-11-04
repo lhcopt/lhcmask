@@ -4,29 +4,33 @@ import pickle
 
 import numpy as np
 
-from config import python_parameters, mask_parameters, knob_parameters
+from config import configuration 
 
 
 #####################################################
 # Read general configurations and setup envirnoment #
 #####################################################
 
-mode = python_parameters['mode']
-tol_beta = python_parameters['tol_beta']
-tol_sep = python_parameters['tol_sep']
-flat_tol = python_parameters['tol_co_flatness']
-links = python_parameters['links']
-optics_file = python_parameters['optics_file']
-check_betas_at_ips = python_parameters['check_betas_at_ips']
-check_separations_at_ips = python_parameters['check_separations_at_ips']
-save_intermediate_twiss = python_parameters['save_intermediate_twiss']
-force_leveling= python_parameters['force_leveling']
+mode = configuration['mode']
+tol_beta = configuration['tol_beta']
+tol_sep = configuration['tol_sep']
+flat_tol = configuration['tol_co_flatness']
+links = configuration['links']
+optics_file = configuration['optics_file']
+check_betas_at_ips = configuration['check_betas_at_ips']
+check_separations_at_ips = configuration['check_separations_at_ips']
+save_intermediate_twiss = configuration['save_intermediate_twiss']
+knob_settings = configuration['knob_settings']
 
 # Make links
 for kk in links.keys():
     if os.path.exists(kk):
         os.remove(kk)
     os.symlink(os.path.abspath(links[kk]), kk)
+
+# Create empty temp folder
+os.system('rm -r temp')
+os.system('mkdir temp')
 
 # Execute customization script if present
 os.system('bash customization.bash')
@@ -43,9 +47,6 @@ import optics_specific_tools as ost
 # Check parameters and activate mode #
 ######################################
 
-# Check and load parameters 
-pm.checks_on_parameter_dict(mask_parameters)
-
 # Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
@@ -54,9 +55,6 @@ pm.checks_on_parameter_dict(mask_parameters)
 
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
-
-if not(enable_bb_legacy) and not(enable_bb_python):
-    mask_parameters['par_on_bb_switch'] = 0.
 
 
 ########################
@@ -73,22 +71,33 @@ ost.build_sequence(mad, beam=beam_to_configure)
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
 
-# Pass parameters to mad
-mad.set_variables_from_dict(params=mask_parameters)
+# Attach beam to sequences
+mad.globals.nrj = configuration['beam_energy_tot']
+gamma_rel = configuration['beam_energy_tot']/mad.globals.pmass
+for ss in mad.sequence.keys():
+    # bv and bv_aux flags
+    if ss == 'lhcb1':
+        ss_beam_bv, ss_bv_aux = 1, 1
+    elif ss == 'lhcb2':
+        if int(beam_to_configure) == 4:
+            ss_beam_bv, ss_bv_aux = 1, -1
+        else:
+            ss_beam_bv, ss_bv_aux = -1, 1
 
-# Prepare auxiliary mad variables
-mad.call("modules/submodule_01a_preparation.madx")
-
-# Attach beams to sequences
-mad.call("modules/submodule_01b_beam.madx")
+    mad.globals['bv_aux'] = ss_bv_aux
+    mad.input(f'''
+    beam, particle=proton,sequence={ss},
+        energy={configuration['beam_energy_tot']},
+        sigt={configuration['beam_sigt']},
+        bv={ss_beam_bv},
+        npart={configuration['beam_npart']},
+        sige={configuration['beam_sige']},
+        ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+    ''')
 
 # Set optics-specific knobs
-ost.set_optics_specific_knobs(mad, knob_parameters, mode)
-
-
-
-
-
+ost.set_optics_specific_knobs(mad, knob_settings, mode)
 
 # Synthesisze knobs
 mad.call('modules/submodule_04_1b_save_references.madx')
@@ -104,6 +113,10 @@ mad.globals.cmrskew = cmrskew_test
 mad.globals.cmiskew = cmiskew_test
 
 # Test old approach
+mad.globals.qx0 = 62.31
+mad.globals.qy0 = 60.32
+mad.globals.qx00 = 62.
+mad.globals.qy00 = 60.
 mad.call('modules/submodule_05b_coupling.madx')
 cmrskew_legacy = mad.globals.cmrskew
 cmiskew_legacy = mad.globals.cmiskew
@@ -112,8 +125,6 @@ cta_legacy = pc.coupling_measurement(mad,
         qx_fractional=.31, qy_fractional=.32,
         tune_knob1_name='kqtf.b1', tune_knob2_name='kqtd.b1',
         sequence_name='lhcb1', skip_use=False)
-
-
 
 # Test new approach
 mad.globals.cmrskew = cmrskew_test

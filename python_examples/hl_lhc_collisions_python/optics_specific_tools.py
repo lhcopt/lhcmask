@@ -113,17 +113,17 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
 
     return twiss_dfs, other_data
 
-def lumi_control(mad, twiss_dfs, python_parameters, mask_parameters, knob_names):
+def lumi_control(mad, twiss_dfs, configuration, knob_names):
     from scipy.optimize import least_squares
 
     # Leveling in IP8
-    sep_plane_ip8 = python_parameters['sep_plane_ip8']
+    sep_plane_ip8 = configuration['sep_plane_ip8']
     sep_knobname_ip8 = knob_names['sepknob_ip8_mm']
 
-    L_target_ip8 = mask_parameters['par_lumi_ip8']
+    L_target_ip8 = configuration['lumi_ip8']
     def function_to_minimize_ip8(sep8_m):
         my_dict_IP8=pm.get_luminosity_dict(
-            mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
+            mad, twiss_dfs, 'ip8', configuration['nco_IP8'])
         my_dict_IP8[sep_plane_ip8 + '_1']=np.abs(sep8_m)
         my_dict_IP8[sep_plane_ip8 + '_2']=-np.abs(sep8_m)
         return np.abs(pm.luminosity(**my_dict_IP8) - L_target_ip8)
@@ -134,13 +134,13 @@ def lumi_control(mad, twiss_dfs, python_parameters, mask_parameters, knob_names)
                                 * np.abs(optres_ip8['x'][0])*1e3)
 
     # Halo collision in IP2
-    sep_plane_ip2 = python_parameters['sep_plane_ip2']
+    sep_plane_ip2 = configuration['sep_plane_ip2']
     sep_knobname_ip2 = knob_names['sepknob_ip2_mm']
     sigma_sep_b1_ip2=np.sqrt(
             twiss_dfs['lhcb1'].loc['ip2:1']['bet'+sep_plane_ip2]
             * mad.sequence.lhcb1.beam['e'+sep_plane_ip2])
     mad.globals[sep_knobname_ip2] = (np.sign(mad.globals[sep_knobname_ip2])
-            * mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_sep_b1_ip2/2*1e3)
+            * configuration['fullsep_in_sigmas_ip2']*sigma_sep_b1_ip2/2*1e3)
 
 
 def _check_beta_at_ips_against_madvars(beam, twiss_df, variable_dicts, tol):
