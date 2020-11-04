@@ -190,8 +190,9 @@ else:
 # Force leveling
 if 'force_leveling' in configuration.keys():
     force_leveling  = configuration['force_leveling']
-    for kk in force_leveling.keys():
-        mad.globals[kk] = force_leveling[kk]
+    if force_leveling is not None:
+        for kk in force_leveling.keys():
+            mad.globals[kk] = force_leveling[kk]
 
 # Re-save knobs (for the last time!)
 mad.input('exec, crossing_save;')
