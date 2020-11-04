@@ -1,4 +1,4 @@
-__version__ = "v0.2"
+__version__ = "v0.3.0"
 
 from .beambeam import *
 from .madpoint import *
