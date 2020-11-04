@@ -99,9 +99,6 @@ for ss in mad.sequence.keys():
 # Set optics-specific knobs
 ost.set_optics_specific_knobs(mad, knob_settings, mode)
 
-
-
-
 # Synthesisze knobs
 mad.call('modules/submodule_04_1b_save_references.madx')
 mad.call('modules/submodule_04a_s1_prepare_nom_twiss_table.madx')
@@ -116,6 +113,10 @@ mad.globals.cmrskew = cmrskew_test
 mad.globals.cmiskew = cmiskew_test
 
 # Test old approach
+mad.globals.qx0 = 62.31
+mad.globals.qy0 = 60.32
+mad.globals.qx00 = 62.
+mad.globals.qy00 = 60.
 mad.call('modules/submodule_05b_coupling.madx')
 cmrskew_legacy = mad.globals.cmrskew
 cmiskew_legacy = mad.globals.cmiskew
@@ -124,8 +125,6 @@ cta_legacy = pc.coupling_measurement(mad,
         qx_fractional=.31, qy_fractional=.32,
         tune_knob1_name='kqtf.b1', tune_knob2_name='kqtd.b1',
         sequence_name='lhcb1', skip_use=False)
-
-
 
 # Test new approach
 mad.globals.cmrskew = cmrskew_test
