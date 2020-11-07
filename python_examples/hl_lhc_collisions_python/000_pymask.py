@@ -250,7 +250,6 @@ if enable_bb_python:
 if generate_b4_from_b2:
     mad_b4 = Madx(command_log="mad_b4.log")
     ost.build_sequence(mad_b4, beam=4)
-    ost.apply_optics(mad_b4, optics_file=optics_file)
 
     pm.configure_b4_from_b2(mad_b4, mad)
 
