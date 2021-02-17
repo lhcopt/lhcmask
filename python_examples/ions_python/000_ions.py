@@ -180,7 +180,7 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
         # Modified module 2 for offset levelling in IP1,2,5,8
-        vars_for_legacy_level = ['lumi_ip8',
+        vars_for_legacy_level = ['lumi_ip8','lumi_ip5', 'lumi_ip1', 'lumi_ip2',
             'nco_IP1', 'nco_IP2', 'nco_IP5', 'nco_IP8']
         mad.set_variables_from_dict({
             'par_'+kk: configuration[kk] for kk in vars_for_legacy_level})
