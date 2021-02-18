@@ -73,8 +73,8 @@ def set_optics_specific_knobs(mad, knob_settings, mode=None):
         assert knob_settings['on_disp'] == 0
 
     # A knob redefinition
-    mad.input('on_alice := on_alice_normalized * 7000./nrj;')
-    mad.input('on_lhcb := on_lhcb_normalized * 7000./nrj;')
+    mad.input('on_alice := on_alice_normalized * 7000./(nrj/charge);')
+    mad.input('on_lhcb := on_lhcb_normalized * 7000./(nrj/charge);')
 
 
 def twiss_and_check(mad, sequences_to_check, twiss_fname,
