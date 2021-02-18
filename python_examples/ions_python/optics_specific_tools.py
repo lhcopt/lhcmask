@@ -61,6 +61,7 @@ def build_sequence(mad, beam):
 
 def apply_optics(mad, optics_file):
     mad.call(optics_file)
+    mad.call('ir7_strengths.madx')
 
 
 def set_optics_specific_knobs(mad, knob_settings, mode=None):
