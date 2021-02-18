@@ -87,6 +87,7 @@ ost.apply_optics(mad, optics_file=optics_file)
 
 # Attach beam to sequences
 mad.globals.nrj = configuration['beam_energy_tot']
+mad.globals.charge = configuration['charge']
 gamma_rel = configuration['beam_energy_tot']/configuration['mass']
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
