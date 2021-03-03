@@ -87,8 +87,7 @@ ost.apply_optics(mad, optics_file=optics_file)
 
 # Attach beam to sequences
 mad.globals.nrj = configuration['beam_energy_tot']
-mad.globals.charge = configuration['charge']
-gamma_rel = configuration['beam_energy_tot']/configuration['mass']
+gamma_rel = (configuration['beam_charge']*configuration['beam_energy_tot'])/configuration['beam_mass']
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
     if ss == 'lhcb1':
@@ -102,15 +101,15 @@ for ss in mad.sequence.keys():
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
     beam, particle=ion,sequence={ss},
-        energy={configuration['beam_energy_tot']},
+        energy={configuration['beam_energy_tot']*configuration['beam_charge']},
         sigt={configuration['beam_sigt']},
         bv={ss_beam_bv},
         npart={configuration['beam_npart']},
         sige={configuration['beam_sige']},
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
-        mass = {configuration['mass']},
-        charge={configuration['charge']},
+        mass = {configuration['beam_mass']},
+        charge={configuration['beam_charge']},
     ''')
 
 
@@ -303,6 +302,11 @@ if generate_b4_from_b2:
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
+# For B1, to be generalized for B4
+filling_scheme_json = configuration['filling_scheme_json']
+bunch_to_track = configuration['bunch_to_track']
+bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(filling_scheme_json,bunch_to_track, beam='1')
+bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
 
 ##################################################
 # Select mad instance for tracking configuration #
@@ -544,3 +548,12 @@ else:
         closed_orbit_method='from_mad',
         pickle_lines_in_folder=pysix_fol_name,
         skip_mad_use=True)
+
+##### Save final twiss
+
+mad_track.globals.on_bb_charge = 0
+mad_track.twiss()
+tdf = mad_track.get_twiss_df('twiss')
+sdf = mad_track.get_summ_df('summ')
+tdf.to_parquet('final_twiss_BBOFF.parquet')
+sdf.to_parquet('final_summ_BBOFF.parquet')

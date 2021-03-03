@@ -44,11 +44,11 @@ configuration = {
     'beam_sigt'            : 0.0824,        # [m]
     'beam_sige'            : 1.02e-4,       # [-]
     'beam_npart'           : 1.8e8,         # [-]
-    'beam_energy_tot'      : 574000.,       # [GeV]
+    'beam_energy_tot'      : 7000.  ,       # [GeV]
 
     # Ion parameters
-    'mass'                 :193.68715,
-    'charge'               :82,
+    'beam_mass'                 :193.68715,
+    'beam_charge'               :82,
 
     # Tunes and chromaticities
     'qx0'                  : 62.31,
@@ -79,13 +79,15 @@ configuration = {
     'nco_IP8'              : 398,
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
-    'numberOfLRPerIRSide'      : [25, 20, 25, 20],
+    'numberOfLRPerIRSide'      : [25, 20, 25, 20], 
     'bunch_spacing_buckets'    : 20,
     'numberOfHOSlices'         : 11,
     'bunch_population_ppb'     : None,
     'sigmaz_m'                 : None,
     'z_crab_twiss'             : 0.,
 
+    'bunch_to_track'           : 488,
+    'filling_scheme_json'     : 'filling.json',
     # Match tunes and chromaticities including beam-beam effects
     'match_q_dq_with_bb'        : False,            # should be off at collision
 

@@ -25,7 +25,7 @@ def build_sequence(mad, beam):
     mad.call('optics_runII/2018/toolkit/macro.madx')
 
     # Redefine macros
-    #_redefine_crossing_save_disable_restore(mad)
+    _redefine_crossing_save_disable_restore(mad)
 
     # optics independent macros
     mad.call('tools/optics_indep_macros.madx')
@@ -74,8 +74,8 @@ def set_optics_specific_knobs(mad, knob_settings, mode=None):
         assert knob_settings['on_disp'] == 0
 
     # A knob redefinition
-    mad.input('on_alice := on_alice_normalized * 7000./(nrj/charge);')
-    mad.input('on_lhcb := on_lhcb_normalized * 7000./(nrj/charge);')
+    mad.input('on_alice := on_alice_normalized * 7000./nrj;')
+    mad.input('on_lhcb := on_lhcb_normalized * 7000./nrj;')
 
 
 def twiss_and_check(mad, sequences_to_check, twiss_fname,
@@ -151,17 +151,11 @@ def _redefine_crossing_save_disable_restore(mad):
     on_x2_aux=on_x2;on_sep2_aux=on_sep2;on_a2_aux=on_a2;on_o2_aux=on_o2; on_oe2_aux=on_oe2;
     on_x5_aux=on_x5;on_sep5_aux=on_sep5;on_a5_aux=on_a5;on_o5_aux=on_o5;
     on_x8_aux=on_x8;on_sep8_aux=on_sep8;on_a8_aux=on_a8;on_o8_aux=on_o8;
-    on_x2h_aux=on_x2h;
-    on_x2v_aux=on_x2v;
-    on_sep2h_aux=on_sep2h;
-    on_sep2v_aux=on_sep2v;
-    on_x8h_aux=on_x8h;
-    on_x8v_aux=on_x8v;
-    on_sep8h_aux=on_sep8h;
-    on_sep8v_aux=on_sep8v;
     on_disp_aux=on_disp;
     on_alice_aux=on_alice;
     on_lhcb_aux=on_lhcb;
+    on_ov2_aux=on_ov2;
+    on_ov5_aux=on_ov5;
     };
 
     crossing_disable: macro={
@@ -169,16 +163,9 @@ def _redefine_crossing_save_disable_restore(mad):
     on_x2=0;on_sep2=0;on_a2=0;on_o2=0;on_oe2=0;
     on_x5=0;on_sep5=0;on_a5=0;on_o5=0;
     on_x8=0;on_sep8=0;on_a8=0;on_o8=0;
-    on_x2h=0;
-    on_x2v=0;
-    on_sep2h=0;
-    on_sep2v=0;
-    on_x8h=0;
-    on_x8v=0;
-    on_sep8h=0;
-    on_sep8v=0;
     on_disp=0;
     on_alice=0; on_lhcb=0;
+    on_ov2=0;on_ov5=0;
     };
 
     crossing_restore: macro={
@@ -186,16 +173,10 @@ def _redefine_crossing_save_disable_restore(mad):
     on_x2=on_x2_aux;on_sep2=on_sep2_aux;on_a2=on_a2_aux;on_o2=on_o2_aux; on_oe2=on_oe2_aux;
     on_x5=on_x5_aux;on_sep5=on_sep5_aux;on_a5=on_a5_aux;on_o5=on_o5_aux;
     on_x8=on_x8_aux;on_sep8=on_sep8_aux;on_a8=on_a8_aux;on_o8=on_o8_aux;
-    on_x2h=on_x2h_aux;
-    on_x2v=on_x2v_aux;
-    on_sep2h=on_sep2h_aux;
-    on_sep2v=on_sep2v_aux;
-    on_x8h=on_x8h_aux;
-    on_x8v=on_x8v_aux;
-    on_sep8h=on_sep8h_aux;
-    on_sep8v=on_sep8v_aux;
     on_disp=on_disp_aux;
     on_alice=on_alice_aux; on_lhcb=on_lhcb_aux;
+    on_ov2=on_ov2_aux;
+    on_ov5=on_ov5_aux;
     };
     ''')
 
@@ -249,3 +230,41 @@ def _check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
     pm.check_separations_against_madvars(separations_to_check,
             twiss_df_b1, twiss_df_b2, variables_dict)
 
+# From Guido: https://github.com/sterbini/run3_beta_beating
+def create_bb_shedule_to_track(filling_scheme_fname,bunch_to_track, beam=1):
+    import fillingpatterns as fp
+    patt = fp.FillingPattern.from_json(filling_scheme_fname)
+    patt.compute_beam_beam_schedule(n_lr_per_side=20)
+    bb_shedule_to_track = patt[f'b{beam}'].bb_schedule.loc[bunch_to_track]
+    return bb_shedule_to_track
+
+def filter_bb_df(bb_df, bb_schedule_to_track):
+    import pandas as pd
+    if bb_schedule_to_track['collides in ATLAS/CMS']==False:
+        bb_df=bb_df[~((bb_df['ip_name']=='ip1') & (bb_df['label']=='bb_ho'))]
+        bb_df=bb_df[~((bb_df['ip_name']=='ip5') & (bb_df['label']=='bb_ho'))]
+    if bb_schedule_to_track['collides in LHCB']==False:
+        bb_df=bb_df[~((bb_df['ip_name']=='ip8') & (bb_df['label']=='bb_ho'))]
+    if bb_schedule_to_track['collides in ALICE']==False:
+        bb_df=bb_df[~((bb_df['ip_name']=='ip2') & (bb_df['label']=='bb_ho'))]
+
+    bb_df_ho=bb_df[bb_df['label']=='bb_ho'].copy()
+
+    # BBLR ATLAS
+    lr_ATLAS=bb_df[(bb_df['ip_name']=='ip1') & (bb_df['label']=='bb_lr')].copy()
+    lr_ATLAS=lr_ATLAS[lr_ATLAS['identifier'].apply(lambda x: x in bb_schedule_to_track['Positions in ATLAS/CMS'])]
+
+    # BBLR ALICE
+    lr_ALICE=bb_df[(bb_df['ip_name']=='ip2') & (bb_df['label']=='bb_lr')].copy()
+    lr_ALICE=lr_ALICE[lr_ALICE['identifier'].apply(lambda x: x in bb_schedule_to_track['Positions in ALICE'])]
+
+    # BBLR CMS
+    lr_CMS=bb_df[(bb_df['ip_name']=='ip5') & (bb_df['label']=='bb_lr')].copy()
+    lr_CMS=lr_CMS[lr_CMS['identifier'].apply(lambda x: x in bb_schedule_to_track['Positions in ATLAS/CMS'])]
+
+    # BBLR LHCB
+    lr_LHCB=bb_df[(bb_df['ip_name']=='ip8') & (bb_df['label']=='bb_lr')].copy()
+    lr_LHCB=lr_LHCB[lr_LHCB['identifier'].apply(lambda x: x in bb_schedule_to_track['Positions in LHCB'])]
+
+    aux=pd.concat([bb_df_ho, lr_ATLAS, lr_ALICE, lr_CMS, lr_LHCB])
+    return aux
