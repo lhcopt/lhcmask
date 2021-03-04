@@ -234,8 +234,11 @@ def _check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
 def create_bb_shedule_to_track(filling_scheme_fname,bunch_to_track, beam=1):
     import fillingpatterns as fp
     patt = fp.FillingPattern.from_json(filling_scheme_fname)
-    patt.compute_beam_beam_schedule(n_lr_per_side=20)
-    bb_shedule_to_track = patt[f'b{beam}'].bb_schedule.loc[bunch_to_track]
+    patt.compute_beam_beam_schedule(n_lr_per_side=25)
+    if beam==1:
+        bb_shedule_to_track = patt.b1.bb_schedule.loc[bunch_to_track]
+    else:
+        bb_shedule_to_track = patt.b2.bb_schedule.loc[bunch_to_track]
     return bb_shedule_to_track
 
 def filter_bb_df(bb_df, bb_schedule_to_track):

@@ -80,7 +80,7 @@ configuration = {
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
     'numberOfLRPerIRSide'      : [25, 20, 25, 20], 
-    'bunch_spacing_buckets'    : 20,
+    'bunch_spacing_buckets'    : 10,
     'numberOfHOSlices'         : 11,
     'bunch_population_ppb'     : None,
     'sigmaz_m'                 : None,
