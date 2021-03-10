@@ -1,30 +1,33 @@
 # Tests performed on pymask
 
-For pysixtrack we are using the branch: "feature/cc_from_mad_and_sixtrack"
 Sixtracktools is on the master
 
-We test the commit be0aa65dc11c8104d6e4d83957fc93d71f2c052c
+We test the commit 5da242cf332661f06a2151dc49fbf616b9806d6b
+
+N.B. For the tests to be successful make sure that cpymad and madx correspond to the same (updated!) version.
+
+
 
 ## Test 1 - b1 with bb legacy macros
 
 We execute the reference:
 ```bash
- cd ../hl_lhc_collision
+ cd ../../examples/hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-We select:
+In config.py we select:
 ```python
-mode = 'b1_with_bb_legacy_macros'
+mode : 'b1_with_bb_legacy_macros'
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
@@ -38,28 +41,28 @@ diff fc.34 ../../examples/hl_lhc_collision/fc.34
 
 
 ## Test 2 - b1 with new bb tools
-We select:
+In config.py we select:
 ```python
-mode = 'b1_with_bb'
+'mode' : 'b1_with_bb',
 ```
 
 We exeute the python version:
 ```bash
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We execute the reference (can be reused from the previous test):
 ```bash
- cd ../hl_lhc_collision
+ cd ../../examples/hl_lhc_collision
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
-
+In the folder ```checks_and_doc```:
 Configure ```t004_compare_pysixtrack_lines.py``` for the test:
 ```python
 # Test b1
-path_test = './'
+path_test = '../'
 type_test = 'sixtrack'
-path_ref = '../hl_lhc_collision'
+path_ref = '../../examples/hl_lhc_collision'
 type_ref = 'sixtrack
 ```
 
@@ -96,22 +99,25 @@ Repeat for IP1.
 
 We execute the reference:
 ```bash
- cd ../hl_lhc_collision_nobb_b4
+ cd ../../examples/hl_lhc_collision_nobb_b4
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-We select:
+In config.py we select:
 ```python
-mode = 'b4_without_bb'
+'mode' : 'b4_without_bb',
+force_leveling : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
 ```
+(the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
+
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
@@ -127,22 +133,26 @@ diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 
 We execute the reference:
 ```bash
- cd ../hl_lhc_collision_nobb_b4
+ cd ../../examples/hl_lhc_collision_nobb_b4
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-We select:
+In config.py we select:
 ```python
-mode = 'b4_from_b2_without_bb'
+'mode' : 'b4_from_b2_without_bb',
+'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
 ```
+(the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
+
+
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 We check that the output is identical
@@ -157,16 +167,17 @@ diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 ## Test 5 - b4 from b2 with bb
 We setup the python version:
 ```bash
-cd ../hl_lhc_collisions_python
+cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-We select:
+In config.py we select:
 ```python
-mode = 'b4_from_b2_with_bb'
+'mode' : 'b4_from_b2_with_bb',
+
 ```
 We run the python version:
 ```
-python 004_pymask.py
+python 000_pymask.py
 ```
 
 **As we don't have a reference we can only perform the check on the crab cavities:**

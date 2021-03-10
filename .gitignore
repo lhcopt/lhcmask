@@ -1,3 +1,14 @@
+*.parquet
+fort.2
+fort.3
+fort.8
+fort.16
+fort.34
+fc.2
+fc.3
+fc.8
+fc.16
+fc.34
 beambeam_macros
 db5
 error_table.tfs

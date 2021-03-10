@@ -22,7 +22,7 @@ system, "ln -fns tracking_tools/errors errors";
 
 
 ! Execute user-defined customization script if present
-system, "bash customization.bash"
+system, "bash customization.bash";
 
 
 !*************************!

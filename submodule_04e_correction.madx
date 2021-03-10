@@ -10,13 +10,9 @@ print, text="";
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !               correction of field errors in MB (compatible with V6.503 & SLHC)
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-select, flag=error, clear;
-select, flag=error, pattern=MB\.,class=multipole;
-select, flag=error, pattern=MBH\.,class=multipole;
-esave,  file="temp/MB.errors";
-system, "errors/HL-LHC/corr_MB_ats_v4";
-call,   file="temp/MB_corr_setting.mad";
-!exec, reset_MB_corr;
+call, file="modules/submodule_04e_s1_synthesize_knobs.madx";
+
+
 
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ! correction of triplet and D1 (only in collision, not compatible V6.503)

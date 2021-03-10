@@ -154,12 +154,6 @@ def configure_b4_from_b2(mad_b4, mad_b2):
         if nn not in b2_dep.keys():
             print(f'Warning: b4 dep {nn}={str(b4_dep[nn])} is not in b2.')
 
-def checks_on_parameter_dict(params):
-
-    assert params['par_nco_IP5']==params['par_nco_IP1']
-    assert 'par_beam_norm_emit' in params
-    print('Checks on paramter dict passed!')
-
 def check_twiss_value(twiss_df, element_name, keyword, target, tol):
     assert abs(twiss_df.loc[element_name][keyword] - target) < tol,\
                 f'Check not passed on {keyword} at {element_name}'
@@ -236,61 +230,64 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
 
     if bb_df is not None:
         sxt_df_4d = bb_df[bb_df['label']=='bb_lr'].copy()
-        sxt_df_4d['h-sep [mm]'] = -sxt_df_4d['separation_x']*1e3
-        sxt_df_4d['v-sep [mm]'] = -sxt_df_4d['separation_y']*1e3
-        sxt_df_4d['strength-ratio'] = sxt_df_4d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
-        sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
-        sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
-        sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
-        sxt_df_4d['fort3entry'] = sxt_df_4d.apply(lambda x: ' '.join([
-                f"{x.elementName}",
-                '0',
-                f"{x['4dSxx [mm*mm]']}",
-                f"{x['4dSyy [mm*mm]']}",
-                f"{x['h-sep [mm]']}",
-                f"{x['v-sep [mm]']}",
-                f"{x['strength-ratio']}",
-                # f"{x['4dSxy [mm*mm]']}" Not really used
-                ]), axis=1)
+        if len(sxt_df_4d) > 0:
+            sxt_df_4d['h-sep [mm]'] = -sxt_df_4d['separation_x']*1e3
+            sxt_df_4d['v-sep [mm]'] = -sxt_df_4d['separation_y']*1e3
+            sxt_df_4d['strength-ratio'] = (sxt_df_4d['other_charge_ppb']
+                    / reference_bunch_charge_sixtrack_ppb)
+            sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
+            sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
+            sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
+            sxt_df_4d['fort3entry'] = sxt_df_4d.apply(lambda x: ' '.join([
+                    f"{x.elementName}",
+                    '0',
+                    f"{x['4dSxx [mm*mm]']}",
+                    f"{x['4dSyy [mm*mm]']}",
+                    f"{x['h-sep [mm]']}",
+                    f"{x['v-sep [mm]']}",
+                    f"{x['strength-ratio']}",
+                    # f"{x['4dSxy [mm*mm]']}" Not really used
+                    ]), axis=1)
 
 
         sxt_df_6d = bb_df[bb_df['label']=='bb_ho'].copy()
-        sxt_df_6d['h-sep [mm]'] = -sxt_df_6d['separation_x']*1e3
-        sxt_df_6d['v-sep [mm]'] = -sxt_df_6d['separation_y']*1e3
-        sxt_df_6d['phi [rad]'] = sxt_df_6d['phi']
-        sxt_df_6d['alpha [rad]'] = sxt_df_6d['alpha']
-        sxt_df_6d['strength-ratio'] = sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
-        sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
-        sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
-        sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
-        sxt_df_6d['Syy [mm*mm]'] = sxt_df_6d['other_Sigma_33'] *1e6
-        sxt_df_6d['Syyp [mm*mrad]'] = sxt_df_6d['other_Sigma_34'] *1e6
-        sxt_df_6d['Sypyp [mrad*mrad]'] = sxt_df_6d['other_Sigma_44'] *1e6
-        sxt_df_6d['Sxy [mm*mm]'] = sxt_df_6d['other_Sigma_13'] *1e6
-        sxt_df_6d['Sxyp [mm*mrad]'] = sxt_df_6d['other_Sigma_14'] *1e6
-        sxt_df_6d['Sxpy [mrad*mm]'] = sxt_df_6d['other_Sigma_23'] *1e6
-        sxt_df_6d['Sxpyp [mrad*mrad]'] = sxt_df_6d['other_Sigma_24'] *1e6
-        sxt_df_6d['fort3entry'] = sxt_df_6d.apply(lambda x: ' '.join([
-                f"{x.elementName}",
-                '1',
-                f"{x['phi [rad]']}",
-                f"{x['alpha [rad]']}",
-                f"{x['h-sep [mm]']}",
-                f"{x['v-sep [mm]']}",
-                '\n'
-                f"{x['Sxx [mm*mm]']}",
-                f"{x['Sxxp [mm*mrad]']}",
-                f"{x['Sxpxp [mrad*mrad]']}",
-                f"{x['Syy [mm*mm]']}",
-                f"{x['Syyp [mm*mrad]']}",
-                '\n',
-                f"{x['Sypyp [mrad*mrad]']}",
-                f"{x['Sxy [mm*mm]']}",
-                f"{x['Sxyp [mm*mrad]']}",
-                f"{x['Sxpy [mrad*mm]']}",
-                f"{x['Sxpyp [mrad*mrad]']}",
-                f"{x['strength-ratio']}",
-                ]), axis=1)
+        if len(sxt_df_6d) > 0:
+            sxt_df_6d['h-sep [mm]'] = -sxt_df_6d['separation_x']*1e3
+            sxt_df_6d['v-sep [mm]'] = -sxt_df_6d['separation_y']*1e3
+            sxt_df_6d['phi [rad]'] = sxt_df_6d['phi']
+            sxt_df_6d['alpha [rad]'] = sxt_df_6d['alpha']
+            sxt_df_6d['strength-ratio'] = sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
+            sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
+            sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
+            sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
+            sxt_df_6d['Syy [mm*mm]'] = sxt_df_6d['other_Sigma_33'] *1e6
+            sxt_df_6d['Syyp [mm*mrad]'] = sxt_df_6d['other_Sigma_34'] *1e6
+            sxt_df_6d['Sypyp [mrad*mrad]'] = sxt_df_6d['other_Sigma_44'] *1e6
+            sxt_df_6d['Sxy [mm*mm]'] = sxt_df_6d['other_Sigma_13'] *1e6
+            sxt_df_6d['Sxyp [mm*mrad]'] = sxt_df_6d['other_Sigma_14'] *1e6
+            sxt_df_6d['Sxpy [mrad*mm]'] = sxt_df_6d['other_Sigma_23'] *1e6
+            sxt_df_6d['Sxpyp [mrad*mrad]'] = sxt_df_6d['other_Sigma_24'] *1e6
+            sxt_df_6d['fort3entry'] = sxt_df_6d.apply(lambda x: ' '.join([
+                    f"{x.elementName}",
+                    '1',
+                    f"{x['phi [rad]']}",
+                    f"{x['alpha [rad]']}",
+                    f"{x['h-sep [mm]']}",
+                    f"{x['v-sep [mm]']}",
+                    '\n'
+                    f"{x['Sxx [mm*mm]']}",
+                    f"{x['Sxxp [mm*mrad]']}",
+                    f"{x['Sxpxp [mrad*mrad]']}",
+                    f"{x['Syy [mm*mm]']}",
+                    f"{x['Syyp [mm*mrad]']}",
+                    '\n',
+                    f"{x['Sypyp [mrad*mrad]']}",
+                    f"{x['Sxy [mm*mm]']}",
+                    f"{x['Sxyp [mm*mrad]']}",
+                    f"{x['Sxpy [mrad*mm]']}",
+                    f"{x['Sxpyp [mrad*mrad]']}",
+                    f"{x['strength-ratio']}",
+                    ]), axis=1)
 
         f3_common_settings = ' '.join([
             f"{reference_bunch_charge_sixtrack_ppb}",
@@ -311,9 +308,13 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
 
         f3_string += '\n'
 
-        f3_string += '\n'.join(
-            list(sxt_df_6d['fort3entry'].values)
-          + list(sxt_df_4d['fort3entry'].values))
+        list_entries = []
+        if len(sxt_df_6d) > 0:
+            list_entries += list(sxt_df_6d['fort3entry'].values)
+        if len(sxt_df_4d) > 0:
+            list_entries += list(sxt_df_4d['fort3entry'].values)
+
+        f3_string += '\n'.join(list_entries)
 
         f3_string += '\nNEXT\n'
 

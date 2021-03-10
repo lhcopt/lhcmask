@@ -1,72 +1,115 @@
-import sys, os
+import os
+import sys
 import pickle
 
 import numpy as np
 
+
+#####################################################
+# Read general configurations and setup envirnoment #
+#####################################################
+
+from config import configuration
+
+mode = configuration['mode']
+tol_beta = configuration['tol_beta']
+tol_sep = configuration['tol_sep']
+flat_tol = configuration['tol_co_flatness']
+links = configuration['links']
+optics_file = configuration['optics_file']
+check_betas_at_ips = configuration['check_betas_at_ips']
+check_separations_at_ips = configuration['check_separations_at_ips']
+save_intermediate_twiss = configuration['save_intermediate_twiss']
+enable_lumi_control = configuration['enable_lumi_control']
+enable_imperfections = configuration['enable_imperfections']
+enable_crabs = configuration['enable_crabs']
+match_q_dq_with_bb = configuration['match_q_dq_with_bb']
+knob_settings = configuration['knob_settings']
+knob_names = configuration['knob_names']
+
+
+# Make links
+for kk in links.keys():
+    if os.path.exists(kk):
+        os.remove(kk)
+    os.symlink(os.path.abspath(links[kk]), kk)
+
+# Create empty temp folder
+os.system('rm -r temp')
+os.system('mkdir temp')
+
+# Execute customization script if present
+os.system('bash customization.bash')
+
 # Import pymask
-sys.path.append('../../')
+sys.path.append('./modules')
 import pymask as pm
 
+# Import user-defined optics-specific tools
 import optics_specific_tools as ost
-from mask_parameters import mask_parameters
 
-Madx = pm.Madxp
-
-# Select mode
-#mode = 'b1_without_bb'
-mode = 'b1_with_bb'
-#mode = 'b1_with_bb_legacy_macros'
-#mode = 'b4_without_bb'
-#mode = 'b4_from_b2_without_bb'
-mode = 'b4_from_b2_with_bb'
-
-# Tolarances for checks [ip1, ip2, ip5, ip8]
-tol_beta = [1e-3, 10e-2, 1e-3, 1e-2]
-tol_sep = [1e-6, 1e-6, 1e-6, 1e-6]
-
-pm.make_links(force=True, links_dict={
-    'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-    'modules': 'tracking_tools/modules',
-    'tools': 'tracking_tools/tools',
-    'beambeam_macros': 'tracking_tools/beambeam_macros',
-    'errors': 'tracking_tools/errors'})
-
-optics_file = 'opticsfile.29'
-
-check_betas_at_ips = True
-check_separations_at_ips = True
-save_intermediate_twiss = True
-
-# Check and load parameters 
-pm.checks_on_parameter_dict(mask_parameters)
+######################################
+# Check parameters and activate mode #
+######################################
 
 # Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
     track_from_b4_mad_instance, enable_bb_python, enable_bb_legacy,
     force_disable_check_separations_at_ips,
     ) = pm.get_pymask_configuration(mode)
+
 if force_disable_check_separations_at_ips:
     check_separations_at_ips = False
 
-# Start mad
-mad = Madx()
+if not(enable_crabs):
+    knob_settings['par_crab1'] = 0.
+    knob_settings['par_crab5'] = 0.
 
-# Build sequence
+########################
+# Build MAD-X instance #
+########################
+
+# Start mad
+Madx = pm.Madxp
+mad = Madx(command_log="mad_collider.log")
+
+# Set verbose flag
+mad.globals.par_verbose = int(configuration['verbose_mad_parts'])
+
+# Build sequence (alse creates link to optics_toolkit and calls it)
 ost.build_sequence(mad, beam=beam_to_configure)
+
+# Set twiss formats for MAD-X parts (macro from opt. toolkit)
+mad.input('exec, twiss_opt;')
 
 # Apply optics
 ost.apply_optics(mad, optics_file=optics_file)
 
-# Force disable beam-beam when needed
-if not(enable_bb_legacy) and not(enable_bb_python):
-    mask_parameters['par_on_bb_switch'] = 0.
+# Attach beam to sequences
+mad.globals.nrj = configuration['beam_energy_tot']
+gamma_rel = configuration['beam_energy_tot']/mad.globals.pmass
+for ss in mad.sequence.keys():
+    # bv and bv_aux flags
+    if ss == 'lhcb1':
+        ss_beam_bv, ss_bv_aux = 1, 1
+    elif ss == 'lhcb2':
+        if int(beam_to_configure) == 4:
+            ss_beam_bv, ss_bv_aux = 1, -1
+        else:
+            ss_beam_bv, ss_bv_aux = -1, 1
 
-# Pass parameters to mad
-mad.set_variables_from_dict(params=mask_parameters)
+    mad.globals['bv_aux'] = ss_bv_aux
+    mad.input(f'''
+    beam, particle=proton,sequence={ss},
+        energy={configuration['beam_energy_tot']},
+        sigt={configuration['beam_sigt']},
+        bv={ss_beam_bv},
+        npart={configuration['beam_npart']},
+        sige={configuration['beam_sige']},
+        ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+        ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+    ''')
 
-# Prepare sequences and attach beam
-mad.call("modules/submodule_01a_preparation.madx")
-mad.call("modules/submodule_01b_beam.madx")
 
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -76,69 +119,137 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         check_betas_at_ips=check_betas_at_ips,
         check_separations_at_ips=check_separations_at_ips)
 
-# Set phase, apply and save crossing
-mad.call("modules/submodule_01c_phase.madx")
+# Set IP1-IP5 phase and store corresponding reference
+mad.input("call, file='modules/submodule_01c_phase.madx';")
 
 # Set optics-specific knobs
-ost.set_optics_specific_knobs(mad, mode)
+ost.set_optics_specific_knobs(mad, knob_settings, mode)
 
 # Crossing-save and some reference measurements
-mad.input('exec, crossing_save')
-mad.call("modules/submodule_01e_final.madx")
+mad.input('exec, crossing_save;')
+mad.input("call, file='modules/submodule_01e_final.madx';")
 
-# Test flat machine
-mad.input('exec, crossing_disable')
+
+#################################
+# Check bahavior of orbit knobs #
+#################################
+
+# Check flat machine
+mad.input('exec, crossing_disable;')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_no_crossing',
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
-# Check flatness
-flat_tol = 1e-6
+
+# Check orbit flatness
 for ss in twiss_dfs.keys():
     tt = twiss_dfs[ss]
     assert np.max(np.abs(tt.x)) < flat_tol
     assert np.max(np.abs(tt.y)) < flat_tol
 
 # Check machine after crossing restore
-mad.input('exec, crossing_restore')
+mad.input('exec, crossing_restore;')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
         twiss_fname='twiss_with_crossing',
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
 
-mad.use(f'lhcb{beam_to_configure}')
 
-# # Call leveling module
-# if mode=='b4_without_bb':
-#     print('Leveling not working in this mode!')
-# else:
-#     mad.call("modules/module_02_lumilevel.madx")
+#################################
+# Set luminosity in IP2 and IP8 #
+#################################
+
+if len(sequences_to_check) == 2:
+    print('Luminosities before leveling (crab cavities are not considered):')
+    pm.print_luminosity(mad, twiss_dfs,
+            configuration['nco_IP1'], configuration['nco_IP2'],
+            configuration['nco_IP5'], configuration['nco_IP8'])
+else:
+    print('Warning: Luminosity computation requires two beams')
 
 
-mad.input('on_disp = 0')
+if not enable_lumi_control:
+    print('Separations in IP2 and IP8 are left untouched')
+elif enable_bb_legacy or mode=='b4_without_bb':
+    mad.use(f'lhcb{beam_to_configure}')
+    if mode=='b4_without_bb':
+        print('Leveling not working in this mode!')
+    else:
+        # Luminosity levelling
+        vars_for_legacy_level = ['lumi_ip8',
+            'nco_IP1', 'nco_IP2', 'nco_IP5', 'nco_IP8']
+        mad.set_variables_from_dict({
+            'par_'+kk: configuration[kk] for kk in vars_for_legacy_level})
+        mad.input("call, file='modules/module_02_lumilevel.madx';")
+else:
+    print('Start pythonic leveling:')
+    ost.lumi_control(mad, twiss_dfs, configuration, knob_names)
+
+# Force leveling
+if 'force_leveling' in configuration.keys():
+    force_leveling  = configuration['force_leveling']
+    if force_leveling is not None:
+        for kk in force_leveling.keys():
+            mad.globals[kk] = force_leveling[kk]
+
+# Re-save knobs (for the last time!)
+mad.input('exec, crossing_save;')
+
+# Check machine after leveling
+mad.input('exec, crossing_restore;')
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
+        tol_beta=tol_beta, tol_sep=tol_sep,
+        twiss_fname='twiss_after_leveling',
+        save_twiss_files=save_intermediate_twiss,
+        check_betas_at_ips=check_betas_at_ips,
+        check_separations_at_ips=check_separations_at_ips)
+
+if len(sequences_to_check) == 2:
+    print('Luminosities after leveling (crab cavities are not considered):')
+    pm.print_luminosity(mad, twiss_dfs,
+            configuration['nco_IP1'], configuration['nco_IP2'],
+            configuration['nco_IP5'], configuration['nco_IP8'])
+else:
+    print('Luminosity computation requires two beams')
+
+
+#####################
+# Force on_disp = 0 #
+#####################
+
+mad.globals.on_disp = 0.
+# will be restored later
+
+
+###################################
+# Compute beam-beam configuration #
+###################################
 
 # Prepare bb dataframes
 if enable_bb_python:
     bb_dfs = pm.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
-        numberOfLRPerIRSide=[25, 20, 25, 20],
-        bunch_spacing_buckets=10,
-        numberOfHOSlices=11,
-        bunch_population_ppb=None,
-        sigmaz_m=None,
-        z_crab_twiss = 0,
+        numberOfLRPerIRSide=configuration['numberOfLRPerIRSide'],
+        bunch_spacing_buckets=configuration['bunch_spacing_buckets'],
+        numberOfHOSlices=configuration['numberOfHOSlices'],
+        bunch_population_ppb=configuration['bunch_population_ppb'],
+        sigmaz_m=configuration['sigmaz_m'],
+        z_crab_twiss=configuration['z_crab_twiss']*float(enable_crabs),
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
 
-# Generate mad instance for b4
+
+###################
+# Generate beam 4 #
+###################
+
 if generate_b4_from_b2:
-    mad_b4 = Madx()
+    mad_b4 = Madx(command_log="mad_b4.log")
     ost.build_sequence(mad_b4, beam=4)
-    ost.apply_optics(mad_b4, optics_file=optics_file)
 
     pm.configure_b4_from_b2(mad_b4, mad)
 
@@ -157,8 +268,11 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 
+##################################################
+# Select mad instance for tracking configuration #
+##################################################
 
-# We working exclusively on the sequence to track
+# We will be working exclusively on the sequence to track
 # Select mad object
 if track_from_b4_mad_instance:
     mad_track = mad_b4
@@ -176,7 +290,11 @@ twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 
-# Install bb lenses
+#####################
+# Install bb lenses #
+#####################
+
+# Python approach
 if enable_bb_python:
     if track_from_b4_mad_instance:
         bb_df_track = bb_dfs['b4']
@@ -187,50 +305,163 @@ if enable_bb_python:
 
     pm.install_lenses_in_sequence(mad_track, bb_df_track, sequence_to_track)
 
-    # Disable bb
+    # Disable bb (to be activated later)
     mad_track.globals.on_bb_charge = 0
 else:
     bb_df_track = None
-
 
 # Legacy bb macros
 if enable_bb_legacy:
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
     assert(not(enable_bb_python))
-    mad_track.call("modules/module_03_beambeam.madx")
+    mad_track.globals['par_on_bb_switch'] = 1
+    mad_track.set_variables_from_dict(
+       params=configuration['pars_for_legacy_bb_macros'])
+    mad_track.set_variables_from_dict(
+            params={f'par_nho_ir{ir}':configuration['numberOfHOSlices']
+            for ir in [1,2,5,8]})
+    mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
-# # Install crab cavities
-# mad_track.call("tools/enable_crabcavities.madx")
 
-# # Install crab cavities
-#mad_track.call("modules/submodule_04_1a_install_crabs.madx")
+#########################
+# Install crab cavities #
+#########################
 
-# Save references (orbit at IPs)
-mad_track.call('modules/submodule_04_1b_save_references.madx')
+if enable_crabs:
+    mad_track.input("call, file='optics_toolkit/enable_crabcavities.madx';")
+    # They are left off, they will be swiched on at the end:
+    mad_track.globals.on_crab1 = 0
+    mad_track.globals.on_crab5 = 0
 
-# Switch off dipersion correction knob
+
+##############################################
+# Save references for tuning and corrections #
+##############################################
+
+mad_track.input("call, file='modules/submodule_04_1b_save_references.madx';")
+
+
+#####################
+# Force on_disp = 0 #
+#####################
+
 mad_track.globals.on_disp = 0.
+# will be restored later
 
-# Final use
+
+#############
+# Final use #
+#############
+
 mad_track.use(sequence_to_track)
 # Disable use
 mad_track._use = mad_track.use
 mad_track.use = None
 
-# # Install and correct errors
-# mad_track.call("modules/module_04_errors.madx")
 
-# Machine tuning (enables bb)
-mad_track.call("modules/module_05_tuning.madx")
+##############################
+# Install and correct errors #
+##############################
 
-# # Switch on crab cavities
-# mad_track.globals.on_crab1 = mad_track.globals.par_crab1
-# mad_track.globals.on_crab5 = mad_track.globals.par_crab5
+if enable_imperfections:
+    mad_track.set_variables_from_dict(
+            configuration['pars_for_imperfections'])
+    mad_track.input("call, file='modules/module_04_errors.madx';")
+else:
+    # Synthesize knobs
+    mad_track.input('call, file="modules/submodule_04a_s1_prepare_nom_twiss_table.madx";')
+    if configuration['enable_knob_synthesis']:
+        mad_track.input('exec, crossing_disable;')
+        mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
+        mad_track.input('exec, crossing_restore;')
 
-# Generate sixtrack
+
+##################
+# Machine tuning #
+##################
+
+# Enable bb for matchings
+if match_q_dq_with_bb:
+    mad_track.globals['on_bb_charge'] = 1
+else:
+    mad_track.globals['on_bb_charge'] = 0
+
+# Switch on octupoles
+brho = mad_track.globals.nrj*1e9/mad_track.globals.clight
+i_oct = configuration['oct_current']
+beam_str = {'lhcb1':'b1', 'lhcb2':'b2'}[sequence_to_track]
+for ss in '12 23 34 45 56 67 78 81'.split():
+   mad_track.input(f'kof.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
+   mad_track.input(f'kod.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
+
+
+# Correct linear coupling
+qx_fractional, qx_integer = np.modf(configuration['qx0'])
+qy_fractional, qy_integer = np.modf(configuration['qy0'])
+coupl_corr_info = pm.coupling_correction(mad_track,
+        n_iterations=configuration['N_iter_coupling'],
+        qx_integer=qx_integer, qy_integer=qy_integer,
+        qx_fractional=qx_fractional, qy_fractional=qy_fractional,
+        tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
+        tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
+        cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
+        cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
+        sequence_name=sequence_to_track, skip_use=True)
+
+# Add custom values to coupling knobs
+mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
+mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
+
+# Check strength limits
+if enable_imperfections:
+    mad_track.input('call, file="errors/HL-LHC/corr_limit.madx";')
+
+# Rematch the orbit at IPs
+mad_track.input("call, file='tools/rematchCOIP.madx';")
+
+# Rematch the CO in the arc for dispersion correction
+if mad_track.globals.on_disp != 0:
+    mad_track.input("call, file='tools/rematchCOarc.madx';")
+
+# Match tunes and chromaticities
+pm.match_tune_and_chromaticity(mad_track,
+        q1=configuration['qx0'],
+        q2=configuration['qy0'],
+        dq1=configuration['chromaticity_x'],
+        dq2=configuration['chromaticity_y'],
+        tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
+        tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
+        chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
+        chromaticity_knob2_name=knob_names['chromknob_2'][sequence_to_track],
+        sequence_name=sequence_to_track, skip_use=True)
+
+# Check strength limits
+if enable_imperfections:
+    mad_track.input("call, file='errors/HL-LHC/corr_value_limit.madx';")
+
+# Switch on bb lenses
+mad_track.globals.on_bb_charge = 1.
+
+# Switch on RF cavities
+mad_track.globals['vrf400'] = configuration['vrf_total']
+if sequence_to_track == 'lhcb1':
+    mad_track.globals['lagrf400.b1'] = 0.5
+elif sequence_to_track == 'lhcb2':
+    mad_track.globals['lagrf400.b2'] = 0.
+
+# Switch on crab cavities
+if enable_crabs:
+    mad_track.globals.on_crab1 = knob_settings['on_crab1']
+    mad_track.globals.on_crab5 = knob_settings['on_crab5']
+
+
+#####################
+# Generate sixtrack #
+#####################
+
 if enable_bb_legacy:
-    mad_track.call("modules/module_06_generate.madx")
+    mad_track.input("call, file='modules/module_06_generate.madx'")
 else:
     pm.generate_sixtrack_input(mad_track,
         seq_name=sequence_to_track,
@@ -253,13 +484,21 @@ else:
         radius_sixtrack_multip_conversion_mad=0.017,
         skip_mad_use=True)
 
-# Get optics and orbit at start ring
+
+#######################################
+# Save optics and orbit at start ring #
+#######################################
+
 optics_orbit_start_ring = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
 with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
     pickle.dump(optics_orbit_start_ring, fid)
 
-# Generate pysixtrack lines
+
+#############################
+# Generate pysixtrack lines #
+#############################
+
 if enable_bb_legacy:
     print('Pysixtrack line is not generated with bb legacy macros')
 else:

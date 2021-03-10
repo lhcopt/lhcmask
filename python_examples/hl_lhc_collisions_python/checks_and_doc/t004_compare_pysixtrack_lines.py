@@ -6,17 +6,17 @@ import pysixtrack
 import sixtracktools
 
 # Test b1 
-path_test = './'
+path_test = '../'
 type_test = 'sixtrack'
-path_ref = '../../examples/hl_lhc_collision'
+path_ref = '../../../examples/hl_lhc_collision'
 type_ref = 'sixtrack'
 
 # # Test b4 nobb sixtrack
-# path_test = './'
+# path_test = '../../'
 # type_test = 'sixtrack'
-# path_ref = '../hl_lhc_collision_nobb_b4'
+# path_ref = '../../../examples/hl_lhc_collision_nobb_b4'
 # type_ref = 'sixtrack'
-#
+
 # # Test b4 nobb pysixtrack (not working for now)
 # path_test = './pysixtrack/line_bb_dipole_not_cancelled.pkl'
 # type_test = 'pysixtrack'
@@ -68,6 +68,7 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
 ):
     assert type(ee_test) == type(ee_six)
 
+
     dtest = ee_test.to_dict(keepextra=True)
     dsix = ee_six.to_dict(keepextra=True)
 
@@ -94,6 +95,21 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
         if diff_abs < 1e-12:
             continue
 
+        # Exception: correctors involved in lumi leveling
+        if nn_test in [
+            'mcbcv.5l8.b1', 'mcbyv.a4l8.b1', 'mcbxv.3l8',
+            'mcbyv.4r8.b1', 'mcbyv.b5r8.b1',
+            'mcbyh.b5l2.b1', 'mcbyh.4l2.b1', 'mcbxh.3l2', 'mcbyh.a4r2.b1',
+            'mcbch.5r2.b1',
+            'mcbcv.5l8.b2', 'mcbyv.a4l8.b2', 'mcbxv.3l8',
+            'mcbyv.4r8.b2', 'mcbyv.b5r8.b2',
+            'mcbyh.b5l2.b2', 'mcbyh.4l2.b2', 'mcbxh.3l2', 'mcbyh.a4r2.b2',
+            'mcbch.5r2.b2', 'mcbch.a5r2.b2', 'mcbyh.4r2.b2', 'mcbxh.3r2',
+            'mcbyh.a4l2.b2', 'mcbyh.5l2.b2', 'mcbyv.5r8.b2', 'mcbyv.a4r8.b2',
+            'mcbxv.3r8', 'mcbyv.4l8.b2', 'mcbcv.b5l8.b2']:
+            if diff_rel < 1e-2:
+                continue
+
         # Exception: drift length (100 um tolerance)
         if isinstance(
             ee_test, (pysixtrack.elements.Drift, pysixtrack.elements.DriftExact)
@@ -111,10 +127,10 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
         # Exceptions BB4D (separations are recalculated)
         if isinstance(ee_test, pysixtrack.elements.BeamBeam4D):
             if kk == "x_bb":
-                if diff_abs / dtest["sigma_x"] < 0.0001:
+                if diff_abs / dtest["sigma_x"] < 0.01: # This is neede to accommodate different leveling routines (1% difference)
                     continue
             if kk == "y_bb":
-                if diff_abs / dtest["sigma_y"] < 0.0001:
+                if diff_abs / dtest["sigma_y"] < 0.01:
                     continue
             if kk == "sigma_x":
                 if diff_rel < 1e-5:
@@ -129,10 +145,10 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 if diff_abs < 10e-6:
                     continue
             if kk == "x_bb_co":
-                if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.004:
+                if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.015:
                     continue
             if kk == "y_bb_co":
-                if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.004:
+                if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.015:
                     continue
 
         # If it got here it means that no condition above is met
