@@ -41,7 +41,7 @@ def luminosity(f, nb,
       CC_V_y_2=0, CC_f_y_2=0, CC_phase_y_2=0,
       R12_1=0, R22_1=0, R34_1=0, R44_1=0,
       R12_2=0, R22_2=0, R34_2=0, R44_2=0,
-      verbose=False, sigma_integration=3):
+      verbose=False, sigma_integration=3, rest_mass_b1=0.93827231, rest_mass_b2=0.93827231):
     '''
     Returns luminosity in Hz/cm^2.
     f: revolution frequency
@@ -67,6 +67,7 @@ def luminosity(f, nb,
     verbose: to have verbose output
     sigma_integration: the number of sigma consider for the integration
         (taken into account only if CC(s) is/are present)
+    rest_mass_b1, rest_mass_b2: rest mass in GeV
     In MAD-X px is p_x/p_0 (p_x is the x-component of the momentum and p_0 is the design momentum).
     In our approximation we use the paraxial approximation: p_0~p_z so px is an angle.
     Similar arguments holds for py.
@@ -78,15 +79,13 @@ def luminosity(f, nb,
     ps = p0(1+deltap). We assume that dpx is the z-derivative of the px.
     '''
 
-    gamma1 = energy_tot1 / 0.93827231 # To be generalized for ions
+    gamma1 = energy_tot1 / rest_mass_b1
     br_1 = np.sqrt(1-1/gamma1**2)
     betagamma_1 = br_1*gamma1
 
-    gamma2 = energy_tot2 / 0.93827231 # To be generalized for ions
+    gamma2 = energy_tot2 / rest_mass_b2
     br_2 = np.sqrt(1-1/gamma2**2)
     betagamma_2 = br_2*gamma2
-
-    q = qe # To be generalized for ions
 
     # module of B1 speed
     v0_1=br_1*clight
@@ -218,7 +217,7 @@ def get_luminosity_dict(mad, twiss_dfs, ip_name, number_of_ho_collisions):
 	ip_b2=twiss_dfs['lhcb2'].loc[f'{ip_name}:1']
 	return {
             'f':b1.freq0*1e6, 'nb':number_of_ho_collisions,
-            'N1':b1.npart, 'N2':b2.npart,
+            'N1':b1.npart, 'N2':b2.npart,'rest_mass_b1':b1.mass,'rest_mass_b2':b2.mass,
             'energy_tot1':b1.energy, 'energy_tot2':b2.energy,
             'deltap_p0_1':b1.sige, 'deltap_p0_2':b2.sige,
             'epsilon_x1':b1.exn, 'epsilon_x2':b2.exn,
