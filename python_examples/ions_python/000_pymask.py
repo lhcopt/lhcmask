@@ -303,10 +303,12 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 # For B1, to be generalized for B4
-filling_scheme_json = configuration['filling_scheme_json']
-bunch_to_track = configuration['bunch_to_track']
-bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(filling_scheme_json,bunch_to_track, beam='1')
-bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
+if enable_bb_python:
+	filling_scheme_json = configuration['filling_scheme_json']
+	bunch_to_track = configuration['bunch_to_track']
+	bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(filling_scheme_json,bunch_to_track, beam=1)
+	bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
+
 
 ##################################################
 # Select mad instance for tracking configuration #
@@ -423,7 +425,7 @@ else:
 
 # Enable bb for matchings
 if match_q_dq_with_bb:
-    mad_track.globals['on_bb_charge'] = 1
+    mad_track.globals['on_bb_charge'] = 1*configuration['beam_charge']
 else:
     mad_track.globals['on_bb_charge'] = 0
 
@@ -481,7 +483,7 @@ if enable_imperfections:
     mad_track.input("call, file='errors/HL-LHC/corr_value_limit.madx';")
 
 # Switch on bb lenses
-mad_track.globals.on_bb_charge = 1.
+mad_track.globals.on_bb_charge = 1.*configuration['beam_charge']
 
 # Switch on RF cavities
 mad_track.globals['vrf400'] = configuration['vrf_total']
