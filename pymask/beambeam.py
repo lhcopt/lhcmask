@@ -271,7 +271,7 @@ def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
                     'slot_id = %d'%({'bb_lr': 4, 'bb_ho': 6}[label]) # need to add 60 for central
         bb_df['elementDefinition']=bb_df.apply(lambda x: elementDefinition(x.elementName, x.elementClass,
             eattributes(np.sqrt(x['other_Sigma_11']),np.sqrt(x['other_Sigma_33']),
-                x['separation_x'], x['separation_y'],
+                x['xma'], x['yma'],
                 x['other_charge_ppb']/madx_reference_bunch_charge, x['label'])),
             axis=1)
         bb_df['elementInstallation']=bb_df.apply(lambda x: elementInstallation(x.elementName, x.elementClass, x.atPosition, x.ip_name), axis=1)
@@ -327,6 +327,8 @@ def get_counter_rotating(bb_df):
     c_bb_df['other_relativistic_beta']=bb_df['other_relativistic_beta']
     c_bb_df['separation_x'] = bb_df['separation_x'] * (-1.)
     c_bb_df['separation_y'] = bb_df['separation_y']
+    c_bb_df['xma'] = bb_df['xma'] * (-1.)
+    c_bb_df['yma'] = bb_df['yma']
 
     c_bb_df['dpx'] = bb_df['dpx'] * (-1.) * (-1.)
     c_bb_df['dpy'] = bb_df['dpy'] * (-1.)
@@ -791,11 +793,12 @@ def generate_bb_dataframes(mad,
     get_partner_corrected_position_and_optics(
             bb_df_b1, bb_df_b2, ip_position_df)
 
-    # Compute separation, crossing plane rotation and crossing angle
+    # Compute separation, crossing plane rotation, crossing angle and xma
     for bb_df in [bb_df_b1, bb_df_b2]:
         compute_separations(bb_df)
         compute_dpx_dpy(bb_df)
         compute_local_crossing_angle_and_plane(bb_df)
+        compute_xma_yma(bb_df)
 
     # Get bb dataframe and mad model (with dummy bb) for beam 3 and 4
     bb_df_b3 = get_counter_rotating(bb_df_b1)
@@ -838,3 +841,36 @@ def generate_bb_dataframes(mad,
             mad.input(f'endedit;')
 
     return bb_dfs
+
+def find_bb_xma_yma(points_weak, points_strong, names=None):
+    ''' To be used in the compute_xma_yma function'''
+    if names is None:
+        names = ["bb_%d" % ii for ii in range(len(points_weak))]
+
+    xma = []
+    yma = []
+    for i_bb, name_bb in enumerate(names):
+
+        pbw = points_weak[i_bb]
+        pbs = points_strong[i_bb]
+
+        # Find as the position of the strong in the lab frame (points_strong[i_bb].p) 
+        # the reference frame of the weak in the lab frame (points_weak[i_bb].sp) 
+        vbb_ws = points_strong[i_bb].p - points_weak[i_bb].sp        
+
+        # Find separations
+        xma.append(np.dot(vbb_ws, pbw.ex))
+        yma.append(np.dot(vbb_ws, pbw.ey))
+
+    return xma, yma
+
+def compute_xma_yma(bb_df):
+    
+    xma, yma = find_bb_xma_yma(
+        points_weak=bb_df['self_lab_position'].values,
+        points_strong=bb_df['other_lab_position'].values,
+        names=bb_df.index.values,
+        )
+
+    bb_df['xma'] = xma
+    bb_df['yma'] = yma
