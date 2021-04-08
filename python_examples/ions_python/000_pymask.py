@@ -109,9 +109,17 @@ for ss in mad.sequence.keys():
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
         mass = {configuration['beam_mass']},
-        charge={configuration['beam_charge']},
+        charge={configuration['beam_charge']};
     ''')
 
+mad.input('''
+seqedit,sequence=lhcb1;
+install,element=ip3..2,class=marker,at=0., from=ip3;
+endedit;
+seqedit,sequence=lhcb2;
+install,element=ip3..2,class=marker,at=0., from=ip3;
+endedit;
+''')
 
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -276,6 +284,13 @@ if enable_bb_python:
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
+    
+    
+    bb_dfs['b1']['other_charge_ppb'] *=configuration['beam_charge'] # multiply with beam charge
+    bb_dfs['b2']['other_charge_ppb'] *=configuration['beam_charge']
+
+
+
 
 
 ###################
@@ -503,14 +518,14 @@ if enable_crabs:
 #####################
 
 if enable_bb_legacy:
-    mad_track.input("call, file='modules/module_06_generate.madx'")
+    mad_track.input("call, file='modules/module_06_generate.madx;'")
 else:
     pm.generate_sixtrack_input(mad_track,
         seq_name=sequence_to_track,
         bb_df=bb_df_track,
         output_folder='./',
         reference_bunch_charge_sixtrack_ppb=(
-            mad_track.sequence[sequence_to_track].beam.npart),
+            mad_track.sequence[sequence_to_track].beam.npart*configuration['beam_charge']),
         emitnx_sixtrack_um=(
             mad_track.sequence[sequence_to_track].beam.exn),
         emitny_sixtrack_um=(

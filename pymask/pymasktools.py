@@ -234,7 +234,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             sxt_df_4d['h-sep [mm]'] = -sxt_df_4d['separation_x']*1e3
             sxt_df_4d['v-sep [mm]'] = -sxt_df_4d['separation_y']*1e3
             sxt_df_4d['strength-ratio'] = (sxt_df_4d['other_charge_ppb']
-                    / reference_bunch_charge_sixtrack_ppb)
+                    / reference_bunch_charge_sixtrack_ppb) * mad.globals.on_bb_charge
             sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
             sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
             sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
@@ -256,7 +256,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             sxt_df_6d['v-sep [mm]'] = -sxt_df_6d['separation_y']*1e3
             sxt_df_6d['phi [rad]'] = sxt_df_6d['phi']
             sxt_df_6d['alpha [rad]'] = sxt_df_6d['alpha']
-            sxt_df_6d['strength-ratio'] = sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
+            sxt_df_6d['strength-ratio'] = (sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb)* mad.globals.on_bb_charge
             sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
             sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
             sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
