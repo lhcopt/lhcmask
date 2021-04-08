@@ -286,9 +286,8 @@ if enable_bb_python:
     # Here the datafremes can be edited, e.g. to set bbb intensity
     
     
-    bb_dfs['b1']['other_charge_ppb'] *=configuration['beam_charge'] # multiply with beam charge
-    bb_dfs['b2']['other_charge_ppb'] *=configuration['beam_charge']
-
+    bb_dfs['b1']['other_charge_elpb'] =bb_dfs['b1']['other_charge_ppb']*configuration['beam_charge'] # multiply with beam charge
+    bb_dfs['b2']['other_charge_elpb'] =bb_dfs['b2']['other_charge_ppb']*configuration['beam_charge']
 
 
 
