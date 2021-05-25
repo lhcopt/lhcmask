@@ -20,7 +20,7 @@ configuration = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb_legacy_macros',
+    'mode'                      : 'b1_with_bb',
 
     # For test against madx mask for modes 'b4_from_b2_without_bb' and 'b4_without_bb':
     # 'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
@@ -173,4 +173,6 @@ configuration = {
                                     'par_b_t_dist' : 25.,  # bunch spacing [ns]
                                     'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
                                   },
+    #create / append to yaml file
+    'tag_yaml' : 'time_test.yml'
     }

@@ -4,7 +4,6 @@ import pickle
 
 import numpy as np
 
-
 #####################################################
 # Read general configurations and setup envirnoment #
 #####################################################
@@ -26,6 +25,7 @@ enable_crabs = configuration['enable_crabs']
 match_q_dq_with_bb = configuration['match_q_dq_with_bb']
 knob_settings = configuration['knob_settings']
 knob_names = configuration['knob_names']
+
 
 
 # Make links
@@ -65,6 +65,8 @@ if not(enable_crabs):
     knob_settings['par_crab1'] = 0.
     knob_settings['par_crab5'] = 0.
 
+pm.tools.tag_it(configuration['tag_yaml'], 'Complete: Check parameters and activate mode')
+aaaaaa
 ########################
 # Build MAD-X instance #
 ########################
@@ -109,7 +111,7 @@ for ss in mad.sequence.keys():
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
     ''')
-
+pm.tools.tag_it('tag_time.yml', 'Completed: Build MAD-X instance')
 
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -128,6 +130,8 @@ ost.set_optics_specific_knobs(mad, knob_settings, mode)
 # Crossing-save and some reference measurements
 mad.input('exec, crossing_save;')
 mad.input("call, file='modules/submodule_01e_final.madx';")
+
+
 
 
 #################################
