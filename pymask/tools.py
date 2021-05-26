@@ -87,3 +87,21 @@ def tag_it(myfile, mycomment):
 		my_dict[stage]['unix_time'] = datetime.datetime.now().timestamp()        #in seconds
 		my_dict[stage]['comment'] = mycomment
 		yaml.dump(my_dict, file)
+
+
+def tag_first(myfile, mycomment):
+	"""
+	tag_it is to create timestamps and add them to a yaml file.
+	Examples
+	--------
+	>>> tag_it('myfile', 'hello')
+	"""	
+	stage = 0
+	with open(myfile, 'w') as file:
+		yaml = ruamel.yaml.YAML() 
+		my_dict = {stage: {}}
+		my_dict[stage]['human_time'] = datetime.datetime.now()
+		my_dict[stage]['unix_time'] = datetime.datetime.now().timestamp()        #in seconds
+		my_dict[stage]['comment'] = mycomment
+		yaml.dump(my_dict, file)
+

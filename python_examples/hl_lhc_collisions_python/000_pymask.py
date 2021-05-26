@@ -65,8 +65,8 @@ if not(enable_crabs):
     knob_settings['par_crab1'] = 0.
     knob_settings['par_crab5'] = 0.
 
-pm.tools.tag_it(configuration['tag_yaml'], 'Complete: Check parameters and activate mode')
-aaaaaa
+pm.tools.tag_first(configuration['tag_yaml'], 'Complete: Check parameters and activate mode')
+
 ########################
 # Build MAD-X instance #
 ########################
