@@ -1,0 +1,8 @@
+0:
+  human_time: 2021-05-26 10:56:50.578982
+  unix_time: 1622019410.578989
+  comment: 'Complete: Check parameters and activate mode'
+1:
+  human_time: 2021-05-26 10:57:06.781394
+  unix_time: 1622019426.781426
+  comment: 'Completed: Build MAD-X instance'

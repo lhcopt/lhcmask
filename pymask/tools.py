@@ -82,6 +82,7 @@ def get_last_stage(myfile, verbose=True):
 def tag_it(myfile, mycomment):
 	"""
 	tag_it is to create timestamps and add them to a yaml file.
+	
 	Examples
 	--------
 	>>> tag_it('myfile', 'hello')
