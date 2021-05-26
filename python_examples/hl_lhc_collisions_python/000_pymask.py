@@ -111,8 +111,8 @@ for ss in mad.sequence.keys():
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
     ''')
-pm.tools.tag_it('tag_time.yml', 'Completed: Build MAD-X instance')
-
+pm.tools.tag_it(configuration['tag_yaml'], 'Completed: Build MAD-X instance')
+aaaa
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
