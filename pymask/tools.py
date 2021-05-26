@@ -7,9 +7,9 @@ def read_yaml(myfile, verbose=True):
 	read_yaml is to read a yaml file and convert it into python.
 	Example
 	--------
-	>>> read_yaml('mytest')
-	FileNotFoundError, empty dict
-	{}
+	>>> read_yaml('mytest.yml')
+
+	This will return the contents inside of a yaml file.
 	"""
 	try: 
 		with open(myfile, 'r') as file:
@@ -35,6 +35,8 @@ def write_yaml(my_dict, myfile):
 	Examples
 	--------
 	>>> write_yaml({'green': 'hello'}, ('mytest2.yml'))
+
+	This will add {'green': 'hello'} as a dictionary to the ('mytest2.yml') file.
 	"""	
 	with open(myfile, 'w') as file:  
 		yaml = ruamel.yaml.YAML()     
@@ -47,6 +49,8 @@ def append_yaml(my_dict, myfile):
 	Examples
 	--------
 	>>> append_yaml({'blue': 'bonjour'}, ('mytest2.yml'))
+
+	This will append {'blue': 'bonjour'} to an existing yaml file: ('mytest2.yml')
 	"""	
 	with open(myfile, 'a') as file:  
 		yaml = ruamel.yaml.YAML()    
@@ -56,10 +60,13 @@ def append_yaml(my_dict, myfile):
 
 def get_last_stage(myfile, verbose=True):
 	"""
-	get_last_stage
+	get_last_stage is to read a yaml file and to return the number of the last dictionary
+
 	Examples
 	--------
-	>>> tag_it('myfile', 'hello')
+	>>> get_last_stage('myfile', verbose=True)
+
+	If the get_last_stage has two dictionaries: labeled '0' and '1' it will return the '1', the last stage.
 	"""	
 	my_dict=read_yaml(myfile, verbose)
 	try:
@@ -78,6 +85,8 @@ def tag_it(myfile, mycomment):
 	Examples
 	--------
 	>>> tag_it('myfile', 'hello')
+
+	This will create a a human readable and a unix time stamp and append that to 'myfile', includin the comment 'hello'
 	"""	
 	stage = get_last_stage(myfile)
 	with open(myfile, 'a') as file:
@@ -91,10 +100,13 @@ def tag_it(myfile, mycomment):
 
 def tag_first(myfile, mycomment):
 	"""
-	tag_it is to create timestamps and add them to a yaml file.
+	tag_first is to overwrite an already existing yaml file or create a new yaml file and add the first timestamps.
+
 	Examples
 	--------
 	>>> tag_it('myfile', 'hello')
+
+	If 'my_file' already exits, it will overwrite that file and create a first timestamp.
 	"""	
 	stage = 0
 	with open(myfile, 'w') as file:
