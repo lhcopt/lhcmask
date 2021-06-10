@@ -44,13 +44,15 @@ if (ver_hllhc_optics > 0 && NRJ>5000.0000){
 };
 
 ! If the (averages of the) D2 errors were corrected: remove the average errors and assign the real errors of D2
-if (ver_hllhc_optics > 0 && correct_for_D2==1 && on_errors_D2==1){
-  use_average_errors_MBRD=0;
-  call, file="errors/HL-LHC/D2_errortable_v5";
-  eoption,add=false;
-  eoption,seed=myseed+103;
-  call, file="errors/HL-LHC/Efcomp_MBRD.madx";
-  eoption,add=true;
+if (ver_hllhc_optics > 0 && correct_for_D2==1){
+  if (on_errors_D2==1){
+    use_average_errors_MBRD=0;
+    call, file="errors/HL-LHC/D2_errortable_v5";
+    eoption,add=false;
+    eoption,seed=myseed+103;
+    call, file="errors/HL-LHC/Efcomp_MBRD.madx";
+    eoption,add=true;
+  };
 };
 
 ! Add errors for the corrector magnets
