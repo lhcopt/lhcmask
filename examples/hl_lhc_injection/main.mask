@@ -137,6 +137,7 @@ par_on_errors_D1         = 1;
 par_on_errors_IT         = 1;
 par_on_errors_MCBRD      = 0;
 par_on_errors_MCBXF      = 0;
+par_on_errors_NLC        = 0;
 
 
 !*************************!

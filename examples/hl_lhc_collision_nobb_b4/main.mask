@@ -76,6 +76,8 @@ par_a8                   = 0;            ! [urad]
 par_o8                   = 0;            ! [mm]
 par_crab1                = -190;         ! [urad]
 par_crab5                = par_crab1;    ! [urad]
+par_mux_ip15             = 0;            ! default value 0 implies that phase advance is not matched
+par_muy_ip15             = 0;            ! default value 0 implies that phase advance is not matched
 
 ! Mimicking leveling
 par_sep8 = -0.03425547139366354;
@@ -144,6 +146,7 @@ par_on_errors_D1         = 1;
 par_on_errors_IT         = 1;
 par_on_errors_MCBRD      = 0;
 par_on_errors_MCBXF      = 0;
+par_on_errors_NLC        = 0;
 
 
 !*************************!
