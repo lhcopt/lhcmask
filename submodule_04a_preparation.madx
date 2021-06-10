@@ -20,6 +20,8 @@ on_errors_D1    = par_on_errors_D1;
 on_errors_D2    = par_on_errors_D2;
 on_errors_MCBRD = par_on_errors_MCBRD;
 on_errors_MCBXF = par_on_errors_MCBXF;
+on_errors_NLC   = par_on_errors_NLC;
+print_errors    = par_verbose;
 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -46,6 +48,7 @@ if (ver_hllhc_optics >= 1.3) {
 !                Switch ON/OFF some multipole
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+! Tracking is done without first nor second order errors
 exec, ON_ALL_MULT;
 ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
 ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
