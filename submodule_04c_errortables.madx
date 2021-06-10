@@ -33,6 +33,9 @@ if (ver_hllhc_optics > 0 && on_errors_MBH==1){
 if (ver_hllhc_optics > 0 && on_errors_MCBRD==1){
   call, file="errors/HL-LHC/MCBRD_errortable_v1";
 };
+if (ver_hllhc_optics > 0 && on_errors_NLC==1){
+  call,file="errors/HL-LHC/NLC_errortable_v1";
+}
 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -40,7 +43,7 @@ if (ver_hllhc_optics > 0 && on_errors_MCBRD==1){
 ! and call the corresponding measured error table for nominal LHC magnets
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 if (on_errors_LHC==1){
-  LHCerrortableseed=par_myseed-60*FLOOR((par_myseed-1)/60);
+  LHCerrortableseed=myseed-60*FLOOR((myseed-1)/60);
   if (LHCerrortableseed==1) {if (NRJ<4999.999) {readtable, file="errors/LHC/wise/injection_errors-emfqcs-1.tfs" ;}; if (NRJ>5000.000) {readtable, file="errors/LHC/wise/collision_errors-emfqcs-1.tfs" ;}; };
   if (LHCerrortableseed==2) {if (NRJ<4999.999) {readtable, file="errors/LHC/wise/injection_errors-emfqcs-2.tfs" ;}; if (NRJ>5000.000) {readtable, file="errors/LHC/wise/collision_errors-emfqcs-2.tfs" ;}; };
   if (LHCerrortableseed==3) {if (NRJ<4999.999) {readtable, file="errors/LHC/wise/injection_errors-emfqcs-3.tfs" ;}; if (NRJ>5000.000) {readtable, file="errors/LHC/wise/collision_errors-emfqcs-3.tfs" ;}; };
