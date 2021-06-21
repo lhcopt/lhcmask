@@ -8,18 +8,23 @@ print, text="";
 
 on_disp = 0;
 
-correct_for_D2 = par_correct_for_D2;
-correct_for_MCBX = par_correct_for_MCBX;
+myseed               = par_myseed;
+on_errors_LHC        = par_on_errors_LHC;
+off_errors_Q4_inIP15 = par_off_errors_Q4_inIP15;
+off_errors_Q5_inIP15 = par_off_errors_Q5_inIP15;
+on_errors_MBH        = par_on_errors_MBH;
+on_errors_IT         = par_on_errors_IT;
+on_errors_Q4         = par_on_errors_Q4;
+on_errors_D1         = par_on_errors_D1;
+on_errors_D2         = par_on_errors_D2;
+on_errors_MCBRD      = par_on_errors_MCBRD;
+on_errors_MCBXF      = par_on_errors_MCBXF;
+on_errors_NLC        = par_on_errors_NLC;
+correct_for_D2       = par_correct_for_D2;
+correct_for_MCBX     = par_correct_for_MCBX;
+print_errors         = par_verbose;
+write_errortable     = par_write_errortable;
 
-on_errors_LHC   = par_on_errors_LHC;
-on_errors_MBH   = par_on_errors_MBH;
-on_errors_IT    = par_on_errors_IT;
-on_errors_Q4    = par_on_errors_Q4;
-on_errors_Q5    = par_on_errors_Q5;
-on_errors_D1    = par_on_errors_D1;
-on_errors_D2    = par_on_errors_D2;
-on_errors_MCBRD = par_on_errors_MCBRD;
-on_errors_MCBXF = par_on_errors_MCBXF;
 
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -46,6 +51,7 @@ if (ver_hllhc_optics >= 1.3) {
 !                Switch ON/OFF some multipole
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+! Tracking is done without first nor second order errors
 exec, ON_ALL_MULT;
 ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0 ;
 ON_A2s =  0 ; ON_A2r =  0 ; ON_B2s =  0 ; ON_B2r =  0 ;
