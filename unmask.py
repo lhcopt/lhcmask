@@ -58,6 +58,7 @@ if __name__ == '__main__':
                     'or given inline as: %%PARAM1%%:value1, %%PARAM2:value2, ...'))
     parser.add_argument('--output_filename', help='Name of the output file', default='auto')
     parser.add_argument('--run', help='Execute in madx after unmasking', action='store_true')
+    parser.add_argument('--run-cpymad', help='Execute in cpymad after unmasking', action='store_true')
     parser.add_argument('--nocheck', help='Skip check that all %%s are removed', action='store_true')
     args = parser.parse_args()
 
@@ -82,3 +83,13 @@ if __name__ == '__main__':
 
         os.system('madx ' + outfname)
 
+    if args.run_cpymad:
+        import os
+        if args.output_filename == 'auto':
+            outfname = args.mask_filename+'.unmasked'
+        else:
+            outfname = args.output_filename
+
+        from cpymad.madx import Madx
+        mad=Madx()
+        mad.call(outfname)
