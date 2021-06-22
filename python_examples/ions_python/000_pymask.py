@@ -87,7 +87,21 @@ ost.apply_optics(mad, optics_file=optics_file)
 
 # Attach beam to sequences
 mad.globals.nrj = configuration['beam_energy_tot']
-gamma_rel = (configuration['beam_charge']*configuration['beam_energy_tot'])/configuration['beam_mass']
+particle_type = 'proton'
+
+if 'beam_mass' in configuration.keys():
+    beam_mass = configuration['beam_mass']
+    particle_type = 'ion'
+else:
+    beam_mass = mad.globals.pmass # proton mass
+
+if 'beam_charge' in configuration.keys():
+    beam_charge = configuration['beam_charge']
+    particle_type = 'ion'
+else:
+    beam_charge = 1.
+
+gamma_rel = (beam_charge*configuration['beam_energy_tot'])/beam_mass
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
     if ss == 'lhcb1':
@@ -100,16 +114,16 @@ for ss in mad.sequence.keys():
 
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
-    beam, particle=ion,sequence={ss},
-        energy={configuration['beam_energy_tot']*configuration['beam_charge']},
+    beam, particle={particle_type},sequence={ss},
+        energy={configuration['beam_energy_tot']*beam_charge},
         sigt={configuration['beam_sigt']},
         bv={ss_beam_bv},
         npart={configuration['beam_npart']},
         sige={configuration['beam_sige']},
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
-        mass = {configuration['beam_mass']},
-        charge={configuration['beam_charge']},
+        mass={beam_mass},
+        charge={beam_charge},
     ''')
 
 
@@ -179,45 +193,14 @@ elif enable_bb_legacy or mode=='b4_without_bb':
     if mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
-        # Modified module 2 for offset levelling in IP1,2,5,8
-        vars_for_legacy_level = ['lumi_ip8','lumi_ip5', 'lumi_ip1', 'lumi_ip2',
+        if particle_type == 'ion': # the legacy macro for BB have been checked but not maintained
+            raise ValueError 
+        # Luminosity levelling
+        vars_for_legacy_level = ['lumi_ip8',
             'nco_IP1', 'nco_IP2', 'nco_IP5', 'nco_IP8']
         mad.set_variables_from_dict({
             'par_'+kk: configuration[kk] for kk in vars_for_legacy_level})
-        mad.input('''
-        print, text="";
-        print, text="";
-        print, text="+++++++++++++++++++++++++++++++";
-        print, text="++ START MODULE 2: LEVELLING ++";
-        print, text="+++++++++++++++++++++++++++++++";
-        print, text="";
-        print, text="";
-
-        call, file="beambeam_macros/macro_bb.madx";                  ! macros for beam-beam
-
-        exec, DEFINE_BB_PARAM;  !Define main beam-beam parameters
-
-        !Switch on Xscheme in precollision
-        on_disp:=0;
-        halo1=0;halo2=0;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
-        !number of collision/turn at IP1/2/5/8 
-        nco_IP1 = par_nco_IP1;
-        nco_IP5 = par_nco_IP5;
-        nco_IP2 = par_nco_IP2;
-        nco_IP8 = par_nco_IP8;
-        exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip8, 8); value,halo8;
-        exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip1, 1); value,halo1;
-        exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip2, 2); value,halo2;
-        exec, LEVEL_PARALLEL_OFFSET_FOR(par_lumi_ip5, 5); value,halo5;
-        !Redefine the on_sep's accordingly
-        exec, CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
-        ! Saving new crossing scheme with separation
-        on_disp=on_dispaux; ! reset on_disp before saving
-        exec, crossing_save;
-
-        if (mylhcbeam==1) { use, sequence=lhcb1; } else { use, sequence=lhcb2; };
-
-        ''')        
+        mad.input("call, file='modules/module_02_lumilevel.madx';")
 else:
     print('Start pythonic leveling:')
     ost.lumi_control(mad, twiss_dfs, configuration, knob_names)
@@ -303,10 +286,12 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 # For B1, to be generalized for B4
-filling_scheme_json = configuration['filling_scheme_json']
-bunch_to_track = configuration['bunch_to_track']
-bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(filling_scheme_json,bunch_to_track, beam='1')
-bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
+if 'filling_scheme_json' in configuration.keys():
+    filling_scheme_json = configuration['filling_scheme_json']
+    bunch_to_track = configuration['bunch_to_track']
+    bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(
+                              filling_scheme_json,bunch_to_track, beam='1')
+    bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
 
 ##################################################
 # Select mad instance for tracking configuration #
@@ -549,7 +534,9 @@ else:
         pickle_lines_in_folder=pysix_fol_name,
         skip_mad_use=True)
 
-##### Save final twiss
+#############################
+#     Save final twiss      #
+#############################
 
 mad_track.globals.on_bb_charge = 0
 mad_track.twiss()
