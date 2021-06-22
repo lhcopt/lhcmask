@@ -12,19 +12,5 @@ call, file="modules/submodule_04a_preparation.madx";
 call, file="modules/submodule_04b_alignsep.madx";
 call, file="modules/submodule_04c_errortables.madx";
 call, file="modules/submodule_04d_efcomp.madx";
-
-select, flag=error, clear;
-select, flag=error, pattern=".";
-esave,  file="error_all.tfs";
-print, text="===============================================";
-print, text="======  OPTICS PARAMETERS: AFTER ERRORS  ======";
-print, text="===============================================";
-call, file="tools/get_optics_params.madx";
-
 call, file="modules/submodule_04e_correction.madx";
 call, file="modules/submodule_04f_final.madx";
-
-print, text="==================================================";
-print, text="======  OPTICS PARAMETERS: BEFORE MATCHING  ======";
-print, text="==================================================";
-call, file="tools/get_optics_params.madx";

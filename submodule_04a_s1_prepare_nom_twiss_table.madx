@@ -28,24 +28,26 @@ twiss,  file='temp/optics0_MB.mad';
 
 ! print nominal optics parameter at the D1, MQX and triplet corrector
 ! for triplet correction
-select, flag=twiss, clear;
-select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
-if (correct_for_D2==1){
-  select, flag=twiss, pattern=MBRD , class=multipole, column=name,betx,bety,x,y;
+if (ver_hllhc_optics > 0){
+  select, flag=twiss, clear;
+  select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
+  if (correct_for_D2==1){
+    select, flag=twiss, pattern=MBRD , class=multipole, column=name,betx,bety,x,y;
+  };
+  select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCQSX                 , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCDX                  , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCDSX                 , column=name,betx,bety,x,y;
+  select, flag=twiss, pattern=MCTSX                 , column=name,betx,bety,x,y;
+  if (correct_for_MCBX==1){
+    select, flag=twiss, pattern=MCBXF, class=multipole, column=name,betx,bety,x,y;
+  };
+  twiss,  file='temp/optics0_inser.mad';
 };
-select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCQSX                 , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCDX                  , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCDSX                 , column=name,betx,bety,x,y;
-select, flag=twiss, pattern=MCTSX                 , column=name,betx,bety,x,y;
-if (correct_for_MCBX==1){
-  select, flag=twiss, pattern=MCBXF, class=multipole, column=name,betx,bety,x,y;
-};
-twiss,  file='temp/optics0_inser.mad';

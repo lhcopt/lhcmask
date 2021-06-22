@@ -6,6 +6,16 @@ print, text="";
 print, text="";
 
 
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!    Error output
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if(write_errortable==1){
+  select, flag=error, clear;
+  select, flag=error, pattern=".";
+  esave,  file="error_all.tfs";
+}
+
+
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !    correct orbit distortion resulting from other magnets

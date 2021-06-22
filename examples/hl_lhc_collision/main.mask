@@ -75,6 +75,10 @@ par_o8                   = 0;            ! [mm]
 par_crab1                = -190;         ! [urad]
 par_crab5                = par_crab1;    ! [urad]
 
+! Phase advance
+par_mux_ip15             = 0;            ! default value 0 implies that phase advance is not matched
+par_muy_ip15             = 0;            ! default value 0 implies that phase advance is not matched
+
 ! Dispersion correction knob
 par_on_disp              = 1;
 
@@ -129,14 +133,19 @@ par_correct_for_D2       = 0;
 par_correct_for_MCBX     = 0;
 
 par_on_errors_LHC        = 1;
+par_off_errors_Q4_inIP15 = 0;  ! Set this flag only when errors in IP1 & IP5 need to be removed for Q4
+par_off_errors_Q5_inIP15 = 0;  ! Set this flag only when errors in IP1 & IP5 need to be removed for Q5
 par_on_errors_MBH        = 1;
-par_on_errors_Q5         = 1;
 par_on_errors_Q4         = 1;
 par_on_errors_D2         = 1;
 par_on_errors_D1         = 1;
 par_on_errors_IT         = 1;
 par_on_errors_MCBRD      = 0;
 par_on_errors_MCBXF      = 0;
+par_on_errors_NLC        = 0;
+
+! Create errortable output file
+par_write_errortable     = 1;
 
 
 !*************************!
@@ -144,7 +153,7 @@ par_on_errors_MCBXF      = 0;
 !*************************!
 
 ! Build machine and optics
-! (the user can intruduce in this section additional custom code 
+! (the user can introduce in this section additional custom code 
 ! to edit machine and/or optics)
 call, file="make_sequence.madx";
 call, file="optics.madx";
