@@ -158,14 +158,17 @@ configuration = {
         'par_correct_for_D2'       : 0,
         'par_correct_for_MCBX'     : 0,
         'par_on_errors_LHC'        : 1,
+        'par_off_errors_Q4_inIP15' : 0, 
+        'par_off_errors_Q5_inIP15' : 0,
         'par_on_errors_MBH'        : 1,
-        'par_on_errors_Q5'         : 1,
         'par_on_errors_Q4'         : 1,
         'par_on_errors_D2'         : 1,
         'par_on_errors_D1'         : 1,
         'par_on_errors_IT'         : 1,
         'par_on_errors_MCBRD'      : 0,
         'par_on_errors_MCBXF'      : 0,
+        'par_on_errors_NLC'        : 0,
+        'par_write_errortable'     : 1,
         },
 
     # Parameters for legacy beam-beam macros (not used in default modes)

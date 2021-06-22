@@ -44,6 +44,7 @@ def build_sequence(mad, beam):
         call, file="errors/HL-LHC/install_MQXF_fringenl.madx";    ! adding fringe place holder
         call, file="errors/HL-LHC/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
         call, file="errors/HL-LHC/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
+        call, file="errors/HL-LHC/install_NLC_errors.madx";       ! adding non-linear corrector placeholders in IR1/5 (for errors)
 
         !Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
         if (mylhcbeam<3){
