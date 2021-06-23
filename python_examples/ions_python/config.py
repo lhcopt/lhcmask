@@ -3,8 +3,7 @@ configuration = {
     # Links to be made for tools and scripts
     'links'                    : {
                                     'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-                                    #'modules': 'tracking_tools/modules',
-                                    'modules': '../../',
+                                    'modules': 'tracking_tools/modules',
                                     'tools': 'tracking_tools/tools',
                                     'beambeam_macros': 'tracking_tools/beambeam_macros',
                                     'errors': 'tracking_tools/errors',
