@@ -2,11 +2,11 @@ configuration = {
 
     # Links to be made for tools and scripts
     'links'                    : {
-                                    'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-                                    'modules': 'tracking_tools/modules',
-                                    'tools': 'tracking_tools/tools',
-                                    'beambeam_macros': 'tracking_tools/beambeam_macros',
-                                    'errors': 'tracking_tools/errors',
+                                    'base': '/home/rdemaria/local/',
+                                    'modules': 'base/lhcmask',
+                                    'tools': 'base/lhctoolkit',
+                                    #'beambeam_macros': 'base/beambeam_macros',
+                                    'errors': 'base/lhcerrors',
                                  },
     # Mode - choose between:
 
@@ -20,13 +20,13 @@ configuration = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb_legacy_macros',
+    'mode'                      : 'b1_without_bb',
 
     # For test against madx mask for modes 'b4_from_b2_without_bb' and 'b4_without_bb':
     # 'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
 
     # Optics file
-    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
+    'optics_file'              : 'base/hllhc14/round/opt_round_150_1500_thin.madx', #15 cm
 
     # Enable checks
     'check_betas_at_ips'       : True,
