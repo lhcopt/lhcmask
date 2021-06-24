@@ -494,8 +494,11 @@ else:
         seq_name=sequence_to_track,
         bb_df=bb_df_track,
         output_folder='./',
-        reference_bunch_charge_sixtrack_ppb=(
+        reference_num_particles_sixtrack=(
             mad_track.sequence[sequence_to_track].beam.npart),
+        reference_particle_charge_sixtrack=1., # TODO
+                                               # This is to patch a known bug of sixtrack
+                                               # https://github.com/SixTrack/SixTrack/issues/1082
         emitnx_sixtrack_um=(
             mad_track.sequence[sequence_to_track].beam.exn),
         emitny_sixtrack_um=(
