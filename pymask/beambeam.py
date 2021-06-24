@@ -181,7 +181,8 @@ def generate_set_of_bb_encounters_1beam(
     harmonic_number = 35640,
     bunch_spacing_buckets = 10,
     numberOfHOSlices = 11,
-    bunch_charge_ppb = 0.,
+    bunch_num_particles = 0.,
+    bunch_particle_charge = 0.,
     sigt=0.0755,
     relativistic_beta=1.,
     ip_names = ['ip1', 'ip2', 'ip5', 'ip8'],
@@ -201,7 +202,8 @@ def generate_set_of_bb_encounters_1beam(
     if len(myBBLRlist)>0:
         myBBLR=pd.DataFrame(myBBLRlist)[['beam','other_beam','ip_name','label','identifier']]
 
-        myBBLR['self_charge_ppb'] = bunch_charge_ppb
+        myBBLR['self_num_particles'] = bunch_num_particles
+        myBBLR['self_particle_charge'] = bunch_particle_charge
         myBBLR['self_relativistic_beta'] = relativistic_beta
         myBBLR['elementName']=myBBLR.apply(lambda x: elementName(x.label, x.ip_name.replace('ip', ''), x.beam, x.identifier), axis=1)
         myBBLR['other_elementName']=myBBLR.apply(
@@ -229,7 +231,7 @@ def generate_set_of_bb_encounters_1beam(
     myBBHO=pd.DataFrame(myBBHOlist)[['beam','other_beam', 'ip_name','label','identifier']]
 
 
-    myBBHO['self_charge_ppb'] = bunch_charge_ppb/numberOfHOSlices
+    myBBHO['self_num_particles'] = bunch_num_particles/numberOfHOSlices
     myBBHO['self_relativistic_beta'] = relativistic_beta
     for ip_nn in ip_names:
         myBBHO.loc[myBBHO['ip_name']==ip_nn, 'atPosition']=list(z_centroids)
@@ -249,7 +251,7 @@ def generate_set_of_bb_encounters_1beam(
 
     return myBB
 
-def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
+def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_num_particles=1):
 
     if mode == 'dummy':
         bb_df['elementClass']='beambeam'
@@ -259,7 +261,7 @@ def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
                     'yma  = 1, '     + \
                     f'charge = 0*{charge}, ' +\
                     'slot_id = %d'%({'bb_lr': 4, 'bb_ho': 6}[label]) # need to add 60 for central
-        bb_df['elementDefinition']=bb_df.apply(lambda x: elementDefinition(x.elementName, x.elementClass, eattributes(x['self_charge_ppb'], x['label'])), axis=1)
+        bb_df['elementDefinition']=bb_df.apply(lambda x: elementDefinition(x.elementName, x.elementClass, eattributes(x['self_num_particles'], x['label'])), axis=1)
         bb_df['elementInstallation']=bb_df.apply(lambda x: elementInstallation(x.elementName, x.elementClass, x.atPosition, x.ip_name), axis=1)
     elif mode=='from_dataframe':
         bb_df['elementClass']='beambeam'
@@ -272,7 +274,7 @@ def generate_mad_bb_info(bb_df, mode='dummy', madx_reference_bunch_charge=1):
         bb_df['elementDefinition']=bb_df.apply(lambda x: elementDefinition(x.elementName, x.elementClass,
             eattributes(np.sqrt(x['other_Sigma_11']),np.sqrt(x['other_Sigma_33']),
                 x['xma'], x['yma'],
-                x['other_charge_ppb']/madx_reference_bunch_charge, x['label'])),
+                x['other_particle_charge']*x['other_num_particles']/madx_reference_bunch_num_particles, x['label'])), # patch due to the fact that mad-x takes n_part from the weak beam
             axis=1)
         bb_df['elementInstallation']=bb_df.apply(lambda x: elementInstallation(x.elementName, x.elementClass, x.atPosition, x.ip_name), axis=1)
     else:
@@ -290,8 +292,10 @@ def get_counter_rotating(bb_df):
     c_bb_df['identifier'] = bb_df['identifier']
     c_bb_df['elementClass'] = bb_df['elementClass']
     c_bb_df['elementName'] = bb_df['elementName']
-    c_bb_df['self_charge_ppb'] = bb_df['self_charge_ppb']
-    c_bb_df['other_charge_ppb'] = bb_df['other_charge_ppb']
+    c_bb_df['self_num_particles'] = bb_df['self_num_particles']
+    c_bb_df['other_num_particles'] = bb_df['other_num_particles']
+    c_bb_df['self_particle_charge'] = bb_df['self_particle_charge']
+    c_bb_df['other_particle_charge'] = bb_df['other_particle_charge']
     c_bb_df['other_elementName'] = bb_df['other_elementName']
 
     c_bb_df['atPosition'] = bb_df['atPosition'] * (-1.)
@@ -349,9 +353,9 @@ def install_lenses_in_sequence(mad, bb_df, sequence_name,
         regenerate_mad_bb_info_in_df=True):
 
     if regenerate_mad_bb_info_in_df:
-        madx_reference_bunch_charge = mad.sequence[sequence_name].beam.npart
+        madx_reference_bunch_num_particles = mad.sequence[sequence_name].beam.npart
         generate_mad_bb_info(bb_df, mode='from_dataframe',
-                madx_reference_bunch_charge=madx_reference_bunch_charge)
+                madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
 
     mad.input(bb_df['elementDefinition'].str.cat(sep='\n'))
 
@@ -429,7 +433,8 @@ def get_partner_corrected_position_and_optics(bb_df_b1, bb_df_b2, ip_position_df
             for ss in _sigma_names:
                 self_df.loc[ee, f'other_Sigma_{ss}'] = other_df.loc[other_ee, f'self_Sigma_{ss}']
             # Get charge of other beam
-            self_df.loc[ee, 'other_charge_ppb'] = other_df.loc[other_ee, 'self_charge_ppb']
+            self_df.loc[ee, 'other_num_particles'] = other_df.loc[other_ee, 'self_num_particles']
+            self_df.loc[ee, 'other_particle_charge'] = other_df.loc[other_ee, 'self_particle_charge']
             self_df.loc[ee, 'other_relativistic_beta'] = other_df.loc[other_ee, 'self_relativistic_beta']
 
 def compute_separations(bb_df):
@@ -626,7 +631,8 @@ def setup_beam_beam_in_line(
 
     for ee, eename in zip(line.elements, line.element_names):
         if isinstance(ee, pysixtrack.elements.BeamBeam4D):
-            ee.charge = bb_df.loc[eename, 'other_charge_ppb']
+            ee.charge = (bb_df.loc[eename, 'other_num_particles']
+                        * bb_df.loc[eename, 'other_particle_charge']) # TODO update pysixtrack interface to separate charge and b. population
             ee.sigma_x = np.sqrt(bb_df.loc[eename, 'other_Sigma_11'])
             ee.sigma_y = np.sqrt(bb_df.loc[eename, 'other_Sigma_33'])
             ee.beta_r = bb_df.loc[eename, 'other_relativistic_beta']
@@ -639,8 +645,8 @@ def setup_beam_beam_in_line(
             ee.alpha = bb_df.loc[eename, 'alpha']
             ee.x_bb_co = bb_df.loc[eename, 'separation_x']
             ee.y_bb_co = bb_df.loc[eename, 'separation_y']
-
-            ee.charge_slices = [bb_df.loc[eename, 'other_charge_ppb']]
+            ee.charge_slices = [(bb_df.loc[eename, 'other_num_particles']
+                                 * bb_df.loc[eename, 'other_particle_charge'])] # TODO update pysixtrack interface to separate charge and b. population
             ee.zeta_slices = [0.0]
             ee.sigma_11 = bb_df.loc[eename, 'other_Sigma_11']
             ee.sigma_12 = bb_df.loc[eename, 'other_Sigma_12']
@@ -735,7 +741,8 @@ def generate_bb_dataframes(mad,
     harmonic_number=35640,
     bunch_spacing_buckets=10,
     numberOfHOSlices=11,
-    bunch_population_ppb=None,
+    bunch_num_particles=None,
+    bunch_particle_charge=None,
     sigmaz_m=None,
     z_crab_twiss=0.,
     remove_dummy_lenses=True):
@@ -744,13 +751,17 @@ def generate_bb_dataframes(mad,
         assert mad.sequence.lhcb1.beam[pp] == mad.sequence.lhcb2.beam[pp]
 
     circumference = mad.sequence.lhcb1.beam.circ
-    madx_reference_bunch_charge = mad.sequence.lhcb1.beam.npart
+    madx_reference_bunch_num_particles = mad.sequence.lhcb1.beam.npart
+
+    if bunch_num_particles is None:
+        bunch_num_particles = madx_reference_bunch_num_particles
+    if bunch_particle_charge is None:
+        bunch_particle_charge = mad.sequence.lhcb1.beam.charge
+
+
+
     relativistic_gamma = mad.sequence.lhcb1.beam.gamma
     relativistic_beta = np.sqrt(1 - 1.0 / relativistic_gamma ** 2)
-    if bunch_population_ppb is not None:
-        bunch_charge_ppb = bunch_population_ppb
-    else:
-        bunch_charge_ppb = madx_reference_bunch_charge
 
     if sigmaz_m  is not None:
         sigt = sigmaz_m
@@ -760,15 +771,18 @@ def generate_bb_dataframes(mad,
     bb_df_b1 = generate_set_of_bb_encounters_1beam(
         circumference, harmonic_number,
         bunch_spacing_buckets,
-        numberOfHOSlices, bunch_charge_ppb, sigt,
-        relativistic_beta, ip_names, numberOfLRPerIRSide,
+        numberOfHOSlices,
+        bunch_num_particles, bunch_particle_charge,
+        sigt, relativistic_beta, ip_names, numberOfLRPerIRSide,
         beam_name = 'b1',
         other_beam_name = 'b2')
 
     bb_df_b2 = generate_set_of_bb_encounters_1beam(
         circumference, harmonic_number,
         bunch_spacing_buckets,
-        numberOfHOSlices, bunch_charge_ppb, sigt,
+        numberOfHOSlices,
+        bunch_num_particles, bunch_particle_charge,
+        sigt,
         relativistic_beta, ip_names, numberOfLRPerIRSide,
         beam_name = 'b2',
         other_beam_name = 'b1')
@@ -808,13 +822,13 @@ def generate_bb_dataframes(mad,
 
     # Generate mad info
     generate_mad_bb_info(bb_df_b1, mode='from_dataframe',
-            madx_reference_bunch_charge=madx_reference_bunch_charge)
+            madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
     generate_mad_bb_info(bb_df_b2, mode='from_dataframe',
-            madx_reference_bunch_charge=madx_reference_bunch_charge)
+            madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
     generate_mad_bb_info(bb_df_b3, mode='from_dataframe',
-            madx_reference_bunch_charge=madx_reference_bunch_charge)
+            madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
     generate_mad_bb_info(bb_df_b4, mode='from_dataframe',
-            madx_reference_bunch_charge=madx_reference_bunch_charge)
+            madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
 
     bb_dfs = {
         'b1': bb_df_b1,

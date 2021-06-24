@@ -89,19 +89,19 @@ ost.apply_optics(mad, optics_file=optics_file)
 mad.globals.nrj = configuration['beam_energy_tot']
 particle_type = 'proton'
 
-if 'beam_mass' in configuration.keys():
-    beam_mass = configuration['beam_mass']
+if 'particle_mass' in configuration.keys():
+    particle_mass = configuration['particle_mass']
     particle_type = 'ion'
 else:
-    beam_mass = mad.globals.pmass # proton mass
+    particle_mass = mad.globals.pmass # proton mass
 
-if 'beam_charge' in configuration.keys():
-    beam_charge = configuration['beam_charge']
+if 'particle_charge' in configuration.keys():
+    particle_charge = configuration['particle_charge']
     particle_type = 'ion'
 else:
-    beam_charge = 1.
+    particle_charge = 1.
 
-gamma_rel = (beam_charge*configuration['beam_energy_tot'])/beam_mass
+gamma_rel = (particle_charge*configuration['beam_energy_tot'])/particle_mass
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
     if ss == 'lhcb1':
@@ -115,15 +115,15 @@ for ss in mad.sequence.keys():
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
     beam, particle={particle_type},sequence={ss},
-        energy={configuration['beam_energy_tot']*beam_charge},
+        energy={configuration['beam_energy_tot']*particle_charge},
         sigt={configuration['beam_sigt']},
         bv={ss_beam_bv},
         npart={configuration['beam_npart']},
         sige={configuration['beam_sige']},
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
-        mass={beam_mass},
-        charge={beam_charge},
+        mass={particle_mass},
+        charge={particle_charge},
     ''')
 
 
@@ -247,15 +247,17 @@ mad.globals.on_disp = 0.
 
 # Prepare bb dataframes
 if enable_bb_python:
+    bbconfig = configuration['beambeam_config']
     bb_dfs = pm.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
-        numberOfLRPerIRSide=configuration['numberOfLRPerIRSide'],
-        bunch_spacing_buckets=configuration['bunch_spacing_buckets'],
-        numberOfHOSlices=configuration['numberOfHOSlices'],
-        bunch_population_ppb=configuration['bunch_population_ppb'],
-        sigmaz_m=configuration['sigmaz_m'],
-        z_crab_twiss=configuration['z_crab_twiss']*float(enable_crabs),
+        numberOfLRPerIRSide=bbconfig['numberOfLRPerIRSide'],
+        bunch_spacing_buckets=bbconfig['bunch_spacing_buckets'],
+        numberOfHOSlices=bbconfig['numberOfHOSlices'],
+        bunch_num_particles = bbconfig['bunch_num_particles'],
+        bunch_particle_charge = bbconfig['bunch_particle_charge'],
+        sigmaz_m=bbconfig['sigmaz_m'],
+        z_crab_twiss=bbconfig['z_crab_twiss']*float(enable_crabs),
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
