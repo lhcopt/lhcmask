@@ -232,6 +232,7 @@ def generate_set_of_bb_encounters_1beam(
 
 
     myBBHO['self_num_particles'] = bunch_num_particles/numberOfHOSlices
+    myBBHO['self_particle_charge'] = bunch_particle_charge
     myBBHO['self_relativistic_beta'] = relativistic_beta
     for ip_nn in ip_names:
         myBBHO.loc[myBBHO['ip_name']==ip_nn, 'atPosition']=list(z_centroids)
