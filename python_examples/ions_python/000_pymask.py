@@ -262,6 +262,14 @@ if enable_bb_python:
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
 
+    # For B1, to be generalized for B4
+    if 'filling_scheme_json' in configuration.keys():
+        filling_scheme_json = configuration['filling_scheme_json']
+        bunch_to_track = configuration['bunch_to_track']
+        bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(
+                                  filling_scheme_json,bunch_to_track, beam='1')
+        bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
+
 
 ###################
 # Generate beam 4 #
@@ -287,13 +295,6 @@ if generate_b4_from_b2:
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
-# For B1, to be generalized for B4
-if 'filling_scheme_json' in configuration.keys():
-    filling_scheme_json = configuration['filling_scheme_json']
-    bunch_to_track = configuration['bunch_to_track']
-    bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(
-                              filling_scheme_json,bunch_to_track, beam='1')
-    bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
 
 ##################################################
 # Select mad instance for tracking configuration #
