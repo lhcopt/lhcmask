@@ -47,7 +47,7 @@ configuration = {
     'beam_energy_tot'      : 7000.  ,       # [GeV]
 
     # Ion parameters
-    'particle_mass'        :193.68715,
+    'particle_mass'        :193.6872729,
     'particle_charge'      :82,
 
     # Tunes and chromaticities
