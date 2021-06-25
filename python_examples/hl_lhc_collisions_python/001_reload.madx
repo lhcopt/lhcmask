@@ -1,0 +1,8 @@
+set,format=".15g";
+call,file="saved_lhcb1.madx";
+use,sequence="lhcb1";
+twiss;
+readtable,file="error_all.tfs", table="errtab";
+seterr,table="errtab";
+twiss;
+sixtrack,cavall,radius=0.017;
