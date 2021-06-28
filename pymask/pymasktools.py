@@ -194,7 +194,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
         ibbc_sixtrack,
         radius_sixtrack_multip_conversion_mad,
         skip_mad_use=False):
-
+   
     six_fol_name = output_folder
     os.makedirs(six_fol_name, exist_ok=True)
 
@@ -237,8 +237,8 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             sxt_df_4d['strength-ratio'] = (
                     sxt_df_4d['other_num_particles']
                     * sxt_df_4d['other_particle_charge']
-                    / reference_num_particles_sixtrack
-                    / reference_particle_charge_sixtrack)
+                    / reference_num_particles_sixtrack)
+                    #/ reference_particle_charge_sixtrack)# patch for sixtrack inconsistency
             sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
             sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
             sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
@@ -263,8 +263,8 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             sxt_df_6d['strength-ratio'] = (
                     sxt_df_6d['other_num_particles']
                     * sxt_df_6d['other_particle_charge']
-                    / reference_num_particles_sixtrack
-                    / reference_particle_charge_sixtrack)
+                    / reference_num_particles_sixtrack)
+                    #/ reference_particle_charge_sixtrack) # patch for sixtrack
             sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
             sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
             sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
@@ -298,7 +298,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
                     ]), axis=1)
 
         f3_common_settings = ' '.join([
-            f"{reference_num_particles_sixtrack}",
+            f"{reference_num_particles_sixtrack*reference_particle_charge_sixtrack}",
             f"{emitnx_sixtrack_um}",
             f"{emitny_sixtrack_um}",
             f"{sigz_sixtrack_m}",
