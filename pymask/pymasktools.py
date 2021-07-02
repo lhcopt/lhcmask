@@ -388,7 +388,7 @@ def generate_xline_with_bb(mad, seq_name, bb_df,
     # Build xline model
     import xline
     line = xline.Line.from_madx_sequence(
-        mad.sequence[seq_name])
+        mad.sequence[seq_name], apply_madx_errors=True)
 
     if bb_df is not None:
         bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
@@ -429,7 +429,7 @@ def generate_xline_with_bb(mad, seq_name, bb_df,
         
         line.to_json(xline_fol_name + "/line_bb_dipole_not_cancelled.json", keepextra=True)
         line_bb_dipole_cancelled.to_json(xline_fol_name + "/line_bb_dipole_cancelled.json", keepextra=True)
-        part_on_CO.to_json(xline_fol_name + "/particle_on_closed_orbit.pkl")
+        part_on_CO.to_json(xline_fol_name + "/particle_on_closed_orbit.json")
 
     return xline_dict
 

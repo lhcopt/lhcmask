@@ -37,10 +37,10 @@ def fc_to_fort():
 
 mad=Madx()
 
-mad.call("saved_seq.madx")
+mad.call("final_seq.madx")
 mad.use(sequence="lhcb1")
 mad.twiss()
-mad.readtable(file="errors_lhc.tfs", table="errtab")
+mad.readtable(file="final_errors.tfs", table="errtab")
 mad.seterr(table="errtab")
 mad.set(format=".15g")
 mad.twiss()
@@ -48,13 +48,13 @@ mad.sixtrack(cavall=True,radius=0.017,max_mult_ord=18,mult_auto_off=True)
 fc_to_fort()
 
 import sixtracktools
-import pysixtrack
+import xline
 
 sixin=sixtracktools.sixinput.SixInput(".")
-linesix=pysixtrack.Line.from_sixinput(sixin)
-linemad=pysixtrack.Line.from_madx_sequence(mad.sequence.lhcb1,apply_madx_errors=True)
+linesix=xline.Line.from_sixinput(sixin)
+linemad=xline.Line.from_madx_sequence(mad.sequence.lhcb1,apply_madx_errors=True)
 
-#linemad=pysixtrack.Line.from_madx_sequence(mad.sequence.lhcb1)
+#linemad=xline.Line.from_madx_sequence(mad.sequence.lhcb1)
 
 for ll in (linesix, linemad):
     ll.remove_inactive_multipoles(inplace=True)
