@@ -182,7 +182,8 @@ def check_separations_against_madvars(checks, twiss_df_b1, twiss_df_b2, variable
                 cc['plane'], target, cc['tol'])
 
 def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
-        reference_bunch_charge_sixtrack_ppb,
+        reference_num_particles_sixtrack,
+        reference_particle_charge_sixtrack,
         emitnx_sixtrack_um,
         emitny_sixtrack_um,
         sigz_sixtrack_m,
@@ -193,7 +194,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
         ibbc_sixtrack,
         radius_sixtrack_multip_conversion_mad,
         skip_mad_use=False):
-
+   
     six_fol_name = output_folder
     os.makedirs(six_fol_name, exist_ok=True)
 
@@ -233,8 +234,11 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
         if len(sxt_df_4d) > 0:
             sxt_df_4d['h-sep [mm]'] = -sxt_df_4d['separation_x']*1e3
             sxt_df_4d['v-sep [mm]'] = -sxt_df_4d['separation_y']*1e3
-            sxt_df_4d['strength-ratio'] = (sxt_df_4d['other_charge_ppb']
-                    / reference_bunch_charge_sixtrack_ppb)
+            sxt_df_4d['strength-ratio'] = (
+                    sxt_df_4d['other_num_particles']
+                    * sxt_df_4d['other_particle_charge']
+                    / reference_num_particles_sixtrack)
+                    #/ reference_particle_charge_sixtrack)# patch for sixtrack inconsistency
             sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
             sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
             sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
@@ -256,7 +260,11 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             sxt_df_6d['v-sep [mm]'] = -sxt_df_6d['separation_y']*1e3
             sxt_df_6d['phi [rad]'] = sxt_df_6d['phi']
             sxt_df_6d['alpha [rad]'] = sxt_df_6d['alpha']
-            sxt_df_6d['strength-ratio'] = sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
+            sxt_df_6d['strength-ratio'] = (
+                    sxt_df_6d['other_num_particles']
+                    * sxt_df_6d['other_particle_charge']
+                    / reference_num_particles_sixtrack)
+                    #/ reference_particle_charge_sixtrack) # patch for sixtrack
             sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
             sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
             sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
@@ -290,7 +298,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
                     ]), axis=1)
 
         f3_common_settings = ' '.join([
-            f"{reference_bunch_charge_sixtrack_ppb}",
+            f"{reference_num_particles_sixtrack*reference_particle_charge_sixtrack}",
             f"{emitnx_sixtrack_um}",
             f"{emitny_sixtrack_um}",
             f"{sigz_sixtrack_m}",
