@@ -534,6 +534,21 @@ else:
         pickle_lines_in_folder=pysix_fol_name,
         skip_mad_use=True)
 
+#####################################
+#     Save sequence and errors      #
+#####################################
+
+mad_track.select(flag="error",clear=True)
+mad_track.select(flag="error",class_="multipole")
+mad_track.select(flag="error",class_="hkicker")
+mad_track.select(flag="error",class_="vkicker")
+mad_track.select(flag="error",class_="kicker")
+mad_track.esave(file="errors_lhc.tfs")
+mad_track.select(flag="error",clear=True)
+mad_track.select(flag="error",full=True)
+mad_track.esave(file="errors_all_lhc.tfs")
+mad_track.save(sequence=ss,beam=True,file=f"saved_seq.madx")
+
 #############################
 #     Save final twiss      #
 #############################
@@ -544,3 +559,9 @@ tdf = mad_track.get_twiss_df('twiss')
 sdf = mad_track.get_summ_df('summ')
 tdf.to_parquet('final_twiss_BBOFF.parquet')
 sdf.to_parquet('final_summ_BBOFF.parquet')
+
+
+
+
+
+
