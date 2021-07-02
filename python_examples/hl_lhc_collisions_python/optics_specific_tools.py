@@ -11,7 +11,7 @@ def build_sequence(mad, beam):
     mad.input(f'mylhcbeam = {beam}')
 
     # Make link to optics toolkit
-    pm.make_links({'optics_toolkit': 'base/hllhc14/toolkit'},
+    pm.make_links({'optics_toolkit': 'optics_repository/HLLHCV1.4/toolkit'},
         force=True)
 
     mad.input('''
@@ -21,20 +21,20 @@ def build_sequence(mad, beam):
         ver_hllhc_optics = 1.4;
 
         ! Get the toolkit
-        call, file="base/hllhc14/toolkit/macro.madx";
+        call, file="optics_repository/HLLHCV1.4/toolkit/macro.madx";
 
 
         ! Build sequence
         option, -echo,-warn,-info;
         if (mylhcbeam==4){
-          call,file="base/lhcrunIII/lhcb4.seq";
+          call,file="optics_repository/runIII/lhcb4.seq";
         } else {
-          call,file="base/lhcrunIII/lhc.seq";
+          call,file="optics_repository/runIII/lhc.seq";
         };
         option, -echo, warn,-info;
 
         !Install HL-LHC
-        call, file="base/hllhc14/hllhc_sequence.madx";
+        call, file="optics_repository/HLLHCV1.4/hllhc_sequence.madx";
 
 
         ! Slice nominal sequence

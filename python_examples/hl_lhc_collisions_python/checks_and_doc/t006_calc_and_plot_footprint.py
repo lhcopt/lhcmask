@@ -5,7 +5,7 @@ import helpers as hp
 import footprint
 import matplotlib.pyplot as plt
 
-import pysixtrack
+import xline
 import sixtracktools
 
 track_with = 'PySixtrack'
@@ -25,15 +25,15 @@ n_turns = 100
 
 def prepare_line(path, input_type):
 
-    if input_type == 'pysixtrack':
-        # Load pysixtrack machine 
+    if input_type == 'xline':
+        # Load xline machine 
         with open(path, "rb") as fid:
-            ltest = pysixtrack.Line.from_dict(
+            ltest = xline.Line.from_dict(
                     pickle.load(fid))
     elif input_type == 'sixtrack':
-        print('Build pysixtrack from sixtrack input:')
+        print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = pysixtrack.Line.from_sixinput(sixinput_test)
+        ltest = xline.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
@@ -47,7 +47,7 @@ with open('../optics_orbit_at_start_ring.pkl', 'rb') as fid:
     ddd = pickle.load(fid)
 ddd['p0c'] =  ddd['p0c_eV']
 
-partCO = pysixtrack.Particles.from_dict(ddd)
+partCO = xline.Particles.from_dict(ddd)
 
 # line.disable_beambeam()
 part = partCO.copy()
@@ -82,7 +82,7 @@ if track_with == 'PySixtrack':
 
     part = partCO.copy()
 
-    x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt = hp.track_particle_pysixtrack(
+    x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt = hp.track_particle_xline(
         line, part=part, Dx_wrt_CO_m=0., Dpx_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 0].flatten(),
         Dy_wrt_CO_m=0, Dpy_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 1].flatten(),
         Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns, verbose=True)

@@ -378,24 +378,24 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
             }
     return optics_at_start_ring
 
-def generate_pysixtrack_line_with_bb(mad, seq_name, bb_df,
+def generate_xline_with_bb(mad, seq_name, bb_df,
         closed_orbit_method='from_mad', pickle_lines_in_folder=None,
         skip_mad_use=False):
 
     opt_and_CO = get_optics_and_orbit_at_start_ring(mad, seq_name,
             with_bb_forces=False, skip_mad_use=True)
 
-    # Build pysixtrack model
-    import pysixtrack
-    pysxt_line = pysixtrack.Line.from_madx_sequence(
+    # Build xline model
+    import xline
+    line = xline.Line.from_madx_sequence(
         mad.sequence[seq_name])
 
     if bb_df is not None:
-        bb.setup_beam_beam_in_line(pysxt_line, bb_df, bb_coupling=False)
+        bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
 
     # Temporary fix due to bug in mad loader
-    cavities, cav_names = pysxt_line.get_elements_of_type(
-            pysixtrack.elements.Cavity)
+    cavities, cav_names = line.get_elements_of_type(
+            xline.elements.Cavity)
     for cc, nn in zip(cavities, cav_names):
         if cc.frequency ==0.:
             ii_mad = mad.sequence[seq_name].element_names().index(nn)
@@ -405,37 +405,42 @@ def generate_pysixtrack_line_with_bb(mad, seq_name, bb_df,
 
     mad_CO = np.array([opt_and_CO[kk] for kk in ['x', 'px', 'y', 'py', 'sigma', 'delta']])
 
-    pysxt_line.disable_beambeam()
-    part_on_CO = pysxt_line.find_closed_orbit(
+    line.disable_beambeam()
+    part_on_CO = line.find_closed_orbit(
         guess=mad_CO, p0c=opt_and_CO['p0c_eV'],
         method={'from_mad': 'get_guess', 'from_tracking': 'Nelder-Mead'}[closed_orbit_method])
-    pysxt_line.enable_beambeam()
+    line.enable_beambeam()
 
-    pysxt_line_bb_dipole_cancelled = pysxt_line.copy()
+    line_bb_dipole_cancelled = line.copy()
 
-    pysxt_line_bb_dipole_cancelled.beambeam_store_closed_orbit_and_dipolar_kicks(
+    line_bb_dipole_cancelled.beambeam_store_closed_orbit_and_dipolar_kicks(
         part_on_CO,
         separation_given_wrt_closed_orbit_4D=True,
         separation_given_wrt_closed_orbit_6D=True)
 
-    pysxt_dict = {
-            'line_bb_dipole_not_cancelled': pysxt_line,
-            'line_bb_dipole_cancelled': pysxt_line_bb_dipole_cancelled,
+    xline_dict = {
+            'line_bb_dipole_not_cancelled': line,
+            'line_bb_dipole_cancelled': line_bb_dipole_cancelled,
             'particle_on_closed_orbit': part_on_CO}
 
     if pickle_lines_in_folder is not None:
-        pysix_fol_name = pickle_lines_in_folder
-        os.makedirs(pysix_fol_name, exist_ok=True)
+        xline_fol_name = pickle_lines_in_folder
+        os.makedirs(xline_fol_name, exist_ok=True)
+        
+        line.to_json(xline_fol_name + "/line_bb_dipole_not_cancelled.json", keepextra=True)
+        line_bb_dipole_cancelled.to_json(xline_fol_name + "/line_bb_dipole_cancelled.json", keepextra=True)
+        part_on_CO.to_json(xline_fol_name + "/particle_on_closed_orbit.pkl")
 
-        with open(pysix_fol_name + "/line_bb_dipole_not_cancelled.pkl", "wb") as fid:
-            pickle.dump(pysxt_line.to_dict(keepextra=True), fid)
+    return xline_dict
 
-        with open(pysix_fol_name + "/line_bb_dipole_cancelled.pkl", "wb") as fid:
-            pickle.dump(pysxt_line_bb_dipole_cancelled.to_dict(keepextra=True), fid)
-
-        with open(pysix_fol_name + "/particle_on_closed_orbit.pkl", "wb") as fid:
-            pickle.dump(part_on_CO.to_dict(), fid)
-
-    return pysxt_dict
-
-
+def save_mad_sequence_and_error(mad, seq_name, filename='lhc'):
+    mad.select(flag="error",clear=True)
+    mad.select(flag="error",class_="multipole")
+    mad.select(flag="error",class_="hkicker")
+    mad.select(flag="error",class_="vkicker")
+    mad.select(flag="error",class_="kicker")
+    mad.esave(file=filename + "_errors.tfs")
+    mad.select(flag="error",clear=True)
+    mad.select(flag="error",full=True)
+    mad.esave(file=filename + "_errors_all.tfs")
+    mad.save(sequence=seq_name,beam=True,file=filename + "_seq.madx")

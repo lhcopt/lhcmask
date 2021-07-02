@@ -527,18 +527,20 @@ with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
 #############################
 
 if enable_bb_legacy:
-    print('Pysixtrack line is not generated with bb legacy macros')
+    print('xline is not generated with bb legacy macros')
 else:
-    pysix_fol_name = "./pysixtrack"
-    dct_pysxt = pm.generate_pysixtrack_line_with_bb(mad_track,
+    xline_fol_name = "./xline"
+    dct_xline = pm.generate_xline_with_bb(mad_track,
         sequence_to_track, bb_df_track,
         closed_orbit_method='from_mad',
-        pickle_lines_in_folder=pysix_fol_name,
+        pickle_lines_in_folder=xline_fol_name,
         skip_mad_use=True)
 
-#############################
-#     Save final twiss      #
-#############################
+
+
+###################################
+#         Save final twiss        #
+###################################
 
 mad_track.globals.on_bb_charge = 0
 mad_track.twiss()
@@ -546,3 +548,18 @@ tdf = mad_track.get_twiss_df('twiss')
 sdf = mad_track.get_summ_df('summ')
 tdf.to_parquet('final_twiss_BBOFF.parquet')
 sdf.to_parquet('final_summ_BBOFF.parquet')
+
+
+mad_track.globals.on_bb_charge = 1
+mad_track.twiss()
+tdf = mad_track.get_twiss_df('twiss')
+sdf = mad_track.get_summ_df('summ')
+tdf.to_parquet('final_twiss_BBON.parquet')
+sdf.to_parquet('final_summ_BBON.parquet')
+
+#############################    
+#  Save sequence and errors #
+#############################
+
+pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
+

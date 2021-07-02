@@ -2,7 +2,7 @@ import shutil
 import pickle
 import numpy as np
 
-import pysixtrack
+import xline
 import sixtracktools
 
 # Test b1 
@@ -17,22 +17,22 @@ type_ref = 'sixtrack'
 # path_ref = '../../../examples/hl_lhc_collision_nobb_b4'
 # type_ref = 'sixtrack'
 
-# # Test b4 nobb pysixtrack (not working for now)
-# path_test = './pysixtrack/line_bb_dipole_not_cancelled.pkl'
-# type_test = 'pysixtrack'
+# # Test b4 nobb xline (not working for now)
+# path_test = './xline/line_bb_dipole_not_cancelled.pkl'
+# type_test = 'xline'
 # path_ref = '../hl_lhc_collision_nobb_b4'
 # type_ref = 'sixtrack'
 
 def prepare_line(path, input_type):
 
-    if input_type == 'pysixtrack':
-        # Load pysixtrack machine 
+    if input_type == 'xline':
+        # Load xline machine 
         with open(path, "rb") as fid:
-            ltest = pysixtrack.Line.from_dict(pickle.load(fid))
+            ltest = xline.Line.from_dict(pickle.load(fid))
     elif input_type == 'sixtrack':
-        print('Build pysixtrack from sixtrack input:')
+        print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = pysixtrack.Line.from_sixinput(sixinput_test)
+        ltest = xline.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
@@ -112,20 +112,20 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
 
         # Exception: drift length (100 um tolerance)
         if isinstance(
-            ee_test, (pysixtrack.elements.Drift, pysixtrack.elements.DriftExact)
+            ee_test, (xline.elements.Drift, xline.elements.DriftExact)
         ):
             if kk == "length":
                 if diff_abs < 1e-4:
                     continue
 
         # Exception: multipole lrad is not passed to sixtraxk
-        if isinstance(ee_test, pysixtrack.elements.Multipole):
+        if isinstance(ee_test, xline.elements.Multipole):
             if kk == "length":
                 if np.abs(ee_test.hxl) + np.abs(ee_test.hyl) == 0.0:
                     continue
 
         # Exceptions BB4D (separations are recalculated)
-        if isinstance(ee_test, pysixtrack.elements.BeamBeam4D):
+        if isinstance(ee_test, xline.elements.BeamBeam4D):
             if kk == "x_bb":
                 if diff_abs / dtest["sigma_x"] < 0.01: # This is neede to accommodate different leveling routines (1% difference)
                     continue
@@ -140,7 +140,7 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                     continue
 
         # Exceptions BB4D (angles and separations are recalculated)
-        if isinstance(ee_test, pysixtrack.elements.BeamBeam6D):
+        if isinstance(ee_test, xline.elements.BeamBeam6D):
             if kk == "alpha":
                 if diff_abs < 10e-6:
                     continue

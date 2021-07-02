@@ -84,7 +84,7 @@ configuration = {
             'bunch_spacing_buckets'    : 10,
             'numberOfHOSlices'         : 11,
             'bunch_num_particles'      : None,
-            'bunch_particle_charge'          : None,
+            'bunch_particle_charge'    : None,
             'sigmaz_m'                 : None,
             'z_crab_twiss'             : 0.,
 
@@ -98,7 +98,7 @@ configuration = {
     # Enable crab cavities
     'enable_crabs'             : False,
 
-    # N. iterations coupling correction
+    # N. iterations for coupling correction
     'N_iter_coupling'            : 2,
 
     # Value to be added to linear coupling knobs (on sequence_to_track)
