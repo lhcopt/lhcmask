@@ -531,7 +531,6 @@ if enable_bb_legacy:
     print('xline is not generated with bb legacy macros')
 else:
     xline_fol_name = "./xline"
-    import pdb; pdb.set_trace()
     dct_xline = pm.generate_xline_with_bb(mad_track,
         sequence_to_track, bb_df_track,
         closed_orbit_method='from_mad',

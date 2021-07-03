@@ -14,7 +14,7 @@ type_ref = 'sixtrack'
 # Test b1 
 path_test = '../xline/line_bb_dipole_not_cancelled.json'
 type_test = 'xline'
-path_ref = '../../../examples/hl_lhc_collision'
+path_ref = '../'
 type_ref = 'sixtrack'
 
 # # Test b4 nobb sixtrack
@@ -108,21 +108,27 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
             continue
 
         # Check if the relative error is small
+        val_test = dtest[kk]
+        val_ref = dref[kk]
         try:
-            val_test = dtest[kk]
-            val_ref = dref[kk]
-            if not np.isscalar(val_ref):
-                lmin = min(len(val_ref), len(val_test))
-                val_test = val_test[:lmin]
-                val_ref = val_ref[:lmin]
-            diff_rel = norm(np.array(val_test) - np.array(val_ref)) / norm(val_test)
+            if not np.isscalar(val_ref) and len(val_ref) != len(val_test):
+                    diff_rel = 100
+                #lmin = min(len(val_ref), len(val_test))
+                #val_test = val_test[:lmin]
+                #val_ref = val_ref[:lmin]
+            else:
+                diff_rel = norm(np.array(val_test) - np.array(val_ref)) / norm(val_test)
         except ZeroDivisionError:
             diff_rel = 100.0
         if diff_rel < 3e-5:
             continue
 
         # Check if absolute error is small
-        diff_abs = norm(np.array(dtest[kk]) - np.array(dref[kk]))
+
+        if not np.isscalar(val_ref) and len(val_ref) != len(val_test):
+            diff_abs = 1000
+        else:
+            diff_abs = norm(np.array(val_test) - np.array(val_ref))
         if diff_abs > 0:
             print(f"{nn_test}[{kk}] - test:{dtest[kk]} six:{dref[kk]}")
         if diff_abs < 1e-12:
@@ -156,6 +162,18 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
             if kk == "length":
                 if np.abs(ee_test.hxl) + np.abs(ee_test.hyl) == 0.0:
                     continue
+            if kk == 'knl' or kk == 'ksl':
+                ARRIVATO QUA
+                if len(val_ref) != len(val_test):
+                    lmin = min(len(val_ref), len(val_test))
+                    if lmin < 13:
+                        raise ValueError('Missing significane multipole strength')
+                    else:
+                        diff_rel = norm(np.array(val_test[:lmin])
+                                        - np.array(val_ref[:lmin]))/norm(val_ref)
+                        if diff_rel < 1e-5:
+                            continue
+
 
         # Exceptions BB4D (separations are recalculated)
         if isinstance(ee_test, xline.elements.BeamBeam4D):
