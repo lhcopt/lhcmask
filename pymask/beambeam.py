@@ -627,27 +627,27 @@ def setup_beam_beam_in_line(
     bb_df,
     bb_coupling=False,
 ):
-    import pysixtrack
+    import xline
     assert bb_coupling is False  # Not implemented
 
     for ee, eename in zip(line.elements, line.element_names):
-        if isinstance(ee, pysixtrack.elements.BeamBeam4D):
+        if isinstance(ee, xline.elements.BeamBeam4D):
             ee.charge = (bb_df.loc[eename, 'other_num_particles']
-                        * bb_df.loc[eename, 'other_particle_charge']) # TODO update pysixtrack interface to separate charge and b. population
+                        * bb_df.loc[eename, 'other_particle_charge']) # TODO update xline interface to separate charge and b. population
             ee.sigma_x = np.sqrt(bb_df.loc[eename, 'other_Sigma_11'])
             ee.sigma_y = np.sqrt(bb_df.loc[eename, 'other_Sigma_33'])
             ee.beta_r = bb_df.loc[eename, 'other_relativistic_beta']
             ee.x_bb = bb_df.loc[eename, 'separation_x']
             ee.y_bb = bb_df.loc[eename, 'separation_y']
 
-        if isinstance(ee, pysixtrack.elements.BeamBeam6D):
+        if isinstance(ee, xline.elements.BeamBeam6D):
 
             ee.phi = bb_df.loc[eename, 'phi']
             ee.alpha = bb_df.loc[eename, 'alpha']
             ee.x_bb_co = bb_df.loc[eename, 'separation_x']
             ee.y_bb_co = bb_df.loc[eename, 'separation_y']
             ee.charge_slices = [(bb_df.loc[eename, 'other_num_particles']
-                                 * bb_df.loc[eename, 'other_particle_charge'])] # TODO update pysixtrack interface to separate charge and b. population
+                                 * bb_df.loc[eename, 'other_particle_charge'])] # TODO update xline interface to separate charge and b. population
             ee.zeta_slices = [0.0]
             ee.sigma_11 = bb_df.loc[eename, 'other_Sigma_11']
             ee.sigma_12 = bb_df.loc[eename, 'other_Sigma_12']

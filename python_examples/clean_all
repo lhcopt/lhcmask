@@ -9,7 +9,7 @@ rm twiss_bb
 rm last_twiss.*.gz
 rm fort.*
 rm *.tfs
-rm -r pysixtrack
+rm -r xline 
 rm -r temp
 rm -r __pycache__ 
 

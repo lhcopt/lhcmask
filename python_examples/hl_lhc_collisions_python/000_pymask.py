@@ -496,7 +496,7 @@ else:
         output_folder='./',
         reference_num_particles_sixtrack=(
             mad_track.sequence[sequence_to_track].beam.npart),
-        reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge, 
+        reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge,
         emitnx_sixtrack_um=(
             mad_track.sequence[sequence_to_track].beam.exn),
         emitny_sixtrack_um=(
@@ -523,21 +523,20 @@ with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
     pickle.dump(optics_orbit_start_ring, fid)
 
 
-#############################
-# Generate pysixtrack lines #
-#############################
+###################
+# Generate xlines #
+###################
 
 if enable_bb_legacy:
     print('xline is not generated with bb legacy macros')
 else:
     xline_fol_name = "./xline"
+    import pdb; pdb.set_trace()
     dct_xline = pm.generate_xline_with_bb(mad_track,
         sequence_to_track, bb_df_track,
         closed_orbit_method='from_mad',
         pickle_lines_in_folder=xline_fol_name,
         skip_mad_use=True)
-
-
 
 ###################################
 #         Save final twiss        #
@@ -561,6 +560,6 @@ sdf.to_parquet('final_summ_BBON.parquet')
 #############################    
 #  Save sequence and errors #
 #############################
-
-pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
+# N.B. this erases the errors
+# pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
 
