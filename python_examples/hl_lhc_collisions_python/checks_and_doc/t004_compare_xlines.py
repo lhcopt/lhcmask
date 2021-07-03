@@ -11,6 +11,12 @@ type_test = 'sixtrack'
 path_ref = '../../../examples/hl_lhc_collision'
 type_ref = 'sixtrack'
 
+# Test b1 
+path_test = '../xline/line_bb_dipole_not_cancelled.json'
+type_test = 'xline'
+path_ref = '../../../examples/hl_lhc_collision'
+type_ref = 'sixtrack'
+
 # # Test b4 nobb sixtrack
 # path_test = '../../'
 # type_test = 'sixtrack'
@@ -27,8 +33,7 @@ def prepare_line(path, input_type):
 
     if input_type == 'xline':
         # Load xline machine 
-        with open(path, "rb") as fid:
-            ltest = xline.Line.from_dict(pickle.load(fid))
+        ltest = xline.Line.from_json(path_test)
     elif input_type == 'sixtrack':
         print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
@@ -51,6 +56,7 @@ for ll in (ltest, lref):
     ll.remove_inactive_multipoles(inplace=True)
     ll.remove_zero_length_drifts(inplace=True)
     ll.merge_consecutive_drifts(inplace=True)
+    ll.merge_consecutive_multipoles(inplace=True)
 
 # Check that the two machines are identical
 assert len(ltest) == len(lref)
@@ -70,28 +76,32 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
 
 
     dtest = ee_test.to_dict(keepextra=True)
-    dsix = ee_six.to_dict(keepextra=True)
+    dref = ee_six.to_dict(keepextra=True)
 
     for kk in dtest.keys():
 
         # Check if they are identical
-        if dtest[kk] == dsix[kk]:
+        if np.isscalar(dref[kk]) and dtest[kk] == dref[kk]:
             continue
 
         # Check if the relative error is small
         try:
-            diff_rel = norm(np.array(dtest[kk]) - np.array(dsix[kk])) / norm(
-                dtest[kk]
-            )
+            val_test = dtest[kk]
+            val_ref = dref[kk]
+            if not np.isscalar(val_ref):
+                lmin = min(len(val_ref), len(val_test))
+                val_test = val_test[:lmin]
+                val_ref = val_ref[:lmin]
+            diff_rel = norm(np.array(val_test) - np.array(val_ref)) / norm(val_test)
         except ZeroDivisionError:
             diff_rel = 100.0
         if diff_rel < 3e-5:
             continue
 
         # Check if absolute error is small
-        diff_abs = norm(np.array(dtest[kk]) - np.array(dsix[kk]))
+        diff_abs = norm(np.array(dtest[kk]) - np.array(dref[kk]))
         if diff_abs > 0:
-            print(f"{nn_test}[{kk}] - test:{dtest[kk]} six:{dsix[kk]}")
+            print(f"{nn_test}[{kk}] - test:{dtest[kk]} six:{dref[kk]}")
         if diff_abs < 1e-12:
             continue
 
