@@ -163,10 +163,11 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 if np.abs(ee_test.hxl) + np.abs(ee_test.hyl) == 0.0:
                     continue
             if kk == 'knl' or kk == 'ksl':
-                ARRIVATO QUA
+                val_ref = np.trim_zeros(val_ref)
+                val_test= np.trim_zeros(val_test)
                 if len(val_ref) != len(val_test):
                     lmin = min(len(val_ref), len(val_test))
-                    if lmin < 13:
+                    if lmin < 10:
                         raise ValueError('Missing significane multipole strength')
                     else:
                         diff_rel = norm(np.array(val_test[:lmin])
