@@ -58,6 +58,29 @@ for ll in (ltest, lref):
     ll.merge_consecutive_drifts(inplace=True)
     ll.merge_consecutive_multipoles(inplace=True)
 
+    # Remove inactive RFMultipoles and normalize phase
+    for ii, ee in enumerate(ll.elements):
+        if ee.__class__.__name__ == 'RFMultipole':
+            if ( np.max(np.abs(ee.knl)) < 1e-20 and
+                 np.max(np.abs(ee.ksl)) < 1e-20 and
+                 abs(ee.voltage) < 1e-20):
+                ll.element_names[ii] = None
+                ll.elements[ii] = None
+            for kkll, pp in [[ee.knl, ee.pn],
+                             [ee.ksl, ee.ps]]:
+                for ii, vv in enumerate(kkll):
+                    if vv < 0:
+                        kkll[ii] = -vv
+                        pp[ii] += 180
+                    if pp[ii]>180:
+                        pp[ii] -= 360
+
+    while None in ll.element_names:
+        ll.element_names.remove(None)
+    while None in ll.elements:
+        ll.elements.remove(None)
+
+
 # Check that the two machines are identical
 assert len(ltest) == len(lref)
 
