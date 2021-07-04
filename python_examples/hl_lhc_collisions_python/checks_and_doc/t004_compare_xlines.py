@@ -14,7 +14,7 @@ rtol = 3e-5
 atol = 1e-12
 strict = False
 
-# # Test b1 
+# # Test b1 (xline) 
 # path_test = '../xline/line_bb_dipole_not_cancelled.json'
 # type_test = 'xline'
 # path_ref = '../'
@@ -23,17 +23,23 @@ strict = False
 # atol = 1e-100
 # strict=True
 
-# # Test b4 nobb sixtrack
-# path_test = '../../'
-# type_test = 'sixtrack'
-# path_ref = '../../../examples/hl_lhc_collision_nobb_b4'
-# type_ref = 'sixtrack'
+# Test b4 nobb sixtrack
+path_test = '../'
+type_test = 'sixtrack'
+path_ref = '../../../examples/hl_lhc_collision_nobb_b4'
+type_ref = 'sixtrack'
+rtol = 3e-5
+atol = 1e-12
+strict = True
 
-# # Test b4 nobb xline (not working for now)
-# path_test = './xline/line_bb_dipole_not_cancelled.pkl'
-# type_test = 'xline'
-# path_ref = '../hl_lhc_collision_nobb_b4'
-# type_ref = 'sixtrack'
+# Test b4 (xline) 
+path_test = '../xline/line_bb_dipole_not_cancelled.json'
+type_test = 'xline'
+path_ref = '../'
+type_ref = 'sixtrack'
+rtol = 3e-7
+atol = 1e-100
+strict=True
 
 def prepare_line(path, input_type):
 
