@@ -154,7 +154,7 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 if len(val_ref) != len(val_test):
                     lmin = min(len(val_ref), len(val_test))
                     if lmin < 10:
-                        raise ValueError('Missing significane multipole strength')
+                        raise ValueError('Missing significant multipole strength')
                     else:
                         val_ref = val_ref[:lmin]
                         val_test = val_test[:lmin]
@@ -167,7 +167,8 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                         continue
 
         # Exception: correctors involved in lumi leveling
-        if nn_test in [
+        passed_corr = False
+        for nn_corr in [
             'mcbcv.5l8.b1', 'mcbyv.a4l8.b1', 'mcbxv.3l8',
             'mcbyv.4r8.b1', 'mcbyv.b5r8.b1',
             'mcbyh.b5l2.b1', 'mcbyh.4l2.b1', 'mcbxh.3l2', 'mcbyh.a4r2.b1',
@@ -178,8 +179,11 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
             'mcbch.5r2.b2', 'mcbch.a5r2.b2', 'mcbyh.4r2.b2', 'mcbxh.3r2',
             'mcbyh.a4l2.b2', 'mcbyh.5l2.b2', 'mcbyv.5r8.b2', 'mcbyv.a4r8.b2',
             'mcbxv.3r8', 'mcbyv.4l8.b2', 'mcbcv.b5l8.b2']:
-            if diff_rel < 1e-2:
-                continue
+            if nn_corr in nn_test and diff_rel < 1e-2:
+                passed_corr = True
+                break
+        if passed_corr:
+            continue
 
 
         # Exceptions BB4D (separations are recalculated)
