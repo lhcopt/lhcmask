@@ -10,12 +10,18 @@ path_test = '../'
 type_test = 'sixtrack'
 path_ref = '../../../examples/hl_lhc_collision'
 type_ref = 'sixtrack'
+rtol = 3e-5
+atol = 1e-12
+strict = False
 
 # # Test b1 
 # path_test = '../xline/line_bb_dipole_not_cancelled.json'
 # type_test = 'xline'
 # path_ref = '../'
 # type_ref = 'sixtrack'
+# rtol = 3e-7
+# atol = 1e-100
+# strict=True
 
 # # Test b4 nobb sixtrack
 # path_test = '../../'
@@ -121,7 +127,7 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 diff_rel = norm(np.array(val_test) - np.array(val_ref)) / norm(val_test)
         except ZeroDivisionError:
             diff_rel = 100.0
-        if diff_rel < 3e-5:
+        if diff_rel < rtol:
             continue
 
         # Check if absolute error is small
@@ -132,11 +138,11 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
             diff_abs = norm(np.array(val_test) - np.array(val_ref))
         if diff_abs > 0:
             print(f"{nn_test}[{kk}] - test:{dtest[kk]} six:{dref[kk]}")
-        if diff_abs < 1e-12:
+        if diff_abs < atol:
             continue
 
         # Exception: drift length (100 um tolerance)
-        if isinstance(
+        if not(strict) and isinstance(
             ee_test, (xline.elements.Drift, xline.elements.DriftExact)
         ):
             if kk == "length":
@@ -163,7 +169,7 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 else:
                     diff_rel = (norm(np.array(val_test) - np.array(val_ref))
                                 /norm(val_test))
-                    if diff_rel < 1e-5:
+                    if diff_rel < rtol:
                         continue
 
         # Exception: correctors involved in lumi leveling
@@ -182,12 +188,12 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
             if nn_corr in nn_test and diff_rel < 1e-2:
                 passed_corr = True
                 break
-        if passed_corr:
+        if not(strict) and  passed_corr:
             continue
 
 
         # Exceptions BB4D (separations are recalculated)
-        if isinstance(ee_test, xline.elements.BeamBeam4D):
+        if not(strict) and isinstance(ee_test, xline.elements.BeamBeam4D):
             if kk == "x_bb":
                 if diff_abs / dtest["sigma_x"] < 0.01: # This is neede to accommodate different leveling routines (1% difference)
                     continue
@@ -202,7 +208,7 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                     continue
 
         # Exceptions BB4D (angles and separations are recalculated)
-        if isinstance(ee_test, xline.elements.BeamBeam6D):
+        if not(strict) and isinstance(ee_test, xline.elements.BeamBeam6D):
             if kk == "alpha":
                 if diff_abs < 10e-6:
                     continue
