@@ -66,14 +66,15 @@ for ll in (ltest, lref):
                  abs(ee.voltage) < 1e-20):
                 ll.element_names[ii] = None
                 ll.elements[ii] = None
-            for kkll, pp in [[ee.knl, ee.pn],
-                             [ee.ksl, ee.ps]]:
-                for ii, vv in enumerate(kkll):
-                    if vv < 0:
-                        kkll[ii] = -vv
-                        pp[ii] += 180
-                    if pp[ii]>180:
-                        pp[ii] -= 360
+            # # Normalize phase
+            # for kkll, pp in [[ee.knl, ee.pn],
+            #                  [ee.ksl, ee.ps]]:
+            #     for ii, vv in enumerate(kkll):
+            #         if vv < 0:
+            #             kkll[ii] = -vv
+            #             pp[ii] += 180
+            #         if pp[ii]>180:
+            #             pp[ii] -= 360
 
     while None in ll.element_names:
         ll.element_names.remove(None)
@@ -170,10 +171,15 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                     if lmin < 10:
                         raise ValueError('Missing significane multipole strength')
                     else:
-                        diff_rel = norm(np.array(val_test[:lmin])
-                                        - np.array(val_ref[:lmin]))/norm(val_ref)
-                        if diff_rel < 1e-5:
-                            continue
+                        val_ref = val_ref[:lmin]
+                        val_test = val_test[:lmin]
+                if len(val_ref) == 0 and len(val_test) == 0:
+                    continue
+                else:
+                    diff_rel = (norm(np.array(val_test) - np.array(val_ref))
+                                /norm(val_test))
+                    if diff_rel < 1e-5:
+                        continue
 
 
         # Exceptions BB4D (separations are recalculated)
