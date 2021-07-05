@@ -39,9 +39,9 @@ tests = [
 #         'type_test': 'sixtrack',
 #         'path_ref': '../../../examples/hl_lhc_collision_nobb_b4',
 #         'type_ref': 'sixtrack',
-#         'rtol': 3e-5,
+#         'rtol': 8e-5,
 #         'atol': 1e-12,
-#         'strict': True,
+#         'strict': False,
 #     },
 #     {
 #         'test_name': 'B4 - pymask xline vs pymask sixtrack input',
