@@ -17,7 +17,7 @@ tests = [
         'type_ref': 'sixtrack',
         'rtol': 3e-5,
         'atol': 1e-12,
-        'strict': True,
+        'strict': False,
     },
     {
         'test_name': 'B1 - pymask xline vs pymask sixtrack input',
@@ -62,7 +62,7 @@ def prepare_line(path, input_type):
 
     if input_type == 'xline':
         # Load xline machine 
-        ltest = xline.Line.from_json(path_test)
+        ltest = xline.Line.from_json(path)
     elif input_type == 'sixtrack':
         print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
