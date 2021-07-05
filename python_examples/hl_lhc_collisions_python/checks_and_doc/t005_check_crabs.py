@@ -46,12 +46,14 @@ phi_c_strong = -phi_c_weak
 path_test = '../'
 type_test = 'sixtrack'
 
+path_test = '../xline/line_bb_dipole_not_cancelled.json'
+type_test = 'xline'
+
 def prepare_line(path, input_type):
 
     if input_type == 'xline':
         # Load xline machine 
-        with open(path, "rb") as fid:
-            ltest = xline.Line.from_dict(pickle.load(fid))
+        ltest = xline.Line.from_json(path)
     elif input_type == 'sixtrack':
         print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
