@@ -37,7 +37,7 @@ path_test = '../xline/line_bb_dipole_not_cancelled.json'
 type_test = 'xline'
 path_ref = '../'
 type_ref = 'sixtrack'
-rtol = 3e-7
+rtol = 4e-7
 atol = 1e-100
 strict=True
 
@@ -161,21 +161,25 @@ for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
                 if np.abs(ee_test.hxl) + np.abs(ee_test.hyl) == 0.0:
                     continue
             if kk == 'knl' or kk == 'ksl':
-                val_ref = np.trim_zeros(val_ref)
-                val_test= np.trim_zeros(val_test)
                 if len(val_ref) != len(val_test):
                     lmin = min(len(val_ref), len(val_test))
-                    if lmin < 10:
-                        raise ValueError('Missing significant multipole strength')
-                    else:
-                        val_ref = val_ref[:lmin]
-                        val_test = val_test[:lmin]
+                    for vv in [val_ref,val_test]:
+                        if len(vv)> lmin:
+                            for oo in range(lmin, len(vv)): # we do not care about errors above 10
+                                if vv[oo] != 0 and oo < 10:
+                                    raise ValueError('Missing significant multipole strength')
+
+                    val_ref = val_ref[:lmin]
+                    val_test = val_test[:lmin]
+
                 if len(val_ref) == 0 and len(val_test) == 0:
                     continue
                 else:
-                    diff_rel = (norm(np.array(val_test) - np.array(val_ref))
-                                /norm(val_test))
+                    diff_abs = norm(np.array(val_test) - np.array(val_ref))
+                    diff_rel = diff_abs/norm(val_test)
                     if diff_rel < rtol:
+                        continue
+                    if diff_abs < atol:
                         continue
 
         # Exception: correctors involved in lumi leveling
