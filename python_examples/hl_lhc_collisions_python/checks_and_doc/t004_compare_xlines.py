@@ -6,38 +6,21 @@ import numpy as np
 import xline
 import sixtracktools
 
-# Test b1 
-path_test = '../'
-type_test = 'sixtrack'
-path_ref = '../../../examples/hl_lhc_collision'
-type_ref = 'sixtrack'
-rtol = 3e-5
-atol = 1e-12
-strict = False
 
-# # Test b1 (xline) 
-# path_test = '../xline/line_bb_dipole_not_cancelled.json'
-# type_test = 'xline'
-# path_ref = '../'
-# type_ref = 'sixtrack'
-# rtol = 3e-7
-# atol = 1e-100
-# strict=True
-
-# Test b4 nobb sixtrack
+# Tests b1 with bb
 tests = [
     {
-        'test_name': 'B4 - pymask sixtrack input vs madx mask',
+        'test_name': 'B1 - pymask sixtrack input vs madx mask',
         'path_test': '../',
         'type_test': 'sixtrack',
-        'path_ref': '../../../examples/hl_lhc_collision_nobb_b4',
+        'path_ref': '../../../examples/hl_lhc_collision',
         'type_ref': 'sixtrack',
         'rtol': 3e-5,
         'atol': 1e-12,
         'strict': True,
     },
     {
-        'test_name': 'B4 - pymask xline vs ymask sixtrack input',
+        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
         'path_test': '../xline/line_bb_dipole_not_cancelled.json',
         'type_test': 'xline',
         'path_ref': '../',
@@ -46,8 +29,31 @@ tests = [
         'atol': 1e-100,
         'strict': True,
     }
+]
 
-    ]
+# # Tests b4 no bb
+# tests = [
+#     {
+#         'test_name': 'B4 - pymask sixtrack input vs madx mask',
+#         'path_test': '../',
+#         'type_test': 'sixtrack',
+#         'path_ref': '../../../examples/hl_lhc_collision_nobb_b4',
+#         'type_ref': 'sixtrack',
+#         'rtol': 3e-5,
+#         'atol': 1e-12,
+#         'strict': True,
+#     },
+#     {
+#         'test_name': 'B4 - pymask xline vs pymask sixtrack input',
+#         'path_test': '../xline/line_bb_dipole_not_cancelled.json',
+#         'type_test': 'xline',
+#         'path_ref': '../',
+#         'type_ref': 'sixtrack',
+#         'rtol': 4e-7,
+#         'atol': 1e-100,
+#         'strict': True,
+#     }
+# ]
 
 def norm(x):
     return np.sqrt(np.sum(np.array(x) ** 2))
