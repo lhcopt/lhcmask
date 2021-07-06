@@ -288,6 +288,7 @@ if generate_b4_from_b2:
 
 # For B1, to be generalized for B4
 if 'filling_scheme_json' in configuration['beambeam_config'].keys():
+    assert 'b4' not in mode
     filling_scheme_json = configuration['beambeam_config']['filling_scheme_json']
     bunch_to_track = configuration['beambeam_config']['bunch_to_track']
     bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(
@@ -346,7 +347,7 @@ if enable_bb_legacy:
     mad_track.set_variables_from_dict(
        params=configuration['pars_for_legacy_bb_macros'])
     mad_track.set_variables_from_dict(
-            params={f'par_nho_ir{ir}':bbconfig['numberOfHOSlices']
+            params={f'par_nho_ir{ir}': bbconfig['numberOfHOSlices']
             for ir in [1,2,5,8]})
     mad_track.input("call, file='modules/module_03_beambeam.madx';")
 

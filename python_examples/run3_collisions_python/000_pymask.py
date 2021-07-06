@@ -288,6 +288,7 @@ if generate_b4_from_b2:
 
 # For B1, to be generalized for B4
 if 'filling_scheme_json' in configuration['beambeam_config'].keys():
+    assert 'b4' not in mode
     filling_scheme_json = configuration['beambeam_config']['filling_scheme_json']
     bunch_to_track = configuration['beambeam_config']['bunch_to_track']
     bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(
@@ -338,6 +339,7 @@ else:
 
 # Legacy bb macros
 if enable_bb_legacy:
+    bbconfig = configuration['beambeam_config']
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
     assert(not(enable_bb_python))
@@ -345,7 +347,7 @@ if enable_bb_legacy:
     mad_track.set_variables_from_dict(
        params=configuration['pars_for_legacy_bb_macros'])
     mad_track.set_variables_from_dict(
-            params={f'par_nho_ir{ir}':configuration['numberOfHOSlices']
+            params={f'par_nho_ir{ir}': bbconfig['numberOfHOSlices']
             for ir in [1,2,5,8]})
     mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
@@ -495,7 +497,7 @@ else:
         output_folder='./',
         reference_num_particles_sixtrack=(
             mad_track.sequence[sequence_to_track].beam.npart),
-        reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge, 
+        reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge,
         emitnx_sixtrack_um=(
             mad_track.sequence[sequence_to_track].beam.exn),
         emitny_sixtrack_um=(
@@ -522,9 +524,9 @@ with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
     pickle.dump(optics_orbit_start_ring, fid)
 
 
-#############################
-# Generate pysixtrack lines #
-#############################
+###################
+# Generate xlines #
+###################
 
 if enable_bb_legacy:
     print('xline is not generated with bb legacy macros')
@@ -535,8 +537,6 @@ else:
         closed_orbit_method='from_mad',
         pickle_lines_in_folder=xline_fol_name,
         skip_mad_use=True)
-
-
 
 ###################################
 #         Save final twiss        #
@@ -560,6 +560,6 @@ sdf.to_parquet('final_summ_BBON.parquet')
 #############################    
 #  Save sequence and errors #
 #############################
-
-pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
+# N.B. this erases the errors
+# pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
 

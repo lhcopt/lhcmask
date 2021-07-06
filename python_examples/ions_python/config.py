@@ -7,6 +7,7 @@ configuration = {
                                     'tools': 'tracking_tools/tools',
                                     'beambeam_macros': 'tracking_tools/beambeam_macros',
                                     'errors': 'tracking_tools/errors',
+                                    'optics_repository' : '/afs/cern.ch/eng/lhc/optics',
                                  },
     # Mode - choose between:
 
@@ -23,7 +24,7 @@ configuration = {
     'mode'                      : 'b1_with_bb',
 
     # Optics file
-    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/runII/2018/ION/opticsfile.21',
+    'optics_file'              : 'optics_repository/runII/2018/ION/opticsfile.21',
 
     # Enable checks
     'check_betas_at_ips'       : True,
