@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import sixtracktools
-import pysixtrack
+import xline
 import time
 
 
@@ -79,10 +79,10 @@ def track_particle_sixtrack(
     lines_f13 = []
 
     for i_part in range(n_part):
-        if type(partCO) is pysixtrack.Particles:
+        if type(partCO) is xline.Particles:
             temp_part = partCO.copy()
         else:
-            temp_part = pysixtrack.Particles(**partCO)
+            temp_part = xline.Particles(**partCO)
         temp_part.x     += Dx_wrt_CO_m[i_part]
         temp_part.px    += Dpx_wrt_CO_rad[i_part]
         temp_part.y     += Dy_wrt_CO_m[i_part]
@@ -159,7 +159,7 @@ def track_particle_sixtrack(
     return x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt
 
 
-def track_particle_pysixtrack(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
+def track_particle_xline(line, part, Dx_wrt_CO_m, Dpx_wrt_CO_rad,
                               Dy_wrt_CO_m, Dpy_wrt_CO_rad,
                               Dsigma_wrt_CO_m, Ddelta_wrt_CO, n_turns, verbose=False):
 
@@ -220,10 +220,10 @@ def track_particle_sixtracklib(
                              Dy_wrt_CO_m, Dpy_wrt_CO_rad,
                              Dsigma_wrt_CO_m, Ddelta_wrt_CO)
 
-    #if type(partCO) is pysixtrack.Particles:
+    #if type(partCO) is xline.Particles:
     #    temp_part = partCO.copy()
     #else:
-    #    temp_part = pysixtrack.Particles(**partCO)
+    #    temp_part = xline.Particles(**partCO)
 
     import sixtracklib
     elements=sixtracklib.Elements()
@@ -239,10 +239,10 @@ def track_particle_sixtracklib(
 
     for i_part in range(n_part):
 
-        if type(partCO) is pysixtrack.Particles:
+        if type(partCO) is xline.Particles:
             part = partCO.copy()
         else:
-            part = pysixtrack.Particles(**partCO)
+            part = xline.Particles(**partCO)
         part.x += Dx_wrt_CO_m[i_part]
         part.px += Dpx_wrt_CO_rad[i_part]
         part.y += Dy_wrt_CO_m[i_part]
@@ -255,7 +255,7 @@ def track_particle_sixtracklib(
         part.elemid = 0
         part.turn = 0
 
-        p.from_pysixtrack(part, i_part)
+        p.from_xline(part, i_part)
 
     if device is None:
         job = sixtracklib.TrackJob(elements, ps)
@@ -308,10 +308,10 @@ def track_particle_sixtracklib_long(
                              Dzeta_wrt_CO_m, Ddelta_wrt_CO)
 
 
-    #if type(partCO) is pysixtrack.Particles:
+    #if type(partCO) is xline.Particles:
     #    part = partCO.copy()
     #else:
-    #    part = pysixtrack.Particles(**partCO)
+    #    part = xline.Particles(**partCO)
     n_turns_tbt=1000
     n_turns_to_store=1000
     skip_turns=int(n_turns)//n_turns_to_store
@@ -347,10 +347,10 @@ def track_particle_sixtracklib_long(
 
     for i_part in range(n_part):
 
-        if type(partCO) is pysixtrack.Particles:
+        if type(partCO) is xline.Particles:
             part = partCO.copy()
         else:
-            part = pysixtrack.Particles(**partCO)
+            part = xline.Particles(**partCO)
         part.x += Dx_wrt_CO_m[i_part]
         part.px += Dpx_wrt_CO_rad[i_part]
         part.y += Dy_wrt_CO_m[i_part]
@@ -363,7 +363,7 @@ def track_particle_sixtracklib_long(
         part.elemid = 0
         part.turn = 0
 
-        p.from_pysixtrack(part, i_part)
+        p.from_xline(part, i_part)
 
     if device is None:
         job = sixtracklib.TrackJob(elements, ps)
@@ -453,10 +453,10 @@ def track_particle_sixtracklib_firstlast(
                              Dsigma_wrt_CO_m, Ddelta_wrt_CO)
 
 
-    #if type(partCO) is pysixtrack.Particles:
+    #if type(partCO) is xline.Particles:
     #    part = partCO.copy()
     #else:
-    #    part = pysixtrack.Particles(**partCO)
+    #    part = xline.Particles(**partCO)
 
     n_turns_to_store=1000
     n_turns_tbt=1000
@@ -488,10 +488,10 @@ def track_particle_sixtracklib_firstlast(
 
     for i_part in range(n_part):
 
-        if type(partCO) is pysixtrack.Particles:
+        if type(partCO) is xline.Particles:
             part = partCO.copy()
         else:
-            part = pysixtrack.Particles(**partCO)
+            part = xline.Particles(**partCO)
         part.x += Dx_wrt_CO_m[i_part]
         part.px += Dpx_wrt_CO_rad[i_part]
         part.y += Dy_wrt_CO_m[i_part]
@@ -504,7 +504,7 @@ def track_particle_sixtracklib_firstlast(
         part.elemid = 0
         part.turn = 0
 
-        p.from_pysixtrack(part, i_part)
+        p.from_xline(part, i_part)
 
     if device is None:
         job = sixtracklib.TrackJob(elements, ps)

@@ -7,6 +7,7 @@ configuration = {
                                     'tools': 'tracking_tools/tools',
                                     'beambeam_macros': 'tracking_tools/beambeam_macros',
                                     'errors': 'tracking_tools/errors',
+                                    'optics_repository' : '/afs/cern.ch/eng/lhc/optics',
                                  },
     # Mode - choose between:
 
@@ -23,7 +24,7 @@ configuration = {
     'mode'                      : 'b1_with_bb',
 
     # Optics file
-    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.29',
+    'optics_file'              : 'optics_repository/runIII/RunIII_dev/2022_V1/PROTON/opticsfile.29',
 
     # Enable checks
     'check_betas_at_ips'       : True,
@@ -69,12 +70,16 @@ configuration = {
     'nco_IP8'              : 2376,
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
-    'numberOfLRPerIRSide'      : [25, 20, 25, 20],
-    'bunch_spacing_buckets'    : 10,
-    'numberOfHOSlices'         : 11,
-    'bunch_population_ppb'     : None,
-    'sigmaz_m'                 : None,
-    'z_crab_twiss'             : 0.,
+    'beambeam_config'      :
+        {
+            'numberOfLRPerIRSide'      : [25, 20, 25, 20],
+            'bunch_spacing_buckets'    : 10,
+            'numberOfHOSlices'         : 11,
+            'bunch_num_particles'      : None,
+            'bunch_particle_charge'    : None,
+            'sigmaz_m'                 : None,
+            'z_crab_twiss'             : 0.,
+        },
 
     # Match tunes and chromaticities including beam-beam effects
     'match_q_dq_with_bb'        : False,            # should be off at collision
@@ -82,7 +87,7 @@ configuration = {
     # Enable crab cavities
     'enable_crabs'             : False,
 
-    # N. iterations coupling correction
+    # N. iterations for coupling correction
     'N_iter_coupling'            : 2,
 
     # Value to be added to linear coupling knobs (on sequence_to_track)

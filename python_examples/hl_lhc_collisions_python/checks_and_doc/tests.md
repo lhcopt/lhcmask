@@ -57,7 +57,7 @@ We execute the reference (can be reused from the previous test):
  python ../../unmask.py main.mask parameters_for_unmask.txt --run
 ```
 In the folder ```checks_and_doc```:
-Configure ```t004_compare_pysixtrack_lines.py``` for the test:
+Configure ```t004_compare_xline_lines.py``` for the test:
 ```python
 # Test b1
 path_test = '../'
@@ -66,10 +66,10 @@ path_ref = '../../examples/hl_lhc_collision'
 type_ref = 'sixtrack
 ```
 
-Check using pysixtrack lines:
+Check using xline lines:
 ```bash
 python t003_fc_to_fort.py
-python t004_compare_pysixtrack_lines.py
+python t004_compare_xline_lines.py
 ```
 
 **Check crab cavities:**

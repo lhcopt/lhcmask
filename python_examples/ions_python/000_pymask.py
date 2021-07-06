@@ -89,19 +89,19 @@ ost.apply_optics(mad, optics_file=optics_file)
 mad.globals.nrj = configuration['beam_energy_tot']
 particle_type = 'proton'
 
-if 'beam_mass' in configuration.keys():
-    beam_mass = configuration['beam_mass']
+if 'particle_mass' in configuration.keys():
+    particle_mass = configuration['particle_mass']
     particle_type = 'ion'
 else:
-    beam_mass = mad.globals.pmass # proton mass
+    particle_mass = mad.globals.pmass # proton mass
 
-if 'beam_charge' in configuration.keys():
-    beam_charge = configuration['beam_charge']
+if 'particle_charge' in configuration.keys():
+    particle_charge = configuration['particle_charge']
     particle_type = 'ion'
 else:
-    beam_charge = 1.
+    particle_charge = 1.
 
-gamma_rel = (beam_charge*configuration['beam_energy_tot'])/beam_mass
+gamma_rel = (particle_charge*configuration['beam_energy_tot'])/particle_mass
 for ss in mad.sequence.keys():
     # bv and bv_aux flags
     if ss == 'lhcb1':
@@ -115,15 +115,15 @@ for ss in mad.sequence.keys():
     mad.globals['bv_aux'] = ss_bv_aux
     mad.input(f'''
     beam, particle={particle_type},sequence={ss},
-        energy={configuration['beam_energy_tot']*beam_charge},
+        energy={configuration['beam_energy_tot']*particle_charge},
         sigt={configuration['beam_sigt']},
         bv={ss_beam_bv},
         npart={configuration['beam_npart']},
         sige={configuration['beam_sige']},
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
-        mass={beam_mass},
-        charge={beam_charge},
+        mass={particle_mass},
+        charge={particle_charge},
     ''')
 
 
@@ -247,19 +247,20 @@ mad.globals.on_disp = 0.
 
 # Prepare bb dataframes
 if enable_bb_python:
+    bbconfig = configuration['beambeam_config']
     bb_dfs = pm.generate_bb_dataframes(mad,
         ip_names=['ip1', 'ip2', 'ip5', 'ip8'],
         harmonic_number=35640,
-        numberOfLRPerIRSide=configuration['numberOfLRPerIRSide'],
-        bunch_spacing_buckets=configuration['bunch_spacing_buckets'],
-        numberOfHOSlices=configuration['numberOfHOSlices'],
-        bunch_population_ppb=configuration['bunch_population_ppb'],
-        sigmaz_m=configuration['sigmaz_m'],
-        z_crab_twiss=configuration['z_crab_twiss']*float(enable_crabs),
+        numberOfLRPerIRSide=bbconfig['numberOfLRPerIRSide'],
+        bunch_spacing_buckets=bbconfig['bunch_spacing_buckets'],
+        numberOfHOSlices=bbconfig['numberOfHOSlices'],
+        bunch_num_particles = bbconfig['bunch_num_particles'],
+        bunch_particle_charge = bbconfig['bunch_particle_charge'],
+        sigmaz_m=bbconfig['sigmaz_m'],
+        z_crab_twiss=bbconfig['z_crab_twiss']*float(enable_crabs),
         remove_dummy_lenses=True)
 
     # Here the datafremes can be edited, e.g. to set bbb intensity
-
 
 ###################
 # Generate beam 4 #
@@ -286,11 +287,12 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 # For B1, to be generalized for B4
-if 'filling_scheme_json' in configuration.keys():
-    filling_scheme_json = configuration['filling_scheme_json']
-    bunch_to_track = configuration['bunch_to_track']
+if 'filling_scheme_json' in configuration['beambeam_config'].keys():
+    assert 'b4' not in mode
+    filling_scheme_json = configuration['beambeam_config']['filling_scheme_json']
+    bunch_to_track = configuration['beambeam_config']['bunch_to_track']
     bb_schedule_to_track_b1 = ost.create_bb_shedule_to_track(
-                              filling_scheme_json,bunch_to_track, beam='1')
+                              filling_scheme_json,bunch_to_track, beam=1)
     bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
 
 ##################################################
@@ -337,6 +339,7 @@ else:
 
 # Legacy bb macros
 if enable_bb_legacy:
+    bbconfig = configuration['beambeam_config']
     assert(beam_to_configure == 1)
     assert(not(track_from_b4_mad_instance))
     assert(not(enable_bb_python))
@@ -344,7 +347,7 @@ if enable_bb_legacy:
     mad_track.set_variables_from_dict(
        params=configuration['pars_for_legacy_bb_macros'])
     mad_track.set_variables_from_dict(
-            params={f'par_nho_ir{ir}':configuration['numberOfHOSlices']
+            params={f'par_nho_ir{ir}': bbconfig['numberOfHOSlices']
             for ir in [1,2,5,8]})
     mad_track.input("call, file='modules/module_03_beambeam.madx';")
 
@@ -492,8 +495,9 @@ else:
         seq_name=sequence_to_track,
         bb_df=bb_df_track,
         output_folder='./',
-        reference_bunch_charge_sixtrack_ppb=(
+        reference_num_particles_sixtrack=(
             mad_track.sequence[sequence_to_track].beam.npart),
+        reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge,
         emitnx_sixtrack_um=(
             mad_track.sequence[sequence_to_track].beam.exn),
         emitny_sixtrack_um=(
@@ -520,23 +524,23 @@ with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
     pickle.dump(optics_orbit_start_ring, fid)
 
 
-#############################
-# Generate pysixtrack lines #
-#############################
+###################
+# Generate xlines #
+###################
 
 if enable_bb_legacy:
-    print('Pysixtrack line is not generated with bb legacy macros')
+    print('xline is not generated with bb legacy macros')
 else:
-    pysix_fol_name = "./pysixtrack"
-    dct_pysxt = pm.generate_pysixtrack_line_with_bb(mad_track,
+    xline_fol_name = "./xline"
+    dct_xline = pm.generate_xline_with_bb(mad_track,
         sequence_to_track, bb_df_track,
         closed_orbit_method='from_mad',
-        pickle_lines_in_folder=pysix_fol_name,
+        pickle_lines_in_folder=xline_fol_name,
         skip_mad_use=True)
 
-#############################
-#     Save final twiss      #
-#############################
+###################################
+#         Save final twiss        #
+###################################
 
 mad_track.globals.on_bb_charge = 0
 mad_track.twiss()
@@ -544,3 +548,18 @@ tdf = mad_track.get_twiss_df('twiss')
 sdf = mad_track.get_summ_df('summ')
 tdf.to_parquet('final_twiss_BBOFF.parquet')
 sdf.to_parquet('final_summ_BBOFF.parquet')
+
+
+mad_track.globals.on_bb_charge = 1
+mad_track.twiss()
+tdf = mad_track.get_twiss_df('twiss')
+sdf = mad_track.get_summ_df('summ')
+tdf.to_parquet('final_twiss_BBON.parquet')
+sdf.to_parquet('final_summ_BBON.parquet')
+
+#############################    
+#  Save sequence and errors #
+#############################
+# N.B. this erases the errors
+# pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
+

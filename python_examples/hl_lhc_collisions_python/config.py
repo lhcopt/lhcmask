@@ -7,6 +7,7 @@ configuration = {
                                     'tools': 'tracking_tools/tools',
                                     'beambeam_macros': 'tracking_tools/beambeam_macros',
                                     'errors': 'tracking_tools/errors',
+                                    'optics_repository' : '/afs/cern.ch/eng/lhc/optics',
                                  },
     # Mode - choose between:
 
@@ -20,13 +21,13 @@ configuration = {
     #    'b1_with_bb_legacy_macros'
     #    'b4_without_bb'
 
-    'mode'                      : 'b1_with_bb_legacy_macros',
+    'mode'                      : 'b1_with_bb',
 
     # For test against madx mask for modes 'b4_from_b2_without_bb' and 'b4_without_bb':
-    # 'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
+    #'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292},
 
     # Optics file
-    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
+    'optics_file'              : 'optics_repository/HLLHCV1.4/round/opt_round_150_1500_thin.madx', #15 cm
 
     # Enable checks
     'check_betas_at_ips'       : True,
@@ -72,13 +73,16 @@ configuration = {
     'nco_IP8'              : 2572, # number of Head-On collisions in IP1
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
-    'numberOfLRPerIRSide'      : [25, 20, 25, 20],
-    'bunch_spacing_buckets'    : 10,
-    'numberOfHOSlices'         : 11,
-    'bunch_population_ppb'     : None,
-    'sigmaz_m'                 : None,
-    'z_crab_twiss'             : 0.075,
-
+    'beambeam_config'      :
+        {
+            'numberOfLRPerIRSide'      : [25, 20, 25, 20],
+            'bunch_spacing_buckets'    : 10,
+            'numberOfHOSlices'         : 11,
+            'bunch_num_particles'      : None,
+            'bunch_particle_charge'    : None,
+            'sigmaz_m'                 : None,
+            'z_crab_twiss'             : 0.075,
+        },
     # Match tunes and chromaticities including beam-beam effects
     'match_q_dq_with_bb'        : False,            # should be off at collision
 
