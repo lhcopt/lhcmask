@@ -10,7 +10,7 @@ import sixtracktools
 
 track_with = 'xline'
 track_with = 'xtrack'
-track_with = 'sixtrack'
+#track_with = 'sixtrack'
 
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
@@ -35,7 +35,7 @@ def prepare_line(path, input_type):
 
     return ltest
 
-line = prepare_line('../', input_type='sixtrack')
+line = prepare_line('../xline/line_bb_dipole_cancelled.json', input_type='xline')
 
 
 with open('../optics_orbit_at_start_ring.json', 'r') as fid:
@@ -44,15 +44,7 @@ ddd['p0c'] =  ddd['p0c_eV']
 
 partCO = xline.Particles.from_dict(ddd)
 
-# line.disable_beambeam()
 part = partCO.copy()
-
-line.beambeam_store_closed_orbit_and_dipolar_kicks(
-        partCO.copy(),
-        separation_given_wrt_closed_orbit_4D=True,
-        separation_given_wrt_closed_orbit_6D=True)
-
-
 
 beta_x = ddd['betx']
 beta_y = ddd['bety']
