@@ -1,6 +1,6 @@
 import os
 import sys
-import pickle
+import json
 
 import numpy as np
 
@@ -520,8 +520,8 @@ else:
 
 optics_orbit_start_ring = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
-with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
-    pickle.dump(optics_orbit_start_ring, fid)
+with open('./optics_orbit_at_start_ring.json', 'w') as fid:
+    json.dump(optics_orbit_start_ring, fid)
 
 
 ###################
