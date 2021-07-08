@@ -154,7 +154,11 @@ for ii, ee in enumerate(tracker.line.elements):
 
 dict_line_xtrack = line.to_dict()
 
+dict_line_xtrack['particle_on_co'] = particle_on_co.to_dict()
 
+import pickle
+with open('line_xtrack.pkl', 'wb') as fid:
+    pickle.dump(dict_line_xtrack, fid)
 
 
 
