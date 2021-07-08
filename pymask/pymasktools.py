@@ -3,6 +3,9 @@ import pickle
 import json
 
 import numpy as np
+
+import xline as xl
+
 from . import beambeam as bb
 
 class JEncoder(json.JSONEncoder):
@@ -358,24 +361,27 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
     if initial_bb_state is not None:
         mad.globals.on_bb_switch = initial_bb_state
 
+    mad_beam =  mad.sequence[seq_name].beam
+    assert mad_beam.deltap == 0, "Not implemented."
+
     particle_on_madx_co = xl.Particles(
         p0c = mad_beam.pc*1e9,
         q0 = mad_beam.charge,
         mass0 = mad_beam.mass*1e9,
         s = 0,
-        x = tw.x[0],
-        px = tw.px[0],
-        y = tw.y[0],
-        py = tw.py[0],
-        tau = tw.t[0],
-        ptau = tw.pt[0],
+        x = twiss_table.x[0],
+        px = twiss_table.px[0],
+        y = twiss_table.y[0],
+        py = twiss_table.py[0],
+        tau = twiss_table.t[0],
+        ptau = twiss_table.pt[0],
     )
 
     RR_madx = np.zeros([6,6])
 
     for ii in range(6):
         for jj in range(6):
-            RR_madx[ii, jj] = getattr(tw, f're{ii+1}{jj+1}')[0]
+            RR_madx[ii, jj] = getattr(twiss_table, f're{ii+1}{jj+1}')[0]
 
     optics_and_co_at_start_ring_from_madx = {
             'betx': twiss_table.betx[0],
@@ -386,10 +392,160 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
             'dy': twiss_table.dy[0],
             'dpx': twiss_table.dpx[0],
             'dpy': twiss_table.dpy[0],
+            'RR': RR_madx,
             'particle_on_madx_co': particle_on_madx_co.to_dict()
             }
 
     return optics_and_co_at_start_ring_from_madx
+
+
+def _one_turn_map(p, particle_on_madx_co, tracker):
+    xl_part = particle_on_madx_co.copy()
+    xl_part.x = p[0]
+    xl_part.px = p[1]
+    xl_part.y = p[2]
+    xl_part.py = p[3]
+    xl_part.zeta = p[4]
+    xl_part.delta = p[5]
+
+    part = xt.Particles(**xl_part.to_dict())
+    tracker.track(part)
+    p_res = np.array([
+           part.x[0],
+           part.px[0],
+           part.y[0],
+           part.py[0],
+           part.zeta[0],
+           part.delta[0]])
+    return p_res
+
+def _find_closed_orbit_from_tracker(tracker, particle_co_guess_dict):
+    particle_co_guess = xl.Particles.from_dict(particle_co_guess_dict)
+    print('Start CO search')
+    res = fsolve(lambda p: p - one_turn_map(p, particle_on_madx_co, tracker),
+          x0=np.array([particle_co_guess.x, particle_co_guess.px,
+                       particle_co_guess.y, particle_co_guess.py,
+                       particle_co_guess.zeta, particle_co_guess.delta]))
+    print('Done CO search')
+    particle_on_co = particle_co_guess.copy()
+    particle_on_co.x = res[0]
+    particle_on_co.px = res[1]
+    particle_on_co.y = res[2]
+    particle_on_co.py = res[3]
+    particle_on_co.zeta = res[4]
+    particle_on_co.delta = res[5]
+
+    return particle_on_co
+
+
+def set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
+
+    temp_particles = xt.Particles(**particle_on_co.to_dict())
+    for ii, ee in enumerate(tracker.line.elements):
+        if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+              px_0 = temp_particles.px[0]
+              py_0 = temp_particles.py[0]
+              ee.q0 = ee._temp_q0
+
+              if separation_given_wrt_closed_orbit_4D:
+                  ee.mean_x += temp_particles.x[0]
+                  ee.mean_y += temp_particles.y[0]
+                  line.elements[ii].x_bb = ee.mean_x
+                  line.elements[ii].y_bb = ee.mean_y
+
+              ee.track(temp_particles)
+
+              ee.d_px = temp_particles.px - px_0
+              ee.d_py = temp_particles.py - py_0
+              line.elements[ii].d_px = ee.d_px
+              line.elements[ii].d_py = ee.d_py
+
+              temp_particles.px -= ee.d_px
+              temp_particles.py -= ee.d_py
+
+        elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+            ee.q0 = ee._temp_q0
+            ee.x_CO = temp_particles.x[0]
+            ee.px_CO = temp_particles.px[0]
+            ee.y_CO = temp_particles.y[0]
+            ee.py_CO = temp_particles.py[0]
+            ee.sigma_CO = temp_particles.zeta[0]
+            ee.delta_CO = temp_particles.delta[0]
+
+            ee.track(temp_particles)
+
+            ee.Dx_sub = temp_particles.x[0] - ee.x_CO
+            ee.Dpx_sub = temp_particles.px[0] - ee.px_CO
+            ee.Dy_sub = temp_particles.y[0] - ee.y_CO
+            ee.Dpy_sub = temp_particles.py[0] - ee.py_CO
+            ee.Dsigma_sub = temp_particles.zeta[0] - ee.sigma_CO
+            ee.Ddelta_sub = temp_particles.delta[0] - ee.delta_CO
+
+            temp_particles.x[0] = ee.x_CO
+            temp_particles.px[0] = ee.px_CO
+            temp_particles.y[0] = ee.y_CO
+            temp_particles.py[0] = ee.py_CO
+            temp_particles.zeta[0] = ee.sigma_CO
+            temp_particles.delta[0] = ee.delta_CO
+
+            line.elements[ii].x_co = ee.x_CO
+            line.elements[ii].px_co = ee.px_CO
+            line.elements[ii].y_co = ee.y_CO
+            line.elements[ii].py_co = ee.py_CO
+            line.elements[ii].zeta_co = ee.sigma_CO
+            line.elements[ii].delta_co = ee.delta_CO
+
+            line.elements[ii].d_x = ee.Dx_sub
+            line.elements[ii].d_px = ee.Dpx_sub
+            line.elements[ii].d_y = ee.Dy_sub
+            line.elements[ii].d_py = ee.Dpy_sub
+            line.elements[ii].d_zeta = ee.Dsigma_sub
+            line.elements[ii].d_delta = ee.Ddelta_sub
+        else:
+            ee.track(temp_particles)
+
+
+def generate_xline(mad, seq_name, bb_df,
+        optics_and_co_at_start_ring_from_madx,
+        folder_name=None, skip_mad_use=False,
+        prepare_line_for_xtrack=True):
+
+    # Build xline model
+    line = xline.Line.from_madx_sequence(
+        mad.sequence[seq_name], apply_madx_errors=True)
+
+    if bb_df is not None:
+        bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
+
+    # Temporary fix due to bug in mad loader
+    cavities, cav_names = line.get_elements_of_type(
+            xline.elements.Cavity)
+    for cc, nn in zip(cavities, cav_names):
+        if cc.frequency ==0.:
+            ii_mad = mad.sequence[seq_name].element_names().index(nn)
+            cc_mad = mad.sequence[seq_name].elements[ii_mad]
+            f0_mad = mad.sequence[seq_name].beam.freq0 * 1e6 # mad has it in MHz
+            cc.frequency = f0_mad*cc_mad.parent.harmon
+
+    line_bb_dipole_not_cancelled_dict = line.to_dict(keepextra=True)
+    line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
+            get_optics_and_orbit_at_start_ring['particle_on_madx_co'])
+
+    if folder_name is not None:
+        os.makedirs(folder_name, exist_ok=True)
+        # Note that full separation and not strong beam position is present
+        # in bb lenses (for comparison with sixtrack input)
+        with open(folder_name + '/line_bb_dipole_not_cancelled.json', 'w') as fid:
+            json.dump(line_bb_dipole_not_cancelled_dict, fid, cls=JEncoder)
+
+    if prepare_line_for_xtrack:
+        tracker = xt.Tracker(sequence=line)
+        particle_on_tracker_co = _find_closed_orbit_from_tracker(tracker,
+                optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+
+        set_orbit_dependent_parameters_for_bb(line, tracker,
+                                              particle_on_tracker_co)
+
 
 def generate_xline_with_bb(mad, seq_name, bb_df,
         closed_orbit_method='from_mad', pickle_lines_in_folder=None,

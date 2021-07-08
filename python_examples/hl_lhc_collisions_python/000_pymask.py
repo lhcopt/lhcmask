@@ -521,8 +521,7 @@ else:
 optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
 with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
-    json.dump(optics_orbit_start_ring, fid, cls=pm.JEncoder)
-
+    json.dump(optics_and_co_at_start_ring_from_madx, fid, cls=pm.JEncoder)
 
 ###################
 # Generate xlines #
