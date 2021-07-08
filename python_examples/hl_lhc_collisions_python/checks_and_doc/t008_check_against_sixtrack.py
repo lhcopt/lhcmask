@@ -20,6 +20,12 @@ import pickle
 with open('../line_xtrack.pkl', 'rb') as fid:
     dict_line_xtrack = pickle.load(fid)
 
+with open('../xline/line_bb_dipole_cancelled.json', 'r') as fid:
+    dict_line_old = json.load(fid)
+
+#line = xl.Line.from_dict(dict_line_xtrack)
+line = xl.Line.from_dict(dict_line_old)
+
 partCO = xl.Particles.from_dict(dict_line_xtrack['particle_on_co'])
 
 (x_tbt_sixtrack, px_tbt_sixtrack, y_tbt_sixtrack, py_tbt_sixtrack,
@@ -30,7 +36,6 @@ partCO = xl.Particles.from_dict(dict_line_xtrack['particle_on_co'])
         Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=5,
         input_folder='../')
 
-line = xl.Line.from_dict(dict_line_xtrack)
 tracker = xt.Tracker(sequence=line)
 
 part_track = partCO.copy()
