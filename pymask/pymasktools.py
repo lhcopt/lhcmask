@@ -449,11 +449,13 @@ def _set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
               py_0 = temp_particles.py[0]
               ee.q0 = ee._temp_q0
 
-              if separation_given_wrt_closed_orbit_4D:
-                  ee.mean_x += temp_particles.x[0]
-                  ee.mean_y += temp_particles.y[0]
-                  line.elements[ii].x_bb = ee.mean_x
-                  line.elements[ii].y_bb = ee.mean_y
+              # Separation of 4D is so far set w.r.t. the closes orbit
+              # (to be able to compare against sixtrack)
+              # Here we set the righe quantities (coordinates of the strong beam)
+              ee.mean_x += temp_particles.x[0]
+              ee.mean_y += temp_particles.y[0]
+              line.elements[ii].x_bb = ee.mean_x
+              line.elements[ii].y_bb = ee.mean_y
 
               ee.track(temp_particles)
 
@@ -565,7 +567,7 @@ def generate_xline(mad, seq_name, bb_df,
         if folder_name is not None:
             os.makedirs(folder_name, exist_ok=True)
             with open(folder_name +
-                    '/line_bb_dipole_not_cancelled.json', 'w') as fid:
+                    '/line_bb_for_tracking.json', 'w') as fid:
                 json.dump(line_bb_for_tracking_dict, fid, cls=JEncoder)
 
 def generate_xline_with_bb(mad, seq_name, bb_df,
