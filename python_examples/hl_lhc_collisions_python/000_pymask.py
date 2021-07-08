@@ -518,10 +518,10 @@ else:
 # Save optics and orbit at start ring #
 #######################################
 
-optics_orbit_start_ring = pm.get_optics_and_orbit_at_start_ring(
+optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
-with open('./optics_orbit_at_start_ring.json', 'w') as fid:
-    json.dump(optics_orbit_start_ring, fid)
+with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
+    json.dump(optics_orbit_start_ring, fid, cls=pm.JEncoder)
 
 
 ###################
@@ -563,12 +563,12 @@ sdf.to_parquet('final_summ_BBON.parquet')
 # N.B. this erases the errors
 pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
 
-del(mad_track)
-mad_track = Madx(command_log="mad_final.log")
-mad_track.call("saved_seq.madx")
-mad_track.use(sequence="lhcb1")
-mad_track.twiss()
-mad_track.readtable(file="errors_lhc.tfs", table="errtab")
-mad_track.seterr(table="errtab")
-mad_track.set(format=".15g")
-mad_track.twiss()
+# del(mad_track)
+# mad_track = Madx(command_log="mad_final.log")
+# mad_track.call("saved_seq.madx")
+# mad_track.use(sequence="lhcb1")
+# mad_track.twiss()
+# mad_track.readtable(file="errors_lhc.tfs", table="errtab")
+# mad_track.seterr(table="errtab")
+# mad_track.set(format=".15g")
+# mad_track.twiss()

@@ -1,9 +1,18 @@
 import os
 import pickle
+import json
 
 import numpy as np
-
 from . import beambeam as bb
+
+class JEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif np.issubdtype(type(obj), np.integer):
+            return int(obj)
+        else:
+            return json.JSONEncoder.default(self, obj)
 
 def make_links(links_dict, force=False):
     for kk in links_dict.keys():
@@ -349,14 +358,26 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
     if initial_bb_state is not None:
         mad.globals.on_bb_switch = initial_bb_state
 
-    beta0 = mad.sequence[seq_name].beam.beta
-    gamma0 = mad.sequence[seq_name].beam.gamma
-    p0c_eV = mad.sequence[seq_name].beam.pc*1.e9
+    particle_on_madx_co = xl.Particles(
+        p0c = mad_beam.pc*1e9,
+        q0 = mad_beam.charge,
+        mass0 = mad_beam.mass*1e9,
+        s = 0,
+        x = tw.x[0],
+        px = tw.px[0],
+        y = tw.y[0],
+        py = tw.py[0],
+        tau = tw.t[0],
+        ptau = tw.pt[0],
+    )
 
-    optics_at_start_ring = {
-            'beta': beta0,
-            'gamma' : gamma0,
-            'p0c_eV': p0c_eV,
+    RR_madx = np.zeros([6,6])
+
+    for ii in range(6):
+        for jj in range(6):
+            RR_madx[ii, jj] = getattr(tw, f're{ii+1}{jj+1}')[0]
+
+    optics_and_co_at_start_ring_from_madx = {
             'betx': twiss_table.betx[0],
             'bety': twiss_table.bety[0],
             'alfx': twiss_table.alfx[0],
@@ -365,18 +386,10 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
             'dy': twiss_table.dy[0],
             'dpx': twiss_table.dpx[0],
             'dpy': twiss_table.dpy[0],
-            'x' : twiss_table.x[0],
-            'px' : twiss_table.px[0],
-            'y' : twiss_table.y[0],
-            'py' : twiss_table.py[0],
-            't' : twiss_table.t[0],
-            'pt' : twiss_table.pt[0],
-            #convert tau, pt to sigma,delta
-            'sigma' : beta0 * twiss_table.t[0],
-            'delta' : ((twiss_table.pt[0]**2 +
-                 2.*twiss_table.pt[0]/beta0) + 1.)**0.5 - 1.
+            'particle_on_madx_co': particle_on_madx_co.to_dict()
             }
-    return optics_at_start_ring
+
+    return optics_and_co_at_start_ring_from_madx
 
 def generate_xline_with_bb(mad, seq_name, bb_df,
         closed_orbit_method='from_mad', pickle_lines_in_folder=None,
