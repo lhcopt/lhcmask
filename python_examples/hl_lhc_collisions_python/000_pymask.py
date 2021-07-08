@@ -561,5 +561,14 @@ sdf.to_parquet('final_summ_BBON.parquet')
 #  Save sequence and errors #
 #############################
 # N.B. this erases the errors
-# pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
+pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
 
+del(mad_track)
+mad_track = Madx(command_log="mad_final.log")
+mad_track.call("saved_seq.madx")
+mad_track.use(sequence="lhcb1")
+mad_track.twiss()
+mad_track.readtable(file="errors_lhc.tfs", table="errtab")
+mad_track.seterr(table="errtab")
+mad_track.set(format=".15g")
+mad_track.twiss()
