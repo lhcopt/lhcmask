@@ -7,29 +7,42 @@ import xline
 import sixtracktools
 
 
-# Tests b1 with bb
 tests = [
     {
-        'test_name': 'B1 - pymask sixtrack input vs madx mask',
-        'path_test': '../',
-        'type_test': 'sixtrack',
-        'path_ref': '../../../examples/hl_lhc_collision',
-        'type_ref': 'sixtrack',
-        'rtol': 3e-5,
-        'atol': 1e-12,
-        'strict': False,
-    },
-    {
-        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
-        'path_test': '../xline/line_bb_dipole_not_cancelled.json',
+        'test_name': 'B1 - debug',
+        'path_test': '../line_xtrack.pkl',
         'type_test': 'xline',
-        'path_ref': '../',
-        'type_ref': 'sixtrack',
+        'type_ref': 'xline',
+        'path_ref': '../xline/line_bb_dipole_cancelled.json',
         'rtol': 4e-7,
         'atol': 1e-100,
-        'strict': True,
+        'strict': False,
     }
 ]
+
+## Tests b1 with bb
+#tests = [
+#    {
+#        'test_name': 'B1 - pymask sixtrack input vs madx mask',
+#        'path_test': '../',
+#        'type_test': 'sixtrack',
+#        'path_ref': '../../../examples/hl_lhc_collision',
+#        'type_ref': 'sixtrack',
+#        'rtol': 3e-5,
+#        'atol': 1e-12,
+#        'strict': False,
+#    },
+#    {
+#        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
+#        'path_test': '../xline/line_bb_dipole_not_cancelled.json',
+#        'type_test': 'xline',
+#        'path_ref': '../',
+#        'type_ref': 'sixtrack',
+#        'rtol': 4e-7,
+#        'atol': 1e-100,
+#        'strict': True,
+#    }
+#]
 
 # # Tests b4 no bb
 # tests = [
@@ -62,7 +75,11 @@ def prepare_line(path, input_type):
 
     if input_type == 'xline':
         # Load xline machine 
-        ltest = xline.Line.from_json(path)
+        if path.endswith('.pkl'):
+            with open(path, 'rb') as fid:
+                ltest = xline.Line.from_dict(pickle.load(fid))
+        else:
+            ltest = xline.Line.from_json(path)
     elif input_type == 'sixtrack':
         print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
@@ -86,17 +103,17 @@ for tt in tests:
     # Load
     ltest = prepare_line(path_test, type_test)
     lref = prepare_line(path_ref, type_ref)
-    
+
     original_length = ltest.get_length()
     assert (lref.get_length() - original_length) < 1e-6
-    
+
     # Simplify the two machines
     for ll in (ltest, lref):
         ll.remove_inactive_multipoles(inplace=True)
         ll.remove_zero_length_drifts(inplace=True)
         ll.merge_consecutive_drifts(inplace=True)
         ll.merge_consecutive_multipoles(inplace=True)
-    
+
         # Remove inactive RFMultipoles and normalize phase
         for ii, ee in enumerate(ll.elements):
             if ee.__class__.__name__ == 'RFMultipole':
@@ -114,37 +131,32 @@ for tt in tests:
                 #             pp[ii] += 180
                 #         if pp[ii]>180:
                 #             pp[ii] -= 360
-    
+
         while None in ll.element_names:
             ll.element_names.remove(None)
         while None in ll.elements:
             ll.elements.remove(None)
-    
-    
+
     # Check that the two machines are identical
     assert len(ltest) == len(lref)
-    
+
     assert (ltest.get_length() - original_length) < 1e-6
     assert (lref.get_length() - original_length) < 1e-6
-    
-    
-
 
     for ii, (ee_test, ee_six, nn_test, nn_six) in enumerate(
         zip(ltest.elements, lref.elements, ltest.element_names, lref.element_names)
     ):
         assert type(ee_test) == type(ee_six)
-    
-    
+
         dtest = ee_test.to_dict(keepextra=True)
         dref = ee_six.to_dict(keepextra=True)
-    
+
         for kk in dtest.keys():
-    
+
             # Check if they are identical
             if np.isscalar(dref[kk]) and dtest[kk] == dref[kk]:
                 continue
-    
+
             # Check if the relative error is small
             val_test = dtest[kk]
             val_ref = dref[kk]
@@ -160,9 +172,9 @@ for tt in tests:
                 diff_rel = 100.0
             if diff_rel < rtol:
                 continue
-    
+
             # Check if absolute error is small
-    
+
             if not np.isscalar(val_ref) and len(val_ref) != len(val_test):
                 diff_abs = 1000
             else:
@@ -171,7 +183,7 @@ for tt in tests:
                 print(f"{nn_test}[{kk}] - test:{dtest[kk]} six:{dref[kk]}")
             if diff_abs < atol:
                 continue
-    
+
             # Exception: drift length (100 um tolerance)
             if not(strict) and isinstance(
                 ee_test, (xline.elements.Drift, xline.elements.DriftExact)
@@ -179,7 +191,7 @@ for tt in tests:
                 if kk == "length":
                     if diff_abs < 1e-4:
                         continue
-    
+
             # Exception: multipole lrad is not passed to sixtraxk
             if isinstance(ee_test, xline.elements.Multipole):
                 if kk == "length":
@@ -193,10 +205,10 @@ for tt in tests:
                                 for oo in range(lmin, len(vv)): # we do not care about errors above 10
                                     if vv[oo] != 0 and oo < 10:
                                         raise ValueError('Missing significant multipole strength')
-    
+
                         val_ref = val_ref[:lmin]
                         val_test = val_test[:lmin]
-    
+
                     if len(val_ref) == 0 and len(val_test) == 0:
                         continue
                     else:
@@ -206,7 +218,7 @@ for tt in tests:
                             continue
                         if diff_abs < atol:
                             continue
-    
+
             # Exception: correctors involved in lumi leveling
             passed_corr = False
             for nn_corr in [
@@ -225,8 +237,7 @@ for tt in tests:
                     break
             if not(strict) and  passed_corr:
                 continue
-    
-    
+
             # Exceptions BB4D (separations are recalculated)
             if not(strict) and isinstance(ee_test, xline.elements.BeamBeam4D):
                 if kk == "x_bb":
@@ -241,19 +252,28 @@ for tt in tests:
                 if kk == "sigma_y":
                     if diff_rel < 1e-5:
                         continue
-    
-            # Exceptions BB4D (angles and separations are recalculated)
+
+            # Exceptions BB6D (angles and separations are recalculated)
             if not(strict) and isinstance(ee_test, xline.elements.BeamBeam6D):
                 if kk == "alpha":
                     if diff_abs < 10e-6:
                         continue
-                if kk == "x_bb_co":
+                if kk == "x_co":
                     if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.015:
                         continue
-                if kk == "y_bb_co":
+                if kk == "y_co":
                     if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.015:
                         continue
-    
+                if kk == "zeta_co":
+                    if diff_abs <1e-5:
+                        continue
+                if kk == "delta_co":
+                    if diff_abs <1e-5:
+                        continue
+                if kk == "px_co" or kk == 'py_co':
+                    if diff_abs <30e-9:
+                        continue
+
             # If it got here it means that no condition above is met
             raise ValueError("Too large discrepancy!")
     print(

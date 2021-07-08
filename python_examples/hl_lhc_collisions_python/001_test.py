@@ -32,11 +32,11 @@ particle_on_madx_co = xl.Particles(
     mass0 = mad_beam.mass*1e9,
     s = 0,
     x = tw.x[0],
-    px = tw.px[0], 
+    px = tw.px[0],
     y = tw.y[0],
     py = tw.py[0],
     tau = tw.t[0],
-    ptau = tw.pt[0], 
+    ptau = tw.pt[0],
 )
 
 RR_madx = np.zeros([6,6])
@@ -51,17 +51,17 @@ tracker = xt.Tracker(sequence=line)
 for ee in tracker.line.elements:
     if ee.__class__.__name__.startswith('BeamBeam'):
          ee._temp_q0 = ee.q0
-         ee.q0 = 0 
+         ee.q0 = 0
 
 def one_turn_map(p, particle_on_madx_co, tracker):
-    xl_part = particle_on_madx_co.copy() 
+    xl_part = particle_on_madx_co.copy()
     xl_part.x = p[0]
     xl_part.px = p[1]
     xl_part.y = p[2]
     xl_part.py = p[3]
     xl_part.zeta = p[4]
     xl_part.delta = p[5]
-    
+
     part = xt.Particles(**xl_part.to_dict())
     tracker.track(part)
     p_res = np.array([
@@ -101,22 +101,23 @@ for ii, ee in enumerate(tracker.line.elements):
 
           ee.track(temp_particles)
 
-          ee.d_px = temp_particles.px - px_0   
-          ee.d_py = temp_particles.py - py_0   
+          ee.d_px = temp_particles.px - px_0
+          ee.d_py = temp_particles.py - py_0
           line.elements[ii].d_px = ee.d_px
           line.elements[ii].d_py = ee.d_py
 
-          temp_particles.px -= ee.d_px  
-          temp_particles.py -= ee.d_py  
+          temp_particles.px -= ee.d_px
+          temp_particles.py -= ee.d_py
 
     elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+        ee.q0 = ee._temp_q0
         ee.x_CO = temp_particles.x[0]
         ee.px_CO = temp_particles.px[0]
         ee.y_CO = temp_particles.y[0]
         ee.py_CO = temp_particles.py[0]
         ee.sigma_CO = temp_particles.zeta[0]
         ee.delta_CO = temp_particles.delta[0]
-        
+
         ee.track(temp_particles)
 
         ee.Dx_sub = temp_particles.x[0] - ee.x_CO
@@ -125,31 +126,29 @@ for ii, ee in enumerate(tracker.line.elements):
         ee.Dpy_sub = temp_particles.py[0] - ee.py_CO
         ee.Dsigma_sub = temp_particles.zeta[0] - ee.sigma_CO
         ee.Ddelta_sub = temp_particles.delta[0] - ee.delta_CO
- 
-        temp_particles.x[0] = ee.x_CO 
+
+        temp_particles.x[0] = ee.x_CO
         temp_particles.px[0] = ee.px_CO
         temp_particles.y[0] = ee.y_CO
         temp_particles.py[0] = ee.py_CO
         temp_particles.zeta[0] = ee.sigma_CO
         temp_particles.delta[0] = ee.delta_CO
 
-        line.elements[ii].x_co = ee.x_CO 
+        line.elements[ii].x_co = ee.x_CO
         line.elements[ii].px_co = ee.px_CO
         line.elements[ii].y_co = ee.y_CO
         line.elements[ii].py_co = ee.py_CO
         line.elements[ii].zeta_co = ee.sigma_CO
         line.elements[ii].delta_co = ee.delta_CO
 
-        line.elements[ii].d_x = ee.Dx_sub 
+        line.elements[ii].d_x = ee.Dx_sub
         line.elements[ii].d_px = ee.Dpx_sub
         line.elements[ii].d_y = ee.Dy_sub
         line.elements[ii].d_py = ee.Dpy_sub
         line.elements[ii].d_zeta = ee.Dsigma_sub
         line.elements[ii].d_delta = ee.Ddelta_sub
-	
-	
     else:
-        ee.track(temp_particles)    
+        ee.track(temp_particles)
 
 
 dict_line_xtrack = line.to_dict()
