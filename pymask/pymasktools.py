@@ -3,8 +3,10 @@ import pickle
 import json
 
 import numpy as np
+from scipy.optimize import fsolve
 
 import xline as xl
+import xtrack as xt
 
 from . import beambeam as bb
 
@@ -422,7 +424,7 @@ def _one_turn_map(p, particle_on_madx_co, tracker):
 def _find_closed_orbit_from_tracker(tracker, particle_co_guess_dict):
     particle_co_guess = xl.Particles.from_dict(particle_co_guess_dict)
     print('Start CO search')
-    res = fsolve(lambda p: p - one_turn_map(p, particle_on_madx_co, tracker),
+    res = fsolve(lambda p: p - _one_turn_map(p, particle_co_guess, tracker),
           x0=np.array([particle_co_guess.x, particle_co_guess.px,
                        particle_co_guess.y, particle_co_guess.py,
                        particle_co_guess.zeta, particle_co_guess.delta]))
@@ -438,7 +440,7 @@ def _find_closed_orbit_from_tracker(tracker, particle_co_guess_dict):
     return particle_on_co
 
 
-def set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
+def _set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
 
     temp_particles = xt.Particles(**particle_on_co.to_dict())
     for ii, ee in enumerate(tracker.line.elements):
@@ -511,15 +513,17 @@ def generate_xline(mad, seq_name, bb_df,
         prepare_line_for_xtrack=True):
 
     # Build xline model
-    line = xline.Line.from_madx_sequence(
+    print('Start building xline...')
+    line = xl.Line.from_madx_sequence(
         mad.sequence[seq_name], apply_madx_errors=True)
+    print('Done building xline.')
 
     if bb_df is not None:
         bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
 
     # Temporary fix due to bug in mad loader
     cavities, cav_names = line.get_elements_of_type(
-            xline.elements.Cavity)
+            xl.elements.Cavity)
     for cc, nn in zip(cavities, cav_names):
         if cc.frequency ==0.:
             ii_mad = mad.sequence[seq_name].element_names().index(nn)
@@ -529,7 +533,7 @@ def generate_xline(mad, seq_name, bb_df,
 
     line_bb_dipole_not_cancelled_dict = line.to_dict(keepextra=True)
     line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
-            get_optics_and_orbit_at_start_ring['particle_on_madx_co'])
+            optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
 
     if folder_name is not None:
         os.makedirs(folder_name, exist_ok=True)
@@ -540,12 +544,29 @@ def generate_xline(mad, seq_name, bb_df,
 
     if prepare_line_for_xtrack:
         tracker = xt.Tracker(sequence=line)
+
+        # Disable beam-beam
+        for ee in tracker.line.elements:
+            if ee.__class__.__name__.startswith('BeamBeam'):
+                 ee._temp_q0 = ee.q0
+                 ee.q0 = 0
+
         particle_on_tracker_co = _find_closed_orbit_from_tracker(tracker,
                 optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
 
-        set_orbit_dependent_parameters_for_bb(line, tracker,
+        # (Re-activates bb in line and tracker)
+        _set_orbit_dependent_parameters_for_bb(line, tracker,
                                               particle_on_tracker_co)
 
+        line_bb_for_tracking_dict = line.to_dict(keepextra=True)
+        line_bb_for_tracking_dict['particle_on_tracker_co'] = (
+                                         particle_on_tracker_co.to_dict())
+
+        if folder_name is not None:
+            os.makedirs(folder_name, exist_ok=True)
+            with open(folder_name +
+                    '/line_bb_dipole_not_cancelled.json', 'w') as fid:
+                json.dump(line_bb_for_tracking_dict, fid, cls=JEncoder)
 
 def generate_xline_with_bb(mad, seq_name, bb_df,
         closed_orbit_method='from_mad', pickle_lines_in_folder=None,
