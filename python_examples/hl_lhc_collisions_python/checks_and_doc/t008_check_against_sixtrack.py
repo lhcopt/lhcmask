@@ -45,6 +45,11 @@ particles.particle_id = np.arange(particles.num_particles)
 
 tracker.track(particles, turn_by_turn_monitor=True, num_turns=num_turns)
 
+print('Xtrack')
+print(tracker.record_last_track.x)
+print('Sixtrack')
+print(x_tbt_sixtrack)
+
 assert np.allclose(tracker.record_last_track.x[0, :], x_tbt_sixtrack[:,0],
        rtol=1e-15, atol=9e-11)
 assert np.allclose(tracker.record_last_track.y[0, :], y_tbt_sixtrack[:,0],
