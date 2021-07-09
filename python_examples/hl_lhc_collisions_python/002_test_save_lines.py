@@ -1,3 +1,5 @@
+# Requires dataframes to be saved manually after executing 000_pymask.py
+
 import sys
 import json
 
