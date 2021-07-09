@@ -7,42 +7,29 @@ import xline
 import sixtracktools
 
 
+# Tests b1 with bb
 tests = [
     {
-        'test_name': 'B1 - debug',
-        'path_test': '../line_xtrack.pkl',
+        'test_name': 'B1 - pymask sixtrack input vs madx mask',
+        'path_test': '../',
+        'type_test': 'sixtrack',
+        'path_ref': '../../../examples/hl_lhc_collision',
+        'type_ref': 'sixtrack',
+        'rtol': 3e-5,
+        'atol': 1e-12,
+        'strict': False,
+    },
+    {
+        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
+        'path_test': '../xlines/line_bb_dipole_not_cancelled.json',
         'type_test': 'xline',
-        'type_ref': 'xline',
-        'path_ref': '../xline/line_bb_dipole_cancelled.json',
+        'path_ref': '../',
+        'type_ref': 'sixtrack',
         'rtol': 4e-7,
         'atol': 1e-100,
-        'strict': False,
+        'strict': True,
     }
 ]
-
-## Tests b1 with bb
-#tests = [
-#    {
-#        'test_name': 'B1 - pymask sixtrack input vs madx mask',
-#        'path_test': '../',
-#        'type_test': 'sixtrack',
-#        'path_ref': '../../../examples/hl_lhc_collision',
-#        'type_ref': 'sixtrack',
-#        'rtol': 3e-5,
-#        'atol': 1e-12,
-#        'strict': False,
-#    },
-#    {
-#        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
-#        'path_test': '../xline/line_bb_dipole_not_cancelled.json',
-#        'type_test': 'xline',
-#        'path_ref': '../',
-#        'type_ref': 'sixtrack',
-#        'rtol': 4e-7,
-#        'atol': 1e-100,
-#        'strict': True,
-#    }
-#]
 
 # # Tests b4 no bb
 # tests = [
@@ -258,10 +245,10 @@ for tt in tests:
                 if kk == "alpha":
                     if diff_abs < 10e-6:
                         continue
-                if kk == "x_co":
+                if kk == "x_co" or kk == "x_bb_co":
                     if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.015:
                         continue
-                if kk == "y_co":
+                if kk == "y_co" or kk == "y_bb_co":
                     if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.015:
                         continue
                 if kk == "zeta_co":
