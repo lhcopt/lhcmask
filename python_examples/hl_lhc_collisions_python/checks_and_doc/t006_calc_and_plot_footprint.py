@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import xline
 import sixtracktools
 
-track_with = 'xline'
 track_with = 'xtrack'
 #track_with = 'sixtrack'
 
@@ -35,14 +34,15 @@ def prepare_line(path, input_type):
 
     return ltest
 
-line = prepare_line('../xline/line_bb_dipole_cancelled.json', input_type='xline')
+line = prepare_line('../xlines/line_bb_for_tracking.json', input_type='xline')
 
 
-with open('../optics_orbit_at_start_ring.json', 'r') as fid:
+with open('../xlines/line_bb_for_tracking.json', 'r') as fid:
+    partCO = xline.Particles.from_dict(
+            json.load(fid)['particle_on_tracker_co'])
+
+with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
     ddd = json.load(fid)
-ddd['p0c'] =  ddd['p0c_eV']
-
-partCO = xline.Particles.from_dict(ddd)
 
 part = partCO.copy()
 
