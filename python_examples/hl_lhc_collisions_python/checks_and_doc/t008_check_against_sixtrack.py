@@ -15,7 +15,7 @@ displace_y = [3e-4, -3e-4]
 num_turns = 5
 
 
-with open('../test_xlines/line_bb_for_tracking.json', 'r') as fid:
+with open('../xlines/line_bb_for_tracking.json', 'r') as fid:
     dict_line_xtrack = json.load(fid)
 
 #with open('../xline/line_bb_dipole_cancelled.json', 'r') as fid:

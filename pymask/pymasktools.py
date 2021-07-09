@@ -3,12 +3,14 @@ import pickle
 import json
 
 import numpy as np
-from scipy.optimize import fsolve
 
 import xline as xl
 import xtrack as xt
 
 from . import beambeam as bb
+from .linear_normal_form import find_closed_orbit_from_tracker
+from .linear_normal_form import compute_R_matrix_finite_differences
+from .linear_normal_form import compute_linear_normal_form
 
 class JEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -394,50 +396,13 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
             'dy': twiss_table.dy[0],
             'dpx': twiss_table.dpx[0],
             'dpy': twiss_table.dpy[0],
-            'RR': RR_madx,
+            'RR_madx': RR_madx,
             'particle_on_madx_co': particle_on_madx_co.to_dict()
             }
 
     return optics_and_co_at_start_ring_from_madx
 
 
-def _one_turn_map(p, particle_on_madx_co, tracker):
-    xl_part = particle_on_madx_co.copy()
-    xl_part.x = p[0]
-    xl_part.px = p[1]
-    xl_part.y = p[2]
-    xl_part.py = p[3]
-    xl_part.zeta = p[4]
-    xl_part.delta = p[5]
-
-    part = xt.Particles(**xl_part.to_dict())
-    tracker.track(part)
-    p_res = np.array([
-           part.x[0],
-           part.px[0],
-           part.y[0],
-           part.py[0],
-           part.zeta[0],
-           part.delta[0]])
-    return p_res
-
-def _find_closed_orbit_from_tracker(tracker, particle_co_guess_dict):
-    particle_co_guess = xl.Particles.from_dict(particle_co_guess_dict)
-    print('Start CO search')
-    res = fsolve(lambda p: p - _one_turn_map(p, particle_co_guess, tracker),
-          x0=np.array([particle_co_guess.x, particle_co_guess.px,
-                       particle_co_guess.y, particle_co_guess.py,
-                       particle_co_guess.zeta, particle_co_guess.delta]))
-    print('Done CO search')
-    particle_on_co = particle_co_guess.copy()
-    particle_on_co.x = res[0]
-    particle_on_co.px = res[1]
-    particle_on_co.y = res[2]
-    particle_on_co.py = res[3]
-    particle_on_co.zeta = res[4]
-    particle_on_co.delta = res[5]
-
-    return particle_on_co
 
 
 def _set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
@@ -512,7 +477,9 @@ def _set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
 def generate_xline(mad, seq_name, bb_df,
         optics_and_co_at_start_ring_from_madx,
         folder_name=None, skip_mad_use=False,
-        prepare_line_for_xtrack=True):
+        prepare_line_for_xtrack=True,
+        steps_for_finite_diffs={'dx': 1e-9, 'dpx': 1e-12,
+            'dy': 1e-9, 'dpy': 1e-12, 'dzeta': 1e-9, 'ddelta': 1e-9}):
 
     # Build xline model
     print('Start building xline...')
@@ -536,6 +503,8 @@ def generate_xline(mad, seq_name, bb_df,
     line_bb_dipole_not_cancelled_dict = line.to_dict(keepextra=True)
     line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
             optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+    line_bb_dipole_not_cancelled_dict['RR_madx'] = (
+            optics_and_co_at_start_ring_from_madx['RR_madx'])
 
     if folder_name is not None:
         os.makedirs(folder_name, exist_ok=True)
@@ -553,8 +522,15 @@ def generate_xline(mad, seq_name, bb_df,
                  ee._temp_q0 = ee.q0
                  ee.q0 = 0
 
-        particle_on_tracker_co = _find_closed_orbit_from_tracker(tracker,
+        particle_on_tracker_co = find_closed_orbit_from_tracker(tracker,
                 optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+
+        RR_finite_diffs = compute_R_matrix_finite_differences(
+                particle_on_tracker_co, tracker, symplectify=True,
+                **steps_for_finite_diffs)
+
+        (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
+                ) = compute_linear_normal_form(RR_finite_diffs)
 
         # (Re-activates bb in line and tracker)
         _set_orbit_dependent_parameters_for_bb(line, tracker,
@@ -563,6 +539,10 @@ def generate_xline(mad, seq_name, bb_df,
         line_bb_for_tracking_dict = line.to_dict(keepextra=True)
         line_bb_for_tracking_dict['particle_on_tracker_co'] = (
                                          particle_on_tracker_co.to_dict())
+        line_bb_for_tracking_dict['RR_finite_diffs'] = RR_finite_diffs
+        line_bb_for_tracking_dict['WW_finite_diffs'] = WW_finite_diffs
+        line_bb_for_tracking_dict['WWInv_finite_diffs'] = WWInv_finite_diffs
+        line_bb_for_tracking_dict['RotMat_finite_diffs'] = RotMat_finite_diffs
 
         if folder_name is not None:
             os.makedirs(folder_name, exist_ok=True)
