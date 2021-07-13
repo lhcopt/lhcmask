@@ -360,7 +360,7 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
     # Twiss and get closed-orbit
     if not skip_mad_use:
         mad.use(sequence=seq_name)
-    twiss_table = mad.twiss()
+    twiss_table = mad.twiss(rmatrix=True)
 
     if initial_bb_state is not None:
         mad.globals.on_bb_switch = initial_bb_state
