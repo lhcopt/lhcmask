@@ -60,10 +60,28 @@ In the folder ```checks_and_doc```:
 Configure ```t004_compare_xline_lines.py``` for the test:
 ```python
 # Test b1
-path_test = '../'
-type_test = 'sixtrack'
-path_ref = '../../examples/hl_lhc_collision'
-type_ref = 'sixtrack
+tests = [
+    {
+        'test_name': 'B1 - pymask sixtrack input vs madx mask',
+        'path_test': '../',
+        'type_test': 'sixtrack',
+        'path_ref': '../../../examples/hl_lhc_collision',
+        'type_ref': 'sixtrack',
+        'rtol': 3e-5,
+        'atol': 1e-12,
+        'strict': False,
+    },
+    {
+        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
+        'path_test': '../xline/line_bb_dipole_not_cancelled.json',
+        'type_test': 'xline',
+        'path_ref': '../',
+        'type_ref': 'sixtrack',
+        'rtol': 4e-7,
+        'atol': 1e-100,
+        'strict': True,
+    }
+]
 ```
 
 Check using xline lines:
