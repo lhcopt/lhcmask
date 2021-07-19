@@ -1,6 +1,6 @@
 import os
 import sys
-import pickle
+import json
 
 import numpy as np
 
@@ -518,25 +518,23 @@ else:
 # Save optics and orbit at start ring #
 #######################################
 
-optics_orbit_start_ring = pm.get_optics_and_orbit_at_start_ring(
+optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
         mad_track, sequence_to_track, skip_mad_use=True)
-with open('./optics_orbit_at_start_ring.pkl', 'wb') as fid:
-    pickle.dump(optics_orbit_start_ring, fid)
+with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
+    json.dump(optics_and_co_at_start_ring_from_madx, fid, cls=pm.JEncoder)
 
-
-###################
-# Generate xlines #
-###################
+##################
+# Generate xline #
+##################
 
 if enable_bb_legacy:
     print('xline is not generated with bb legacy macros')
 else:
-    xline_fol_name = "./xline"
-    dct_xline = pm.generate_xline_with_bb(mad_track,
-        sequence_to_track, bb_df_track,
-        closed_orbit_method='from_mad',
-        pickle_lines_in_folder=xline_fol_name,
-        skip_mad_use=True)
+    pm.generate_xline(mad_track, sequence_to_track, bb_df_track,
+                    optics_and_co_at_start_ring_from_madx,
+                    folder_name = './xlines',
+                    skip_mad_use=True,
+                    prepare_line_for_xtrack=True)
 
 ###################################
 #         Save final twiss        #
@@ -560,6 +558,5 @@ sdf.to_parquet('final_summ_BBON.parquet')
 #############################    
 #  Save sequence and errors #
 #############################
-# N.B. this erases the errors
+# N.B. this erases the errors in the mad_track instance
 # pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
-

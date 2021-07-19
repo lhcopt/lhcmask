@@ -1,6 +1,6 @@
 import shutil
-import pickle
 import numpy as np
+import json
 
 import xline
 import sixtracktools
@@ -46,7 +46,7 @@ phi_c_strong = -phi_c_weak
 path_test = '../'
 type_test = 'sixtrack'
 
-path_test = '../xline/line_bb_dipole_not_cancelled.json'
+path_test = '../xlines/line_bb_dipole_not_cancelled.json'
 type_test = 'xline'
 
 def prepare_line(path, input_type):
@@ -117,12 +117,6 @@ plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula'
 
 
 # Chek crabs in weak beam
-import pickle
-with open('../optics_orbit_at_start_ring.pkl', 'rb') as fid:
-    ddd = pickle.load(fid)
-
-ddd['p0c'] =  ddd['p0c_eV']
-
 
 # Switch off all beam-beam lenses
 bb_all, _ = ltest.get_elements_of_type([xline.elements.BeamBeam4D,
@@ -138,7 +132,9 @@ crabs, crab_names = ltest.get_elements_of_type([xline.elements.RFMultipole])
 # for cc in crabs:
 #     cc.knl[0] *= -1
 
-partco = xline.Particles.from_dict(ddd)
+with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
+    ddd = json.load(fid)
+partco = xline.Particles.from_dict(ddd['particle_on_madx_co'])
 z_slices = s_rel * 2.0
 partco.zeta += z_slices
 partco.x += 0*z_slices
@@ -224,7 +220,7 @@ axcby = figcb.add_subplot(2,1,2, sharex=axcbx)
 axcbx.plot(s_twiss, x_twiss)
 axcby.plot(s_twiss, y_twiss)
 
-part = xline.Particles.from_dict(ddd)
+part = xline.Particles.from_dict(ddd['particle_on_madx_co'])
 z_test = np.array([0, z_crab_track])
 part.zeta += z_test
 part.x += 0*z_test + np.array([0, x_twiss[0]])
