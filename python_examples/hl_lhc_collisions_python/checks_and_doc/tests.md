@@ -82,7 +82,7 @@ tests = [
 Check using xline lines:
 ```bash
 python t003_fc_to_fort.py
-python t004_compare_xline_lines.py
+python t004_compare_xlines.py.py
 ```
 
 **Check crab cavities:**
