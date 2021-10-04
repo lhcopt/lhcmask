@@ -59,10 +59,12 @@ def compute_R_matrix_finite_differences(
     II = np.eye(6)
     RR = np.zeros((6, 6), dtype=np.float64)
     for jj, dd in enumerate([dx, dpx, dy, dpy, dzeta, ddelta]):
-        pd=p0+II[jj]*dd
-        RR[:,jj]=(_one_turn_map(pd, particle_on_co, tracker)-p0)/dd
+        RR[:,jj]=(_one_turn_map(p0+II[jj]*dd, particle_on_co, tracker)-
+                  _one_turn_map(p0-II[jj]*dd, particle_on_co, tracker))/(2*dd)
 
-
+    if not 0.999 < np.linalg.det(RR) < 1.001:
+        raise ValueError('The determinant of the RR is out tolerance.')
+    
     if symplectify:
         return healy_symplectify(RR)
     else:
