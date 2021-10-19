@@ -56,7 +56,7 @@ if (ver_hllhc_optics > 0 && correct_for_D2==1){
 };
 
 ! Add errors for the corrector magnets
-if (ver_hllhc_optics > 0 && on_errors_MCBRD==1){
+if (ver_hllhc_optics > 0 && on_errors_NLC==1){
   eoption,seed=myseed+200;call, file="errors/HL-LHC/Efcomp_NLC.madx";
 };
 
