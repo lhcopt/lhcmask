@@ -1,8 +1,8 @@
 import shutil
-import pickle
 import numpy as np
+import json
 
-import pysixtrack
+import xline
 import sixtracktools
 
 L_lhc = 27e3
@@ -46,16 +46,18 @@ phi_c_strong = -phi_c_weak
 path_test = '../'
 type_test = 'sixtrack'
 
+path_test = '../xlines/line_bb_dipole_not_cancelled.json'
+type_test = 'xline'
+
 def prepare_line(path, input_type):
 
-    if input_type == 'pysixtrack':
-        # Load pysixtrack machine 
-        with open(path, "rb") as fid:
-            ltest = pysixtrack.Line.from_dict(pickle.load(fid))
+    if input_type == 'xline':
+        # Load xline machine 
+        ltest = xline.Line.from_json(path)
     elif input_type == 'sixtrack':
-        print('Build pysixtrack from sixtrack input:')
+        print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = pysixtrack.Line.from_sixinput(sixinput_test)
+        ltest = xline.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
@@ -115,20 +117,14 @@ plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula'
 
 
 # Chek crabs in weak beam
-import pickle
-with open('../optics_orbit_at_start_ring.pkl', 'rb') as fid:
-    ddd = pickle.load(fid)
-
-ddd['p0c'] =  ddd['p0c_eV']
-
 
 # Switch off all beam-beam lenses
-bb_all, _ = ltest.get_elements_of_type([pysixtrack.elements.BeamBeam4D,
-                                            pysixtrack.elements.BeamBeam6D])
+bb_all, _ = ltest.get_elements_of_type([xline.elements.BeamBeam4D,
+                                            xline.elements.BeamBeam6D])
 for bb in bb_all: bb.enabled = False
 
 # # Switch off all beam-beam lenses
-crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole])
+crabs, crab_names = ltest.get_elements_of_type([xline.elements.RFMultipole])
 #for cc in crabs:
 #    cc.pn = [-90]
 #    cc.ps = [-90]
@@ -136,7 +132,9 @@ crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole]
 # for cc in crabs:
 #     cc.knl[0] *= -1
 
-partco = pysixtrack.Particles.from_dict(ddd)
+with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
+    ddd = json.load(fid)
+partco = xline.Particles.from_dict(ddd['particle_on_madx_co'])
 z_slices = s_rel * 2.0
 partco.zeta += z_slices
 partco.x += 0*z_slices
@@ -184,7 +182,7 @@ r_lenses = []
 for ibb, bb in enumerate(bb_elems):
     r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
 
-axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak pysixtrack')
+axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak xline')
 Rw_crab = phi_c_weak * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
 Rw_no_crab = phi_weak * s_rel
 axcrab.plot(s_rel, Rw_crab + Rw_no_crab, '*', color='darkblue',
@@ -222,7 +220,7 @@ axcby = figcb.add_subplot(2,1,2, sharex=axcbx)
 axcbx.plot(s_twiss, x_twiss)
 axcby.plot(s_twiss, y_twiss)
 
-part = pysixtrack.Particles.from_dict(ddd)
+part = xline.Particles.from_dict(ddd['particle_on_madx_co'])
 z_test = np.array([0, z_crab_track])
 part.zeta += z_test
 part.x += 0*z_test + np.array([0, x_twiss[0]])

@@ -1,11 +1,6 @@
 # Tests performed on pymask
 
-Sixtracktools is on the master
-
-We test the commit 5da242cf332661f06a2151dc49fbf616b9806d6b
-
 N.B. For the tests to be successful make sure that cpymad and madx correspond to the same (updated!) version.
-
 
 
 ## Test 1 - b1 with bb legacy macros
@@ -13,7 +8,7 @@ N.B. For the tests to be successful make sure that cpymad and madx correspond to
 We execute the reference:
 ```bash
  cd ../../examples/hl_lhc_collision
- python ../../unmask.py main.mask parameters_for_unmask.txt --run
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run-cpymad
 ```
 
 We setup the python version:
@@ -54,22 +49,40 @@ python 000_pymask.py
 We execute the reference (can be reused from the previous test):
 ```bash
  cd ../../examples/hl_lhc_collision
- python ../../unmask.py main.mask parameters_for_unmask.txt --run
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run-cpymad
 ```
 In the folder ```checks_and_doc```:
-Configure ```t004_compare_pysixtrack_lines.py``` for the test:
+Configure ```t004_compare_xline_lines.py``` for the test:
 ```python
 # Test b1
-path_test = '../'
-type_test = 'sixtrack'
-path_ref = '../../examples/hl_lhc_collision'
-type_ref = 'sixtrack
+tests = [
+    {
+        'test_name': 'B1 - pymask sixtrack input vs madx mask',
+        'path_test': '../',
+        'type_test': 'sixtrack',
+        'path_ref': '../../../examples/hl_lhc_collision',
+        'type_ref': 'sixtrack',
+        'rtol': 3e-5,
+        'atol': 1e-12,
+        'strict': False,
+    },
+    {
+        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
+        'path_test': '../xline/line_bb_dipole_not_cancelled.json',
+        'type_test': 'xline',
+        'path_ref': '../',
+        'type_ref': 'sixtrack',
+        'rtol': 4e-7,
+        'atol': 1e-100,
+        'strict': True,
+    }
+]
 ```
 
-Check using pysixtrack lines:
+Check using xline lines:
 ```bash
 python t003_fc_to_fort.py
-python t004_compare_pysixtrack_lines.py
+python t004_compare_xlines.py.py
 ```
 
 **Check crab cavities:**
@@ -100,7 +113,7 @@ Repeat for IP1.
 We execute the reference:
 ```bash
  cd ../../examples/hl_lhc_collision_nobb_b4
- python ../../unmask.py main.mask parameters_for_unmask.txt --run
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run-cpymad
 ```
 
 We setup the python version:
@@ -134,7 +147,7 @@ diff fc.34 ../../examples/hl_lhc_collision_nobb_b4/fc.34
 We execute the reference:
 ```bash
  cd ../../examples/hl_lhc_collision_nobb_b4
- python ../../unmask.py main.mask parameters_for_unmask.txt --run
+ python ../../unmask.py main.mask parameters_for_unmask.txt --run-cpymad
 ```
 
 We setup the python version:

@@ -3,11 +3,11 @@ configuration = {
     # Links to be made for tools and scripts
     'links'                    : {
                                     'tracking_tools': '/afs/cern.ch/eng/tracking-tools',
-                                    #'modules': 'tracking_tools/modules',
-                                    'modules': '../../',
+                                    'modules': 'tracking_tools/modules',
                                     'tools': 'tracking_tools/tools',
                                     'beambeam_macros': 'tracking_tools/beambeam_macros',
                                     'errors': 'tracking_tools/errors',
+                                    'optics_repository' : '/afs/cern.ch/eng/lhc/optics',
                                  },
     # Mode - choose between:
 
@@ -24,7 +24,7 @@ configuration = {
     'mode'                      : 'b1_with_bb',
 
     # Optics file
-    'optics_file'              : '/afs/cern.ch/eng/lhc/optics/runII/2018/ION/opticsfile.21',
+    'optics_file'              : 'optics_repository/runII/2018/ION/opticsfile.21',
 
     # Enable checks
     'check_betas_at_ips'       : True,
@@ -47,8 +47,8 @@ configuration = {
     'beam_energy_tot'      : 7000.  ,       # [GeV]
 
     # Ion parameters
-    'beam_mass'                 :193.68715,
-    'beam_charge'               :82,
+    'particle_mass'        :193.6872729,
+    'particle_charge'      :82,
 
     # Tunes and chromaticities
     'qx0'                  : 62.31,
@@ -79,22 +79,27 @@ configuration = {
     'nco_IP8'              : 398,
 
     # Beam-beam parameters (used by python tools - NOT by legacy macros)
-    'numberOfLRPerIRSide'      : [25, 20, 25, 20], 
-    'bunch_spacing_buckets'    : 10,
-    'numberOfHOSlices'         : 11,
-    'bunch_population_ppb'     : None,
-    'sigmaz_m'                 : None,
-    'z_crab_twiss'             : 0.,
+    'beambeam_config'      :
+        {
+            'numberOfLRPerIRSide'      : [25, 20, 25, 20],
+            'bunch_spacing_buckets'    : 10,
+            'numberOfHOSlices'         : 11,
+            'bunch_num_particles'      : None,
+            'bunch_particle_charge'    : None,
+            'sigmaz_m'                 : None,
+            'z_crab_twiss'             : 0.,
 
-    'bunch_to_track'           : 488,
-    'filling_scheme_json'     : 'filling.json',
+            # Select from filling scheme
+            'filling_scheme_json'     : 'filling.json',
+            'bunch_to_track'           : 488,
+        },
     # Match tunes and chromaticities including beam-beam effects
     'match_q_dq_with_bb'        : False,            # should be off at collision
 
     # Enable crab cavities
     'enable_crabs'             : False,
 
-    # N. iterations coupling correction
+    # N. iterations for coupling correction
     'N_iter_coupling'            : 2,
 
     # Value to be added to linear coupling knobs (on sequence_to_track)
