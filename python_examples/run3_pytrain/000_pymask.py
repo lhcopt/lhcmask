@@ -295,10 +295,6 @@ if 'filling_scheme_json' in configuration['beambeam_config'].keys():
                               filling_scheme_json,bunch_to_track, beam=1)
     bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
 
-if configuration['pytrain']:
-    pm.prepare_pytrain_input(mad)
-    quit()
-
 ##################################################
 # Select mad instance for tracking configuration #
 ##################################################
@@ -312,6 +308,17 @@ else:
 
 mad_collider = mad
 del(mad)
+
+
+##################################################
+#         Producing the pytrain input            #
+##################################################
+
+
+# The implementation of the pm.prepare_pytrain_input is not fully 
+# pythonic and it is still based on old BB macros
+if configuration['pytrain']:
+    pm.prepare_pytrain_input(mad_collider, configuration)
 
 # Twiss machine to track
 twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
