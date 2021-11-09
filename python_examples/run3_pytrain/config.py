@@ -156,4 +156,6 @@ configuration = {
                                     'par_b_t_dist' : 25.,  # bunch spacing [ns]
                                     'par_n_inside_D1': 5,  # n. parasitic encounters inside D1
                                   },
+    # to compute the pytrain input
+    'pytrain': True,
     }

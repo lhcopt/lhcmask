@@ -296,8 +296,8 @@ if 'filling_scheme_json' in configuration['beambeam_config'].keys():
     bb_dfs['b1']=ost.filter_bb_df(bb_dfs['b1'],bb_schedule_to_track_b1)
 
 if configuration['pytrain']:
-    lumi.prepare_pytrain_input(mad)
-    exit
+    pm.prepare_pytrain_input(mad)
+    quit()
 
 ##################################################
 # Select mad instance for tracking configuration #
