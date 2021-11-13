@@ -523,14 +523,14 @@ optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
 with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
     json.dump(optics_and_co_at_start_ring_from_madx, fid, cls=pm.JEncoder)
 
-##################
-# Generate xline #
-##################
+########################
+# Generate xtrack line #
+########################
 
 if enable_bb_legacy:
-    print('xline is not generated with bb legacy macros')
+    print('xtrack line is not generated with bb legacy macros')
 else:
-    pm.generate_xline(mad_track, sequence_to_track, bb_df_track,
+    pm.generate_xtrack_line(mad_track, sequence_to_track, bb_df_track,
                     optics_and_co_at_start_ring_from_madx,
                     folder_name = './xlines',
                     skip_mad_use=True,

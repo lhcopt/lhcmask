@@ -625,7 +625,7 @@ def setup_beam_beam_in_line(
     for ii, (ee, eename) in enumerate(zip(line.elements, line.element_names)):
         if isinstance(ee, xf.BeamBeamBiGaussian2D):
             ee.n_particles=bb_df.loc[eename, 'other_num_particles']
-            ee.q0 = bb_df.loc[eename, 'other_particle_charge'])
+            ee.q0 = bb_df.loc[eename, 'other_particle_charge']
             ee.sigma_x = np.sqrt(bb_df.loc[eename, 'other_Sigma_11'])
             ee.sigma_y = np.sqrt(bb_df.loc[eename, 'other_Sigma_33'])
             ee.beta0 = bb_df.loc[eename, 'other_relativistic_beta']
@@ -672,7 +672,7 @@ def setup_beam_beam_in_line(
             params["d_delta"] = 0
 
             newee = xf.BeamBeamBiGaussian3D(old_interface=params)
-            line[ii] = newee
+            line.elements[ii] = newee
 
 
 

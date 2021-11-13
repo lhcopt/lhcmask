@@ -4,13 +4,11 @@ import json
 
 import numpy as np
 
-import xline as xl
 import xtrack as xt
+import xpart as xp
+import xfields as xf
 
 from . import beambeam as bb
-from .linear_normal_form import find_closed_orbit_from_tracker
-from .linear_normal_form import compute_R_matrix_finite_differences
-from .linear_normal_form import compute_linear_normal_form
 
 class JEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -210,7 +208,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
         ibbc_sixtrack,
         radius_sixtrack_multip_conversion_mad,
         skip_mad_use=False):
-   
+
     six_fol_name = output_folder
     os.makedirs(six_fol_name, exist_ok=True)
 
@@ -368,7 +366,7 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
     mad_beam =  mad.sequence[seq_name].beam
     assert mad_beam.deltap == 0, "Not implemented."
 
-    particle_on_madx_co = xl.Particles(
+    particle_on_madx_co = xp.Particles(
         p0c = mad_beam.pc*1e9,
         q0 = mad_beam.charge,
         mass0 = mad_beam.mass*1e9,
@@ -474,25 +472,24 @@ def _set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
             ee.track(temp_particles)
 
 
-def generate_xline(mad, seq_name, bb_df,
+def generate_xtrack_line(mad, seq_name, bb_df,
         optics_and_co_at_start_ring_from_madx,
         folder_name=None, skip_mad_use=False,
         prepare_line_for_xtrack=True,
         steps_for_finite_diffs={'dx': 1e-9, 'dpx': 1e-12,
             'dy': 1e-9, 'dpy': 1e-12, 'dzeta': 1e-9, 'ddelta': 1e-9}):
 
-    # Build xline model
-    print('Start building xline...')
-    line = xl.Line.from_madx_sequence(
+    # Build xsuite model
+    print('Start building xtrack line...')
+    line = xt.Line.from_madx_sequence(
         mad.sequence[seq_name], apply_madx_errors=True)
-    print('Done building xline.')
+    print('Done building xtrack.')
 
     if bb_df is not None:
         bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
 
     # Temporary fix due to bug in mad loader
-    cavities, cav_names = line.get_elements_of_type(
-            xl.elements.Cavity)
+    cavities, cav_names = line.get_elements_of_type(xt.Cavity)
     for cc, nn in zip(cavities, cav_names):
         if cc.frequency ==0.:
             ii_mad = mad.sequence[seq_name].element_names().index(nn)
@@ -500,7 +497,7 @@ def generate_xline(mad, seq_name, bb_df,
             f0_mad = mad.sequence[seq_name].beam.freq0 * 1e6 # mad has it in MHz
             cc.frequency = f0_mad*cc_mad.parent.harmon
 
-    line_bb_dipole_not_cancelled_dict = line.to_dict(keepextra=True)
+    line_bb_dipole_not_cancelled_dict = line.to_dict()
     line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
             optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
     line_bb_dipole_not_cancelled_dict['RR_madx'] = (
@@ -514,7 +511,7 @@ def generate_xline(mad, seq_name, bb_df,
             json.dump(line_bb_dipole_not_cancelled_dict, fid, cls=JEncoder)
 
     if prepare_line_for_xtrack:
-        tracker = xt.Tracker(sequence=line)
+        tracker = xt.Tracker(line=line)
 
         # Disable beam-beam
         for ee in tracker.line.elements:
@@ -522,21 +519,26 @@ def generate_xline(mad, seq_name, bb_df,
                  ee._temp_q0 = ee.q0
                  ee.q0 = 0
 
-        particle_on_tracker_co = find_closed_orbit_from_tracker(tracker,
-                optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+        particle_on_tracker_co = tracker.find_closed_orbit(
+            particle_co_guess=xp.Particles(
+            **optics_and_co_at_start_ring_from_madx['particle_on_madx_co']))
 
-        RR_finite_diffs = compute_R_matrix_finite_differences(
-                particle_on_tracker_co, tracker, symplectify=True,
+        # Re-enable beam-beam
+        for ee in tracker.line.elements:
+            if ee.__class__.__name__.startswith('BeamBeam'):
+                 ee.q0 = ee._temp_q0
+
+        xf.configure_orbit_dependent_parameters_for_bb(tracker,
+                           particle_on_co=particle_on_tracker_co)
+
+        RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
+                particle_on_tracker_co,
                 **steps_for_finite_diffs)
 
         (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
-                ) = compute_linear_normal_form(RR_finite_diffs)
+                ) = xp.compute_linear_normal_form(RR_finite_diffs)
 
-        # (Re-activates bb in line and tracker)
-        _set_orbit_dependent_parameters_for_bb(line, tracker,
-                                              particle_on_tracker_co)
-
-        line_bb_for_tracking_dict = line.to_dict(keepextra=True)
+        line_bb_for_tracking_dict = line.to_dict()
         line_bb_for_tracking_dict['particle_on_tracker_co'] = (
                                          particle_on_tracker_co.to_dict())
         line_bb_for_tracking_dict['RR_finite_diffs'] = RR_finite_diffs
