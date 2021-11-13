@@ -530,9 +530,9 @@ with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
 if enable_bb_legacy:
     print('xtrack line is not generated with bb legacy macros')
 else:
-    pm.generate_xtrack_line(mad_track, sequence_to_track, bb_df_track,
+    pm.generate_xsuite_line(mad_track, sequence_to_track, bb_df_track,
                     optics_and_co_at_start_ring_from_madx,
-                    folder_name = './xlines',
+                    folder_name = './xsuite_lines',
                     skip_mad_use=True,
                     prepare_line_for_xtrack=True)
 
