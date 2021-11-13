@@ -624,14 +624,13 @@ def setup_beam_beam_in_line(
 
     for ii, (ee, eename) in enumerate(zip(line.elements, line.element_names)):
         if isinstance(ee, xf.BeamBeamBiGaussian2D):
-            ee.charge = (bb_df.loc[eename, 'other_num_particles']
-                        * bb_df.loc[eename, 'other_particle_charge']) # TODO update xline interface to separate charge and b. population
+            ee.n_particles=bb_df.loc[eename, 'other_num_particles']
+            ee.q0 = bb_df.loc[eename, 'other_particle_charge'])
             ee.sigma_x = np.sqrt(bb_df.loc[eename, 'other_Sigma_11'])
             ee.sigma_y = np.sqrt(bb_df.loc[eename, 'other_Sigma_33'])
-            ee.beta_r = bb_df.loc[eename, 'other_relativistic_beta']
-            ee.x_bb = bb_df.loc[eename, 'separation_x']
-            ee.y_bb = bb_df.loc[eename, 'separation_y']
-
+            ee.beta0 = bb_df.loc[eename, 'other_relativistic_beta']
+            ee.mean_x = bb_df.loc[eename, 'separation_x']
+            ee.mean_y = bb_df.loc[eename, 'separation_y']
         if isinstance(ee, xf.BeamBeamBiGaussian3D):
             params = {}
             params['phi'] = bb_df.loc[eename, 'phi']
