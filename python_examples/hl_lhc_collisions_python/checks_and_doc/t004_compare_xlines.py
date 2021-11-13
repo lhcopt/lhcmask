@@ -1,10 +1,12 @@
 import time
 import shutil
 import pickle
+import json
 import numpy as np
 
-import xline
+import xtrack as xt
 import sixtracktools
+
 
 
 # Tests b1 with bb
@@ -21,7 +23,7 @@ tests = [
     },
     {
         'test_name': 'B1 - pymask xline vs pymask sixtrack input',
-        'path_test': '../xlines/line_bb_dipole_not_cancelled.json',
+        'path_test': '../xsuite_lines/line_bb_dipole_not_cancelled.json',
         'type_test': 'xline',
         'path_ref': '../',
         'type_ref': 'sixtrack',
@@ -61,16 +63,13 @@ def norm(x):
 def prepare_line(path, input_type):
 
     if input_type == 'xline':
-        # Load xline machine 
-        if path.endswith('.pkl'):
-            with open(path, 'rb') as fid:
-                ltest = xline.Line.from_dict(pickle.load(fid))
-        else:
-            ltest = xline.Line.from_json(path)
+        # Load machine 
+        with open(path, 'r') as fid:
+            ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
         print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = xline.Line.from_sixinput(sixinput_test)
+        ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
@@ -135,13 +134,16 @@ for tt in tests:
     ):
         assert type(ee_test) == type(ee_six)
 
-        dtest = ee_test.to_dict(keepextra=True)
-        dref = ee_six.to_dict(keepextra=True)
+        dtest = ee_test.to_dict()
+        dref = ee_six.to_dict()
 
         for kk in dtest.keys():
 
             # Check if they are identical
             if np.isscalar(dref[kk]) and dtest[kk] == dref[kk]:
+                continue
+
+            if isinstance(dref[kk], dict):
                 continue
 
             # Check if the relative error is small
@@ -172,9 +174,7 @@ for tt in tests:
                 continue
 
             # Exception: drift length (100 um tolerance)
-            if not(strict) and isinstance(
-                ee_test, (xline.elements.Drift, xline.elements.DriftExact)
-            ):
+            if not(strict) and isinstance(ee_test, xt.Drift):
                 if kk == "length":
                     if diff_abs < 1e-4:
                         continue
