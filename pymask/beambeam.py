@@ -614,24 +614,16 @@ def find_bb_separations(points_weak, points_strong, names=None):
 
     return sep_x, sep_y
 
-
-
-
-
-
-
-
-
 def setup_beam_beam_in_line(
     line,
     bb_df,
     bb_coupling=False,
 ):
-    import xline
+    import xfields as xf
     assert bb_coupling is False  # Not implemented
 
-    for ee, eename in zip(line.elements, line.element_names):
-        if isinstance(ee, xline.elements.BeamBeam4D):
+    for ii, (ee, eename) in enumerate(zip(line.elements, line.element_names)):
+        if isinstance(ee, xf.BeamBeamBiGaussian2D):
             ee.charge = (bb_df.loc[eename, 'other_num_particles']
                         * bb_df.loc[eename, 'other_particle_charge']) # TODO update xline interface to separate charge and b. population
             ee.sigma_x = np.sqrt(bb_df.loc[eename, 'other_Sigma_11'])
@@ -640,31 +632,50 @@ def setup_beam_beam_in_line(
             ee.x_bb = bb_df.loc[eename, 'separation_x']
             ee.y_bb = bb_df.loc[eename, 'separation_y']
 
-        if isinstance(ee, xline.elements.BeamBeam6D):
-
-            ee.phi = bb_df.loc[eename, 'phi']
-            ee.alpha = bb_df.loc[eename, 'alpha']
-            ee.x_bb_co = bb_df.loc[eename, 'separation_x']
-            ee.y_bb_co = bb_df.loc[eename, 'separation_y']
-            ee.charge_slices = [(bb_df.loc[eename, 'other_num_particles']
-                                 * bb_df.loc[eename, 'other_particle_charge'])] # TODO update xline interface to separate charge and b. population
-            ee.zeta_slices = [0.0]
-            ee.sigma_11 = bb_df.loc[eename, 'other_Sigma_11']
-            ee.sigma_12 = bb_df.loc[eename, 'other_Sigma_12']
-            ee.sigma_13 = bb_df.loc[eename, 'other_Sigma_13']
-            ee.sigma_14 = bb_df.loc[eename, 'other_Sigma_14']
-            ee.sigma_22 = bb_df.loc[eename, 'other_Sigma_22']
-            ee.sigma_23 = bb_df.loc[eename, 'other_Sigma_23']
-            ee.sigma_24 = bb_df.loc[eename, 'other_Sigma_24']
-            ee.sigma_33 = bb_df.loc[eename, 'other_Sigma_33']
-            ee.sigma_34 = bb_df.loc[eename, 'other_Sigma_34']
-            ee.sigma_44 = bb_df.loc[eename, 'other_Sigma_44']
+        if isinstance(ee, xf.BeamBeamBiGaussian3D):
+            params = {}
+            params['phi'] = bb_df.loc[eename, 'phi']
+            params['alpha'] =  bb_df.loc[eename, 'alpha']
+            params['x_bb_co'] =  bb_df.loc[eename, 'separation_x']
+            params['y_bb_co'] =  bb_df.loc[eename, 'separation_y']
+            # TODO update xline interface to separate charge and b. population
+            params['charge_slices'] =  [(bb_df.loc[eename, 'other_num_particles']
+                                 * bb_df.loc[eename, 'other_particle_charge'])]
+            params['zeta_slices'] =  [0.0]
+            params['sigma_11'] =  bb_df.loc[eename, 'other_Sigma_11']
+            params['sigma_12'] =  bb_df.loc[eename, 'other_Sigma_12']
+            params['sigma_13'] =  bb_df.loc[eename, 'other_Sigma_13']
+            params['sigma_14'] =  bb_df.loc[eename, 'other_Sigma_14']
+            params['sigma_22'] =  bb_df.loc[eename, 'other_Sigma_22']
+            params['sigma_23'] =  bb_df.loc[eename, 'other_Sigma_23']
+            params['sigma_24'] =  bb_df.loc[eename, 'other_Sigma_24']
+            params['sigma_33'] =  bb_df.loc[eename, 'other_Sigma_33']
+            params['sigma_34'] =  bb_df.loc[eename, 'other_Sigma_34']
+            params['sigma_44'] =  bb_df.loc[eename, 'other_Sigma_44']
 
             if not (bb_coupling):
-                ee.sigma_13 = 0.0
-                ee.sigma_14 = 0.0
-                ee.sigma_23 = 0.0
-                ee.sigma_24 = 0.0
+                params['sigma_13'] =  0.0
+                params['sigma_14'] =  0.0
+                params['sigma_23'] =  0.0
+                params['sigma_24'] =  0.0
+
+            params["x_co"] = 0
+            params["px_co"] = 0
+            params["y_co"] = 0
+            params["py_co"] = 0
+            params["zeta_co"] = 0
+            params["delta_co"] = 0
+            params["d_x"] = 0
+            params["d_px"] = 0
+            params["d_y"] = 0
+            params["d_py"] = 0
+            params["d_zeta"] = 0
+            params["d_delta"] = 0
+
+            newee = xf.BeamBeamBiGaussian3D(old_interface=params)
+            line[ii] = newee
+
+
 
 
 def crabbing_strong_beam(mad, bb_dfs, z_crab_twiss,
@@ -871,8 +882,7 @@ def find_bb_xma_yma(points_weak, points_strong, names=None):
 
         # Find as the position of the strong in the lab frame (points_strong[i_bb].p) 
         # the reference frame of the weak in the lab frame (points_weak[i_bb].sp) 
-        vbb_ws = points_strong[i_bb].p - points_weak[i_bb].sp        
-
+        vbb_ws = points_strong[i_bb].p - points_weak[i_bb].sp
         # Find separations
         xma.append(np.dot(vbb_ws, pbw.ex))
         yma.append(np.dot(vbb_ws, pbw.ey))
@@ -880,7 +890,7 @@ def find_bb_xma_yma(points_weak, points_strong, names=None):
     return xma, yma
 
 def compute_xma_yma(bb_df):
-    
+
     xma, yma = find_bb_xma_yma(
         points_weak=bb_df['self_lab_position'].values,
         points_strong=bb_df['other_lab_position'].values,
