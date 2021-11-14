@@ -406,8 +406,8 @@ def generate_xsuite_line(mad, seq_name, bb_df,
         optics_and_co_at_start_ring_from_madx,
         folder_name=None, skip_mad_use=False,
         prepare_line_for_xtrack=True,
-        steps_for_finite_diffs={'dx': 1e-9, 'dpx': 1e-12,
-            'dy': 1e-9, 'dpy': 1e-12, 'dzeta': 1e-9, 'ddelta': 1e-9}):
+        steps_for_finite_diffs={'dx': 1e-8, 'dpx': 1e-11,
+            'dy': 1e-8, 'dpy': 1e-11, 'dzeta': 1e-7, 'ddelta': 1e-8}):
 
     # Build xsuite model
     print('Start building xtrack line...')
@@ -461,9 +461,20 @@ def generate_xsuite_line(mad, seq_name, bb_df,
         xf.configure_orbit_dependent_parameters_for_bb(tracker,
                            particle_on_co=particle_on_tracker_co)
 
+        # Disable beam-beam
+        for ee in tracker.line.elements:
+            if ee.__class__.__name__.startswith('BeamBeam'):
+                 ee._temp_q0 = ee.q0
+                 ee.q0 = 0
+
         RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
                 particle_on_tracker_co,
                 **steps_for_finite_diffs)
+
+        # Re-enable beam-beam
+        for ee in tracker.line.elements:
+            if ee.__class__.__name__.startswith('BeamBeam'):
+                 ee.q0 = ee._temp_q0
 
         (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
                 ) = xp.compute_linear_normal_form(RR_finite_diffs)
