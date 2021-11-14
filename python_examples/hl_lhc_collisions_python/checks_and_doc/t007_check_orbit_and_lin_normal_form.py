@@ -2,18 +2,18 @@ import json
 
 import numpy as np
 
-import xline as xl
 import xtrack as xt
+import xpart as xp
 
-with open('../xlines/line_bb_for_tracking.json', 'r') as fid:
+with open('../xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     line_dict = json.load(fid)
 
-line = xl.Line.from_dict(line_dict)
+line = xt.Line.from_dict(line_dict)
 
-partCO = xl.Particles.from_dict(line_dict['particle_on_tracker_co'])
+partCO = xp.Particles.from_dict(line_dict['particle_on_tracker_co'])
 
-tracker = xt.Tracker(sequence=line)
-particles = xt.Particles(**partCO.to_dict())
+tracker = xt.Tracker(line=line)
+particles = xp.Particles(**partCO.to_dict())
 
 for _ in range(10):
     print(particles.at_turn[0], particles.x[0], particles.y[0],

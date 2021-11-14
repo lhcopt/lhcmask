@@ -146,7 +146,12 @@ for tt in tests:
                 continue
 
             if isinstance(dref[kk], dict):
-                continue
+                if kk=='fieldmap':
+                    continue
+                if kk=='boost_parameters':
+                    continue
+                if kk=='Sigmas_0_star':
+                    continue
 
             # Check if the relative error is small
             val_test = dtest[kk]
