@@ -194,7 +194,7 @@ elif enable_bb_legacy or mode=='b4_without_bb':
         print('Leveling not working in this mode!')
     else:
         if particle_type == 'ion': # the legacy macro for BB have been checked but not maintained
-            raise ValueError 
+            raise ValueError
         # Luminosity levelling
         vars_for_legacy_level = ['lumi_ip8',
             'nco_IP1', 'nco_IP2', 'nco_IP5', 'nco_IP8']
@@ -523,16 +523,15 @@ optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
 with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
     json.dump(optics_and_co_at_start_ring_from_madx, fid, cls=pm.JEncoder)
 
-##################
-# Generate xline #
-##################
-
+########################
+# Generate xtrack line #
+########################
 if enable_bb_legacy:
-    print('xline is not generated with bb legacy macros')
+    print('xtrack line is not generated with bb legacy macros')
 else:
-    pm.generate_xline(mad_track, sequence_to_track, bb_df_track,
+    pm.generate_xsuite_line(mad_track, sequence_to_track, bb_df_track,
                     optics_and_co_at_start_ring_from_madx,
-                    folder_name = './xlines',
+                    folder_name = './xsuite_lines',
                     skip_mad_use=True,
                     prepare_line_for_xtrack=True)
 
