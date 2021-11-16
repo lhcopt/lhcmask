@@ -25,7 +25,7 @@ WWinv = np.array(line_dict['WWInv_finite_diffs'])
 assert np.max(np.abs(np.dot(WW, WWinv) - np.eye(6)))<1e-10
 
 
-ampl_sigmas = 1.
+ampl_sigmas = 0.2
 norm_emit_x = 2.5e-6
 geom_emit_x = norm_emit_x / particles.beta0 / particles.gamma0
 
@@ -37,14 +37,13 @@ px_norm = ampl_sigmas * np.sqrt(geom_emit_x) * np.sin(theta)
 particles_matched  = xp.build_particles(particle_ref=partCO,
                                         x_norm=x_norm, px_norm=px_norm,
                                         R_matrix=np.array(line_dict['RR_finite_diffs']))
+particles = particles_matched.copy()
+tracker.track(particles_matched, num_turns=10)
 
 import matplotlib.pyplot as plt
 plt.close('all')
 plt.figure(1)
 plt.plot(particles_matched.x, particles_matched.px)
-
-tracker.track(particles_matched, num_turns=10)
-
-plt.plot(particles_matched.x, particles_matched.px)
+plt.plot(particles.x, particles.px)
 
 plt.show()
