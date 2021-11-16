@@ -449,6 +449,7 @@ def generate_xsuite_line(mad, seq_name, bb_df,
             **optics_and_co_at_start_ring_from_madx['particle_on_madx_co']))
         _restore_beam_beam(tracker.line)
 
+        import pdb; pdb.set_trace()
         xf.configure_orbit_dependent_parameters_for_bb(tracker,
                            particle_on_co=particle_on_tracker_co)
 

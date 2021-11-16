@@ -22,7 +22,6 @@ for _ in range(10):
 
 WW = np.array(line_dict['WW_finite_diffs'])
 WWinv = np.array(line_dict['WWInv_finite_diffs'])
-
 assert np.max(np.abs(np.dot(WW, WWinv) - np.eye(6)))<1e-10
 
 
@@ -35,24 +34,9 @@ theta = np.linspace(0, 2*np.pi, n_part)
 x_norm = ampl_sigmas * np.sqrt(geom_emit_x) * np.cos(theta)
 px_norm = ampl_sigmas * np.sqrt(geom_emit_x) * np.sin(theta)
 
-XX_norm= np.array([x_norm,
-                   px_norm,
-                   np.zeros(n_part),
-                   np.zeros(n_part),
-                   np.zeros(n_part),
-                   np.zeros(n_part)])
-
-XX = np.dot(WW, XX_norm)
-pp = partCO.copy()
-
-pp.x += XX[0, :]
-pp.px += XX[1, :]
-pp.y += XX[2, :]
-pp.py += XX[3, :]
-pp.zeta += XX[4, :]
-pp.delta += XX[5, :]
-particles_matched = xt.Particles(**pp.to_dict())
-
+particles_matched  = xp.build_particles(particle_ref=partCO,
+                                        x_norm=x_norm, px_norm=px_norm,
+                                        R_matrix=np.array(line_dict['RR_finite_diffs']))
 
 import matplotlib.pyplot as plt
 plt.close('all')

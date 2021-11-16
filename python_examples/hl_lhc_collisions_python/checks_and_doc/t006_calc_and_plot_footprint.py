@@ -5,8 +5,9 @@ import helpers as hp
 import footprint
 import matplotlib.pyplot as plt
 
-import xline
 import sixtracktools
+import xtrack as xt
+import xpart as xp
 
 track_with = 'xtrack'
 #track_with = 'sixtrack'
@@ -23,22 +24,22 @@ def prepare_line(path, input_type):
 
     if input_type == 'xline':
         # Load xline machine 
-        ltest = xline.Line.from_json(path)
+        ltest = xt.Line.from_json(path)
     elif input_type == 'sixtrack':
         print('Build xline from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = xline.Line.from_sixinput(sixinput_test)
+        ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
 
     return ltest
 
-line = prepare_line('../xlines/line_bb_for_tracking.json', input_type='xline')
+line = prepare_line('../xsuite_lines/line_bb_for_tracking.json', input_type='xline')
 
 
-with open('../xlines/line_bb_for_tracking.json', 'r') as fid:
-    partCO = xline.Particles.from_dict(
+with open('../xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
+    partCO = xp.Particles.from_dict(
             json.load(fid)['particle_on_tracker_co'])
 
 with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
