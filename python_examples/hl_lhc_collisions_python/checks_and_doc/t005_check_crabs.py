@@ -49,16 +49,16 @@ path_test = '../'
 type_test = 'sixtrack'
 
 #path_test = '../xsuite_lines/line_bb_dipole_not_cancelled.json'
-#type_test = 'xline'
+#type_test = 'xsuite'
 
 def prepare_line(path, input_type):
 
-    if input_type == 'xline':
-        # Load xline machine 
+    if input_type == 'xsuite':
+        # Load xsuite machine 
         with open(path, 'r') as fid:
             ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
-        print('Build xline from sixtrack input:')
+        print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
         ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
@@ -106,7 +106,7 @@ R1_orbit = phi_weak * s_rel
 
 axcrab.plot(s_rel, np.array(
     [getattr(bb, f'delta_{plane}') for bb in bb_elems])+R1_orbit,
-    'o', color = 'r', alpha=.5, label='strong pyst')
+    'o', color = 'r', alpha=.5, label='strong xsuite')
 plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula')
 
 #axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems]), 'o', color='r', alpha=.5)
@@ -180,7 +180,7 @@ r_lenses = []
 for ibb, bb in enumerate(bb_elems):
     r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
 
-axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak xline')
+axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak xsuite')
 Rw_crab = phi_c_weak * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
 Rw_no_crab = phi_weak * s_rel
 axcrab.plot(s_rel, Rw_crab + Rw_no_crab, '*', color='darkblue',

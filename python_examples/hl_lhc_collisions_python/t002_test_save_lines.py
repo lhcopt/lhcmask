@@ -5,7 +5,6 @@ import json
 
 import numpy as np
 
-import xline as xl
 import xtrack as xt
 from scipy.optimize import fsolve
 
@@ -33,8 +32,8 @@ bb_df_track = pd.read_pickle('./bb_df_track.pkl')
 with open('./optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
     optics_and_co_at_start_ring_from_madx = json.load(fid)
 
-pm.generate_xline(mad, seq_name, bb_df_track,
+pm.generate_xsuite_line(mad, seq_name, bb_df_track,
                     optics_and_co_at_start_ring_from_madx,
-                    folder_name = 'xlines',
+                    folder_name = 'xsuite_lines',
                     skip_mad_use=False, prepare_line_for_xtrack=True)
 

@@ -17,9 +17,6 @@ num_turns = 5
 with open('../xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     dict_line_xtrack = json.load(fid)
 
-#with open('../xline/line_bb_dipole_cancelled.json', 'r') as fid:
-#    dict_line_old = json.load(fid)
-
 line = xt.Line.from_dict(dict_line_xtrack)
 
 partCO = xp.Particles.from_dict(dict_line_xtrack['particle_on_tracker_co'])

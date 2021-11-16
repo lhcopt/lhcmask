@@ -24,9 +24,9 @@ tests = [
         'strict': False,
     },
     {
-        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
+        'test_name': 'B1 - pymask xsuite vs pymask sixtrack input',
         'path_test': '../xsuite_lines/line_bb_dipole_not_cancelled.json',
-        'type_test': 'xline',
+        'type_test': 'xsuite',
         'path_ref': '../',
         'type_ref': 'sixtrack',
         'rtol': 4e-7,
@@ -48,9 +48,9 @@ tests = [
 #         'strict': False,
 #     },
 #     {
-#         'test_name': 'B4 - pymask xline vs pymask sixtrack input',
-#         'path_test': '../xline/line_bb_dipole_not_cancelled.json',
-#         'type_test': 'xline',
+#         'test_name': 'B4 - pymask xsuite vs pymask sixtrack input',
+#         'path_test': '../xsuite/line_bb_dipole_not_cancelled.json',
+#         'type_test': 'xsuite',
 #         'path_ref': '../',
 #         'type_ref': 'sixtrack',
 #         'rtol': 4e-7,
@@ -64,12 +64,12 @@ def norm(x):
 
 def prepare_line(path, input_type):
 
-    if input_type == 'xline':
+    if input_type == 'xsuite':
         # Load machine 
         with open(path, 'r') as fid:
             ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
-        print('Build xline from sixtrack input:')
+        print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
         ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')

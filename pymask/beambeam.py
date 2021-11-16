@@ -637,7 +637,7 @@ def setup_beam_beam_in_line(
             params['alpha'] =  bb_df.loc[eename, 'alpha']
             params['x_bb_co'] =  bb_df.loc[eename, 'separation_x']
             params['y_bb_co'] =  bb_df.loc[eename, 'separation_y']
-            # TODO update xline interface to separate charge and b. population
+            # TODO update xtrack interface to separate charge and b. population
             params['charge_slices'] =  [(bb_df.loc[eename, 'other_num_particles']
                                  * bb_df.loc[eename, 'other_particle_charge'])]
             params['zeta_slices'] =  [0.0]

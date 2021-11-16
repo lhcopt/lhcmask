@@ -1,6 +1,5 @@
 import sys
 import numpy as np
-import xline as xl
 import xtrack as xt
 
 sys.path.append('./modules')

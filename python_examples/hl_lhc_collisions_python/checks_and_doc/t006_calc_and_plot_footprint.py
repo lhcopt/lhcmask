@@ -22,12 +22,12 @@ n_turns = 100
 
 def prepare_line(path, input_type):
 
-    if input_type == 'xline':
-        # Load xline machine 
+    if input_type == 'xsuite':
+        # Load xsuite machine 
         with open(path, 'r') as fid:
             ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
-        print('Build xline from sixtrack input:')
+        print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
         ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
@@ -36,7 +36,7 @@ def prepare_line(path, input_type):
 
     return ltest
 
-line = prepare_line('../xsuite_lines/line_bb_for_tracking.json', input_type='xline')
+line = prepare_line('../xsuite_lines/line_bb_for_tracking.json', input_type='xsuite')
 
 
 with open('../xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
