@@ -4,13 +4,11 @@ import json
 
 import numpy as np
 
-import xline as xl
 import xtrack as xt
+import xpart as xp
+import xfields as xf
 
 from . import beambeam as bb
-from .linear_normal_form import find_closed_orbit_from_tracker
-from .linear_normal_form import compute_R_matrix_finite_differences
-from .linear_normal_form import compute_linear_normal_form
 
 class JEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -210,7 +208,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
         ibbc_sixtrack,
         radius_sixtrack_multip_conversion_mad,
         skip_mad_use=False):
-   
+
     six_fol_name = output_folder
     os.makedirs(six_fol_name, exist_ok=True)
 
@@ -368,7 +366,7 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
     mad_beam =  mad.sequence[seq_name].beam
     assert mad_beam.deltap == 0, "Not implemented."
 
-    particle_on_madx_co = xl.Particles(
+    particle_on_madx_co = xp.Particles(
         p0c = mad_beam.pc*1e9,
         q0 = mad_beam.charge,
         mass0 = mad_beam.mass*1e9,
@@ -404,95 +402,24 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
 
 
 
-
-def _set_orbit_dependent_parameters_for_bb(line, tracker, particle_on_co):
-
-    temp_particles = xt.Particles(**particle_on_co.to_dict())
-    for ii, ee in enumerate(tracker.line.elements):
-        if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
-              px_0 = temp_particles.px[0]
-              py_0 = temp_particles.py[0]
-              ee.q0 = ee._temp_q0
-
-              # Separation of 4D is so far set w.r.t. the closes orbit
-              # (to be able to compare against sixtrack)
-              # Here we set the righe quantities (coordinates of the strong beam)
-              ee.mean_x += temp_particles.x[0]
-              ee.mean_y += temp_particles.y[0]
-              line.elements[ii].x_bb = ee.mean_x
-              line.elements[ii].y_bb = ee.mean_y
-
-              ee.track(temp_particles)
-
-              ee.d_px = temp_particles.px - px_0
-              ee.d_py = temp_particles.py - py_0
-              line.elements[ii].d_px = ee.d_px
-              line.elements[ii].d_py = ee.d_py
-
-              temp_particles.px -= ee.d_px
-              temp_particles.py -= ee.d_py
-
-        elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
-            ee.q0 = ee._temp_q0
-            ee.x_CO = temp_particles.x[0]
-            ee.px_CO = temp_particles.px[0]
-            ee.y_CO = temp_particles.y[0]
-            ee.py_CO = temp_particles.py[0]
-            ee.sigma_CO = temp_particles.zeta[0]
-            ee.delta_CO = temp_particles.delta[0]
-
-            ee.track(temp_particles)
-
-            ee.Dx_sub = temp_particles.x[0] - ee.x_CO
-            ee.Dpx_sub = temp_particles.px[0] - ee.px_CO
-            ee.Dy_sub = temp_particles.y[0] - ee.y_CO
-            ee.Dpy_sub = temp_particles.py[0] - ee.py_CO
-            ee.Dsigma_sub = temp_particles.zeta[0] - ee.sigma_CO
-            ee.Ddelta_sub = temp_particles.delta[0] - ee.delta_CO
-
-            temp_particles.x[0] = ee.x_CO
-            temp_particles.px[0] = ee.px_CO
-            temp_particles.y[0] = ee.y_CO
-            temp_particles.py[0] = ee.py_CO
-            temp_particles.zeta[0] = ee.sigma_CO
-            temp_particles.delta[0] = ee.delta_CO
-
-            line.elements[ii].x_co = ee.x_CO
-            line.elements[ii].px_co = ee.px_CO
-            line.elements[ii].y_co = ee.y_CO
-            line.elements[ii].py_co = ee.py_CO
-            line.elements[ii].zeta_co = ee.sigma_CO
-            line.elements[ii].delta_co = ee.delta_CO
-
-            line.elements[ii].d_x = ee.Dx_sub
-            line.elements[ii].d_px = ee.Dpx_sub
-            line.elements[ii].d_y = ee.Dy_sub
-            line.elements[ii].d_py = ee.Dpy_sub
-            line.elements[ii].d_zeta = ee.Dsigma_sub
-            line.elements[ii].d_delta = ee.Ddelta_sub
-        else:
-            ee.track(temp_particles)
-
-
-def generate_xline(mad, seq_name, bb_df,
+def generate_xsuite_line(mad, seq_name, bb_df,
         optics_and_co_at_start_ring_from_madx,
         folder_name=None, skip_mad_use=False,
         prepare_line_for_xtrack=True,
-        steps_for_finite_diffs={'dx': 1e-9, 'dpx': 1e-12,
-            'dy': 1e-9, 'dpy': 1e-12, 'dzeta': 1e-9, 'ddelta': 1e-9}):
+        steps_for_finite_diffs={'dx': 1e-8, 'dpx': 1e-11,
+            'dy': 1e-8, 'dpy': 1e-11, 'dzeta': 1e-7, 'ddelta': 1e-8}):
 
-    # Build xline model
-    print('Start building xline...')
-    line = xl.Line.from_madx_sequence(
+    # Build xsuite model
+    print('Start building xtrack line...')
+    line = xt.Line.from_madx_sequence(
         mad.sequence[seq_name], apply_madx_errors=True)
-    print('Done building xline.')
+    print('Done building xtrack.')
 
     if bb_df is not None:
         bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
 
     # Temporary fix due to bug in mad loader
-    cavities, cav_names = line.get_elements_of_type(
-            xl.elements.Cavity)
+    cavities, cav_names = line.get_elements_of_type(xt.Cavity)
     for cc, nn in zip(cavities, cav_names):
         if cc.frequency ==0.:
             ii_mad = mad.sequence[seq_name].element_names().index(nn)
@@ -500,7 +427,7 @@ def generate_xline(mad, seq_name, bb_df,
             f0_mad = mad.sequence[seq_name].beam.freq0 * 1e6 # mad has it in MHz
             cc.frequency = f0_mad*cc_mad.parent.harmon
 
-    line_bb_dipole_not_cancelled_dict = line.to_dict(keepextra=True)
+    line_bb_dipole_not_cancelled_dict = line.to_dict()
     line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
             optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
     line_bb_dipole_not_cancelled_dict['RR_madx'] = (
@@ -514,29 +441,28 @@ def generate_xline(mad, seq_name, bb_df,
             json.dump(line_bb_dipole_not_cancelled_dict, fid, cls=JEncoder)
 
     if prepare_line_for_xtrack:
-        tracker = xt.Tracker(sequence=line)
+        tracker = xt.Tracker(line=line)
 
-        # Disable beam-beam
-        for ee in tracker.line.elements:
-            if ee.__class__.__name__.startswith('BeamBeam'):
-                 ee._temp_q0 = ee.q0
-                 ee.q0 = 0
+        _disable_beam_beam(tracker.line)
+        particle_on_tracker_co = tracker.find_closed_orbit(
+            particle_co_guess=xp.Particles(
+            **optics_and_co_at_start_ring_from_madx['particle_on_madx_co']))
+        _restore_beam_beam(tracker.line)
 
-        particle_on_tracker_co = find_closed_orbit_from_tracker(tracker,
-                optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+        xf.configure_orbit_dependent_parameters_for_bb(tracker,
+                           particle_on_co=particle_on_tracker_co)
 
-        RR_finite_diffs = compute_R_matrix_finite_differences(
-                particle_on_tracker_co, tracker, symplectify=True,
+        _disable_beam_beam(tracker.line)
+        RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
+                particle_on_tracker_co,
                 **steps_for_finite_diffs)
+        _restore_beam_beam(tracker.line)
+
 
         (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
-                ) = compute_linear_normal_form(RR_finite_diffs)
+                ) = xp.compute_linear_normal_form(RR_finite_diffs)
 
-        # (Re-activates bb in line and tracker)
-        _set_orbit_dependent_parameters_for_bb(line, tracker,
-                                              particle_on_tracker_co)
-
-        line_bb_for_tracking_dict = line.to_dict(keepextra=True)
+        line_bb_for_tracking_dict = line.to_dict()
         line_bb_for_tracking_dict['particle_on_tracker_co'] = (
                                          particle_on_tracker_co.to_dict())
         line_bb_for_tracking_dict['RR_finite_diffs'] = RR_finite_diffs
@@ -562,3 +488,56 @@ def save_mad_sequence_and_error(mad, seq_name, filename='lhc'):
     mad.select(flag="error",full=True)
     mad.esave(file=filename + "_errors_all.tfs")
     mad.save(sequence=seq_name,beam=True,file=filename + "_seq.madx")
+
+
+def _disable_beam_beam(line):
+    for ee in line.elements:
+        if ee.__class__.__name__.startswith('BeamBeam'):
+            ee._temp_q0 = ee.q0
+            ee.q0 = 0
+            if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+                ee._temp_d_px = ee.d_px
+                ee._temp_d_py = ee.d_py
+                ee.d_px = 0.
+                ee.d_py = 0.
+            elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+                ee._temp_Dx_sub = ee.Dx_sub
+                ee._temp_Dpx_sub = ee.Dpx_sub
+                ee._temp_Dy_sub = ee.Dy_sub
+                ee._temp_Dpy_sub = ee.Dpy_sub
+                ee._temp_Dsigma_sub = ee.Dsigma_sub
+                ee._temp_Ddelta_sub = ee.Ddelta_sub
+                ee.Dx_sub = 0.
+                ee.Dpx_sub = 0.
+                ee.Dy_sub = 0.
+                ee.Dpy_sub = 0.
+                ee.Dsigma_sub = 0.
+                ee.Ddelta_sub = 0.
+            else:
+                raise ValueError('What?!')
+
+def _restore_beam_beam(line):
+    for ee in line.elements:
+        if ee.__class__.__name__.startswith('BeamBeam'):
+            ee.q0 = ee._temp_q0
+            del(ee._temp_q0)
+            if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+                ee.d_px = ee._temp_d_px
+                ee.d_py = ee._temp_d_py
+                del(ee._temp_d_px)
+                del(ee._temp_d_py)
+            elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+                ee.Dx_sub = ee._temp_Dx_sub
+                ee.Dpx_sub = ee._temp_Dpx_sub
+                ee.Dy_sub = ee._temp_Dy_sub
+                ee.Dpy_sub = ee._temp_Dpy_sub
+                ee.Dsigma_sub = ee._temp_Dsigma_sub
+                ee.Ddelta_sub = ee._temp_Ddelta_sub
+                del(ee._temp_Dx_sub)
+                del(ee._temp_Dpx_sub)
+                del(ee._temp_Dy_sub)
+                del(ee._temp_Dpy_sub)
+                del(ee._temp_Dsigma_sub)
+                del(ee._temp_Ddelta_sub)
+            else:
+                raise ValueError('What?!')

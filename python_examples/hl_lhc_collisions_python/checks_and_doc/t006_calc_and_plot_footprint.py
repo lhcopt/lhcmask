@@ -5,11 +5,12 @@ import helpers as hp
 import footprint
 import matplotlib.pyplot as plt
 
-import xline
 import sixtracktools
+import xtrack as xt
+import xpart as xp
 
 track_with = 'xtrack'
-#track_with = 'sixtrack'
+track_with = 'sixtrack'
 
 epsn_x = 2.5e-6
 epsn_y = 2.5e-6
@@ -21,24 +22,25 @@ n_turns = 100
 
 def prepare_line(path, input_type):
 
-    if input_type == 'xline':
-        # Load xline machine 
-        ltest = xline.Line.from_json(path)
+    if input_type == 'xsuite':
+        # Load xsuite machine 
+        with open(path, 'r') as fid:
+            ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
-        print('Build xline from sixtrack input:')
+        print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = xline.Line.from_sixinput(sixinput_test)
+        ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
 
     return ltest
 
-line = prepare_line('../xlines/line_bb_for_tracking.json', input_type='xline')
+line = prepare_line('../xsuite_lines/line_bb_for_tracking.json', input_type='xsuite')
 
 
-with open('../xlines/line_bb_for_tracking.json', 'r') as fid:
-    partCO = xline.Particles.from_dict(
+with open('../xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
+    partCO = xp.Particles.from_dict(
             json.load(fid)['particle_on_tracker_co'])
 
 with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
@@ -65,29 +67,18 @@ for ii in range(xy_norm.shape[0]):
         DpxDpy_wrt_CO[ii, jj, 1] = xy_norm[ii, jj, 1] * np.sqrt(epsn_y / part.beta0 / part.gamma0 / beta_y)
 
 
-if track_with == 'xline':
-
-    part = partCO.copy()
-
-    x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt, extra = hp.track_particle_xline(
-        line, part=part, Dx_wrt_CO_m=0., Dpx_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 0].flatten(),
-        Dy_wrt_CO_m=0, Dpy_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 1].flatten(),
-        Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns, verbose=True)
-
-    info = track_with
-
-elif track_with == 'sixtrack':
-    x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt, extra = hp.track_particle_sixtrack(
+if track_with == 'sixtrack':
+    x_tbt, px_tbt, y_tbt, py_tbt, zeta_tbt, delta_tbt, extra = hp.track_particle_sixtrack(
         partCO=partCO, Dx_wrt_CO_m=0., Dpx_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 0].flatten(),
         Dy_wrt_CO_m=0, Dpy_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 1].flatten(),
-        Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns,
+        Dzeta_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns,
         input_folder='../')
     info = track_with
 elif track_with == 'xtrack':
-    x_tbt, px_tbt, y_tbt, py_tbt, sigma_tbt, delta_tbt, extra = hp.track_particle_xtrack(
+    x_tbt, px_tbt, y_tbt, py_tbt, zeta_tbt, delta_tbt, extra = hp.track_particle_xtrack(
         line=line, partCO=partCO, Dx_wrt_CO_m=0., Dpx_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 0].flatten(),
         Dy_wrt_CO_m=0., Dpy_wrt_CO_rad=DpxDpy_wrt_CO[:, :, 1].flatten(),
-        Dsigma_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns)
+        Dzeta_wrt_CO_m=0., Ddelta_wrt_CO=0., n_turns=n_turns)
     info = track_with
 else:
     raise ValueError('What?!')

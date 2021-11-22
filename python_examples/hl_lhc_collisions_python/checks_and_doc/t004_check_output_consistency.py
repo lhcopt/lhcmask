@@ -1,10 +1,14 @@
 import time
 import shutil
 import pickle
+import json
 import numpy as np
 
-import xline
 import sixtracktools
+import xtrack as xt
+import xfields as xf
+
+
 
 
 # Tests b1 with bb
@@ -20,9 +24,9 @@ tests = [
         'strict': False,
     },
     {
-        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
-        'path_test': '../xlines/line_bb_dipole_not_cancelled.json',
-        'type_test': 'xline',
+        'test_name': 'B1 - pymask xsuite vs pymask sixtrack input',
+        'path_test': '../xsuite_lines/line_bb_dipole_not_cancelled.json',
+        'type_test': 'xsuite',
         'path_ref': '../',
         'type_ref': 'sixtrack',
         'rtol': 4e-7,
@@ -44,9 +48,9 @@ tests = [
 #         'strict': False,
 #     },
 #     {
-#         'test_name': 'B4 - pymask xline vs pymask sixtrack input',
-#         'path_test': '../xline/line_bb_dipole_not_cancelled.json',
-#         'type_test': 'xline',
+#         'test_name': 'B4 - pymask xsuite vs pymask sixtrack input',
+#         'path_test': '../xsuite/line_bb_dipole_not_cancelled.json',
+#         'type_test': 'xsuite',
 #         'path_ref': '../',
 #         'type_ref': 'sixtrack',
 #         'rtol': 4e-7,
@@ -60,17 +64,14 @@ def norm(x):
 
 def prepare_line(path, input_type):
 
-    if input_type == 'xline':
-        # Load xline machine 
-        if path.endswith('.pkl'):
-            with open(path, 'rb') as fid:
-                ltest = xline.Line.from_dict(pickle.load(fid))
-        else:
-            ltest = xline.Line.from_json(path)
+    if input_type == 'xsuite':
+        # Load machine 
+        with open(path, 'r') as fid:
+            ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
-        print('Build xline from sixtrack input:')
+        print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = xline.Line.from_sixinput(sixinput_test)
+        ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
@@ -135,14 +136,22 @@ for tt in tests:
     ):
         assert type(ee_test) == type(ee_six)
 
-        dtest = ee_test.to_dict(keepextra=True)
-        dref = ee_six.to_dict(keepextra=True)
+        dtest = ee_test.to_dict()
+        dref = ee_six.to_dict()
 
         for kk in dtest.keys():
 
             # Check if they are identical
             if np.isscalar(dref[kk]) and dtest[kk] == dref[kk]:
                 continue
+
+            if isinstance(dref[kk], dict):
+                if kk=='fieldmap':
+                    continue
+                if kk=='boost_parameters':
+                    continue
+                if kk=='Sigmas_0_star':
+                    continue
 
             # Check if the relative error is small
             val_test = dtest[kk]
@@ -172,26 +181,30 @@ for tt in tests:
                 continue
 
             # Exception: drift length (100 um tolerance)
-            if not(strict) and isinstance(
-                ee_test, (xline.elements.Drift, xline.elements.DriftExact)
-            ):
+            if not(strict) and isinstance(ee_test, xt.Drift):
                 if kk == "length":
                     if diff_abs < 1e-4:
                         continue
 
             # Exception: multipole lrad is not passed to sixtraxk
-            if isinstance(ee_test, xline.elements.Multipole):
+            if isinstance(ee_test, xt.Multipole):
                 if kk == "length":
                     if np.abs(ee_test.hxl) + np.abs(ee_test.hyl) == 0.0:
                         continue
-                if kk == 'knl' or kk == 'ksl':
+                if kk == "order":
+                    # Checked through bal
+                    continue
+                if kk == 'knl' or kk == 'ksl' or kk == 'bal':
                     if len(val_ref) != len(val_test):
                         lmin = min(len(val_ref), len(val_test))
                         for vv in [val_ref,val_test]:
                             if len(vv)> lmin:
-                                for oo in range(lmin, len(vv)): # we do not care about errors above 10
-                                    if vv[oo] != 0 and oo < 10:
-                                        raise ValueError('Missing significant multipole strength')
+                                for oo in range(lmin, len(vv)):
+                                    # we do not care about errors above 10
+                                    if vv[oo] != 0 and oo < {'knl':10,
+                                                         'ksl':10, 'bal':20}[kk]:
+                                        raise ValueError(
+                                            'Missing significant multipole strength')
 
                         val_ref = val_ref[:lmin]
                         val_test = val_test[:lmin]
@@ -226,7 +239,7 @@ for tt in tests:
                 continue
 
             # Exceptions BB4D (separations are recalculated)
-            if not(strict) and isinstance(ee_test, xline.elements.BeamBeam4D):
+            if not(strict) and isinstance(ee_test, xf.BeamBeamBiGaussian2D):
                 if kk == "x_bb":
                     if diff_abs / dtest["sigma_x"] < 0.01: # This is neede to accommodate different leveling routines (1% difference)
                         continue
@@ -239,16 +252,22 @@ for tt in tests:
                 if kk == "sigma_y":
                     if diff_rel < 1e-5:
                         continue
+            if isinstance(ee_test, xf.BeamBeamBiGaussian2D):
+                if kk == 'q0' or kk == 'n_particles':
+                    # ambiguity due to old interface
+                    if np.abs(ee_test.n_particles*ee_test.q0 -
+                            ee_six.n_particles*ee_six.q0 ) < 1.: # charges
+                        continue
 
             # Exceptions BB6D (angles and separations are recalculated)
-            if not(strict) and isinstance(ee_test, xline.elements.BeamBeam6D):
+            if not(strict) and isinstance(ee_test, xf.BeamBeamBiGaussian3D):
                 if kk == "alpha":
                     if diff_abs < 10e-6:
                         continue
-                if kk == "x_co" or kk == "x_bb_co":
+                if kk == "x_co" or kk == "x_bb_co" or kk == 'delta_x':
                     if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.015:
                         continue
-                if kk == "y_co" or kk == "y_bb_co":
+                if kk == "y_co" or kk == "y_bb_co" or kk == 'delta_y':
                     if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.015:
                         continue
                 if kk == "zeta_co":

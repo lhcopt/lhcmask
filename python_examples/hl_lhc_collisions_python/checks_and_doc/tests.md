@@ -52,7 +52,7 @@ We execute the reference (can be reused from the previous test):
  python ../../unmask.py main.mask parameters_for_unmask.txt --run-cpymad
 ```
 In the folder ```checks_and_doc```:
-Configure ```t004_compare_xline_lines.py``` for the test:
+Configure ```t004_check_output_consistency.py``` for the test:
 ```python
 # Test b1
 tests = [
@@ -67,9 +67,9 @@ tests = [
         'strict': False,
     },
     {
-        'test_name': 'B1 - pymask xline vs pymask sixtrack input',
-        'path_test': '../xline/line_bb_dipole_not_cancelled.json',
-        'type_test': 'xline',
+        'test_name': 'B1 - pymask xsuite vs pymask sixtrack input',
+        'path_test': '../xsuite/line_bb_dipole_not_cancelled.json',
+        'type_test': 'xsuite',
         'path_ref': '../',
         'type_ref': 'sixtrack',
         'rtol': 4e-7,
@@ -79,10 +79,10 @@ tests = [
 ]
 ```
 
-Check using xline lines:
+Check using xsuite lines:
 ```bash
 python t003_fc_to_fort.py
-python t004_compare_xlines.py.py
+python t004_check_output_consistency.py 
 ```
 
 **Check crab cavities:**
