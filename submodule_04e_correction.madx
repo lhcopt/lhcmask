@@ -17,7 +17,7 @@ call, file="modules/submodule_04e_s1_synthesize_knobs.madx";
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ! correction of triplet and D1 (only in collision, not compatible V6.503)
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if (NRJ>5000.0000){
+if (ver_hllhc_optics > 0 && NRJ>5000.0000){
   option, echo, warn, -info;
   select, flag=error, clear;
   select, flag=error, pattern=MQX,  class=multipole;
@@ -32,15 +32,6 @@ if (NRJ>5000.0000){
   esave,  file="temp/tripD1D2.errors";
   system, "errors/HL-LHC/corr_tripD1_v6";
   call,   file="temp/MCX_setting.mad";
-  !kcsx3.l1:=0 ;kcsx3.r1:=0 ;kcsx3.l5:=0 ;kcsx3.r5:=0 ; !switch off b3  correction in IR1 and IR5
-  !kcox3.l1:=0 ;kcox3.r1:=0 ;kcox3.l5:=0 ;kcox3.r5:=0 ; !switch off b4  correction in IR1 and IR5
-  !kcdx3.l1:=0 ;kcdx3.r1:=0 ;kcdx3.l5:=0 ;kcdx3.r5:=0 ; !switch off b5  correction in IR1 and IR5
-  !kctx3.l1:=0 ;kctx3.r1:=0 ;kctx3.l5:=0 ;kctx3.r5:=0 ; !switch off b6  correction in IR1 and IR5
-  !kqsx3.l1:=0 ;kqsx3.r1:=0 ;kqsx3.l5:=0 ;kqsx3.r5:=0 ; !switch off a2  correction in IR1 and IR5
-  !kcssx3.l1:=0;kcssx3.r1:=0;kcssx3.l5:=0;kcssx3.r5:=0; !switch off a3  correction in IR1 and IR5
-  !kcosx3.l1:=0;kcosx3.r1:=0;kcosx3.l5:=0;kcosx3.r5:=0; !switch off a4  correction in IR1 and IR5
-  !kcdsx3.l1:=0;kcdsx3.r1:=0;kcdsx3.l5:=0;kcdsx3.r5:=0; !switch off a5  correction in IR1 and IR5
-  !kctsx3.l1:=0;kctsx3.r1:=0;kctsx3.l5:=0;kctsx3.r5:=0; !switch off a6  correction in IR1 and IR5
 
   kcsx3.l2 :=0;kcsx3.r2 :=0;kcsx3.l8 :=0;kcsx3.r8 :=0; !switch off b3  correction in IR2 and IR8
   kcox3.l2 :=0;kcox3.r2 :=0;kcox3.l8 :=0;kcox3.r8 :=0; !switch off b4  correction in IR2 and IR8
@@ -49,15 +40,23 @@ if (NRJ>5000.0000){
   kcssx3.l2:=0;kcssx3.r2:=0;kcssx3.l8:=0;kcssx3.r8:=0; !switch off a3  correction in IR2 and IR8
   kcosx3.l2:=0;kcosx3.r2:=0;kcosx3.l8:=0;kcosx3.r8:=0; !switch off a4  correction in IR2 and IR8
 
-  option, -echo; !exec, reset_MQX_corr;                             !switch off all IT multipole correction in all IR's
+  option, -echo;
 };
 
-if (correct_for_D2==1){
-  ! Remove the average errors and assign the real errors of D2
-  use_average_errors_MBRD=0;
-  call, file="errors/HL-LHC/D2_errortable_v5";
-  eoption,add=false;
-  eoption,seed=myseed+103;
-  call, file="errors/HL-LHC/Efcomp_MBRD.madx";
-  eoption,add=true;
+! If the (averages of the) D2 errors were corrected: remove the average errors and assign the real errors of D2
+if (ver_hllhc_optics > 0 && correct_for_D2==1){
+  if (on_errors_D2==1){
+    use_average_errors_MBRD=0;
+    call, file="errors/HL-LHC/D2_errortable_v5";
+    eoption,add=false;
+    eoption,seed=myseed+103;
+    call, file="errors/HL-LHC/Efcomp_MBRD.madx";
+    eoption,add=true;
+  };
 };
+
+! Add errors for the corrector magnets
+if (ver_hllhc_optics > 0 && on_errors_NLC==1){
+  eoption,seed=myseed+200;call, file="errors/HL-LHC/Efcomp_NLC.madx";
+};
+

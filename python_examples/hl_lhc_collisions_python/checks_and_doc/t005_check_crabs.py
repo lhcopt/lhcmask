@@ -1,8 +1,10 @@
 import shutil
-import pickle
 import numpy as np
+import json
 
-import pysixtrack
+import xtrack as xt
+import xpart as xp
+import xfields as xf
 import sixtracktools
 
 L_lhc = 27e3
@@ -46,16 +48,19 @@ phi_c_strong = -phi_c_weak
 path_test = '../'
 type_test = 'sixtrack'
 
+#path_test = '../xsuite_lines/line_bb_dipole_not_cancelled.json'
+#type_test = 'xsuite'
+
 def prepare_line(path, input_type):
 
-    if input_type == 'pysixtrack':
-        # Load pysixtrack machine 
-        with open(path, "rb") as fid:
-            ltest = pysixtrack.Line.from_dict(pickle.load(fid))
+    if input_type == 'xsuite':
+        # Load xsuite machine 
+        with open(path, 'r') as fid:
+            ltest = xt.Line.from_dict(json.load(fid))
     elif input_type == 'sixtrack':
-        print('Build pysixtrack from sixtrack input:')
+        print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = pysixtrack.Line.from_sixinput(sixinput_test)
+        ltest = xt.Line.from_sixinput(sixinput_test)
         print('Done')
     else:
         raise ValueError('What?!')
@@ -100,8 +105,8 @@ R_no_crab = phi_strong * s_rel
 R1_orbit = phi_weak * s_rel
 
 axcrab.plot(s_rel, np.array(
-    [getattr(bb, f'{plane}_bb_co') for bb in bb_elems])+R1_orbit,
-    'o', color = 'r', alpha=.5, label='strong pyst')
+    [getattr(bb, f'delta_{plane}') for bb in bb_elems])+R1_orbit,
+    'o', color = 'r', alpha=.5, label='strong xsuite')
 plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula')
 
 #axcrab.plot(s_rel, np.array([bb.y_bb_co for bb in bb_elems]), 'o', color='r', alpha=.5)
@@ -115,20 +120,15 @@ plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula'
 
 
 # Chek crabs in weak beam
-import pickle
-with open('../optics_orbit_at_start_ring.pkl', 'rb') as fid:
-    ddd = pickle.load(fid)
-
-ddd['p0c'] =  ddd['p0c_eV']
-
 
 # Switch off all beam-beam lenses
-bb_all, _ = ltest.get_elements_of_type([pysixtrack.elements.BeamBeam4D,
-                                            pysixtrack.elements.BeamBeam6D])
-for bb in bb_all: bb.enabled = False
+bb_all, _ = ltest.get_elements_of_type([xf.BeamBeamBiGaussian2D,
+                                        xf.BeamBeamBiGaussian3D])
+for bb in bb_all:
+    bb.q0 = 0
 
 # # Switch off all beam-beam lenses
-crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole])
+crabs, crab_names = ltest.get_elements_of_type([xt.RFMultipole])
 #for cc in crabs:
 #    cc.pn = [-90]
 #    cc.ps = [-90]
@@ -136,19 +136,15 @@ crabs, crab_names = ltest.get_elements_of_type([pysixtrack.elements.RFMultipole]
 # for cc in crabs:
 #     cc.knl[0] *= -1
 
-partco = pysixtrack.Particles.from_dict(ddd)
+with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
+    ddd = json.load(fid)
+partco = xp.Particles.from_dict(ddd['particle_on_madx_co'])
 z_slices = s_rel * 2.0
-partco.zeta += z_slices
-partco.x += 0*z_slices
-partco.s += 0*z_slices
-partco.y += 0*z_slices
-partco.px += 0*z_slices
-partco.py += 0*z_slices
-partco.delta += 0*z_slices
+partco = xp.build_particles(particle_ref=partco, zeta=z_slices)
 
 
-list_co = ltest.track_elem_by_elem(partco)
-list_co2 = ltest.track_elem_by_elem(partco)
+list_co = ltest.slow_track_elem_by_elem(partco)
+list_co2 = ltest.slow_track_elem_by_elem(partco)
 
 plt.figure(2)
 axcox = plt.subplot(2,1,1)
@@ -184,7 +180,7 @@ r_lenses = []
 for ibb, bb in enumerate(bb_elems):
     r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
 
-axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak pysixtrack')
+axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak xsuite')
 Rw_crab = phi_c_weak * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
 Rw_no_crab = phi_weak * s_rel
 axcrab.plot(s_rel, Rw_crab + Rw_no_crab, '*', color='darkblue',
@@ -222,16 +218,17 @@ axcby = figcb.add_subplot(2,1,2, sharex=axcbx)
 axcbx.plot(s_twiss, x_twiss)
 axcby.plot(s_twiss, y_twiss)
 
-part = pysixtrack.Particles.from_dict(ddd)
+part = xp.Particles.from_dict(ddd['particle_on_madx_co'])
+
 z_test = np.array([0, z_crab_track])
-part.zeta += z_test
-part.x += 0*z_test + np.array([0, x_twiss[0]])
-part.s += 0*z_test
-part.y += 0*z_test + np.array([0, y_twiss[0]])
-part.px += 0*z_test + np.array([0, px_twiss[0]])
-part.py += 0*z_test + np.array([0, py_twiss[0]])
-part.delta += 0*z_test
-list_track = ltest.track_elem_by_elem(part)
+part = xp.build_particles(particle_ref=part,
+        zeta = z_test,
+        x = 0*z_test + np.array([0, x_twiss[0]]),
+        y = 0*z_test + np.array([0, y_twiss[0]]),
+        px = 0*z_test + np.array([0, px_twiss[0]]),
+        py = 0*z_test + np.array([0, py_twiss[0]]),
+        delta = 0*z_test)
+list_track = ltest.slow_track_elem_by_elem(part)
 
 axcbx.plot([pp.s[0] for pp in list_track],  [pp.x[1] - pp.x[0] for pp in list_track])
 axcby.plot([pp.s[0] for pp in list_track],  [pp.y[1] - pp.y[0] for pp in list_track])

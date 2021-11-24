@@ -26,6 +26,10 @@ class MadPoint(object):
         if use_survey:
             survey = mad.table.survey
             names = survey.name
+            # patch for this issue https://github.com/hibtc/cpymad/issues/91 
+            for ii, nn in enumerate(names):
+                if not nn.endswith(':1'):
+                    names[ii] = nn+':1'
 
         idx = np.where(names == name)[0][0]
 

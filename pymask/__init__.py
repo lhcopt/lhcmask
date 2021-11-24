@@ -1,4 +1,4 @@
-__version__ = "v0.3.1"
+__version__ = "v1.1.0"
 
 from .beambeam import *
 from .madpoint import *
@@ -7,3 +7,7 @@ from .pymasktools import *
 from .lumi import *
 from .coupling import *
 from .tunechroma import *
+
+from pathlib import Path
+_pkg_root = Path(__file__).parent.absolute()
+del(Path)

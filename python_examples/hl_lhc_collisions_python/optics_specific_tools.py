@@ -11,7 +11,7 @@ def build_sequence(mad, beam):
     mad.input(f'mylhcbeam = {beam}')
 
     # Make link to optics toolkit
-    pm.make_links({'optics_toolkit': '/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/toolkit'},
+    pm.make_links({'optics_toolkit': 'optics_repository/HLLHCV1.4/toolkit'},
         force=True)
 
     mad.input('''
@@ -21,20 +21,20 @@ def build_sequence(mad, beam):
         ver_hllhc_optics = 1.4;
 
         ! Get the toolkit
-        call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/toolkit/macro.madx";
+        call, file="optics_repository/HLLHCV1.4/toolkit/macro.madx";
 
 
         ! Build sequence
         option, -echo,-warn,-info;
         if (mylhcbeam==4){
-          call,file="/afs/cern.ch/eng/lhc/optics/runIII/lhcb4.seq";
+          call,file="optics_repository/runIII/lhcb4.seq";
         } else {
-          call,file="/afs/cern.ch/eng/lhc/optics/runIII/lhc.seq";
+          call,file="optics_repository/runIII/lhc.seq";
         };
         option, -echo, warn,-info;
 
         !Install HL-LHC
-        call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.4/hllhc_sequence.madx";
+        call, file="optics_repository/HLLHCV1.4/hllhc_sequence.madx";
 
 
         ! Slice nominal sequence
@@ -44,6 +44,7 @@ def build_sequence(mad, beam):
         call, file="errors/HL-LHC/install_MQXF_fringenl.madx";    ! adding fringe place holder
         call, file="errors/HL-LHC/install_MCBXFAB_errors.madx";   ! adding D1 corrector placeholders in IR1/5 (for errors)
         call, file="errors/HL-LHC/install_MCBRD_errors.madx";     ! adding D2 corrector placeholders in IR1/5 (for errors)
+        call, file="errors/HL-LHC/install_NLC_errors.madx";       ! adding non-linear corrector placeholders in IR1/5 (for errors)
 
         !Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
         if (mylhcbeam<3){

@@ -27,6 +27,6 @@ exec, align_mbrb;  ! V6.503 D4 in IR4
 if (ver_hllhc_optics > 0 && ver_hllhc_optics < 1.3) {
   call, file="tools/align_mbh_v1.madx"; ! align 11T dipoles
 };
-if (ver_lhc_run > 2 || ver_hllhc_optics > 1.2) {
+if (ver_hllhc_optics >= 1.3) {
   call, file="tools/align_mbh_v2.madx"; ! align 11T dipoles
 };

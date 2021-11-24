@@ -17,7 +17,7 @@ if (on_errors_LHC==1){
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !     correct orbit distortion resulting from MB magnets
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
+if(on_errors_LHC==1 && (ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0){
   exec,   initial_micado(4);
   exec,   initial_micado(4);
 };
@@ -37,66 +37,59 @@ if (on_errors_LHC==1){
 
 ! Quadrupoles
 if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQW.madx" ; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQTL.madx"; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQMC.madx"; on_B2S=ON_B2Saux;
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQX.madx" ; on_B2S=ON_B2Saux;
-};
-if (on_errors_Q4==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQY.madx" ; on_B2S=ON_B2Saux;
-} else {
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQY_noIP15.madx" ; on_B2S=ON_B2Saux;
-};
-if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQM.madx" ; on_B2S=ON_B2Saux;
-};
-if (on_errors_Q5==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQML.madx"; on_B2S=ON_B2Saux;
-} else {
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQML_noIP15.madx"; on_B2S=ON_B2Saux;
-};
-if (on_errors_LHC==1){
-  ON_B2Saux=on_B2S;on_B2S=0*ON_B2Saux;call, file="errors/LHC/Efcomp_MQ.madx"  ; on_B2S=ON_B2Saux;
+  ON_B2Saux=on_B2S;on_B2S=0;
+  call, file="errors/LHC/Efcomp_MQW.madx" ;
+  call, file="errors/LHC/Efcomp_MQTL.madx";
+  call, file="errors/LHC/Efcomp_MQMC.madx";
+  call, file="errors/LHC/Efcomp_MQX.madx" ;
+  if (off_errors_Q4_inIP15==1){
+    call, file="errors/LHC/Efcomp_MQY_noIP15.madx" ;
+  } else {
+    call, file="errors/LHC/Efcomp_MQY.madx" ;
+  };
+  call, file="errors/LHC/Efcomp_MQM.madx" ;
+  if (off_errors_Q5_inIP15==1){
+    call, file="errors/LHC/Efcomp_MQML_noIP15.madx";
+  } else {
+    call, file="errors/LHC/Efcomp_MQML.madx";
+  };
+  call, file="errors/LHC/Efcomp_MQ.madx"  ;
+  on_B2S=ON_B2Saux;
 };
 
 if (on_errors_LHC==1){
   call, file="errors/LHC/Set_alignment_errors.madx";
 };
 
-! New IT/D1/D2/Q4/Q5
-myseed = par_myseed;
-
-if (on_errors_IT==1){
+! New HL-LHC magnets
+if (ver_hllhc_optics > 0 && on_errors_IT==1){
   eoption,seed=myseed+101;
-  if (useMQXFAB==1) {
-    call, file="errors/HL-LHC/Efcomp_MQXFA.madx";      ! new IT in IR1/5
-    call, file="errors/HL-LHC/Efcomp_MQXFB.madx";
-  } else {
-    call, file="errors/HL-LHC/Efcomp_MQXFbody.madx"; ! new IT in IR1/5
-    call, file="errors/HL-LHC/Efcomp_MQXFends.madx";                            ! new IT in IR1/5
-  };
+  call, file="errors/HL-LHC/Efcomp_MQXFbody.madx"; ! new IT in IR1/5
+  call, file="errors/HL-LHC/Efcomp_MQXFends.madx";
 };
-if (on_errors_D1==1){
+if (ver_hllhc_optics > 0 && on_errors_D1==1){
   eoption,seed=myseed+102;call, file="errors/HL-LHC/Efcomp_MBXAB.madx";    ! new D1 in IR1/5
 };
-if (on_errors_D2==1){
+if (ver_hllhc_optics > 0 && on_errors_D2==1){
   if (correct_for_D2==1){
     use_average_errors_MBRD=1;   ! using average errors for correction algorithm
   };
   eoption,seed=myseed+103;call, file="errors/HL-LHC/Efcomp_MBRD.madx";   	! new D2 in IR1/5
 };
-if (on_errors_Q4==1){
-  call, file="errors/HL-LHC/Efcomp_MQY.madx";     ! old Q4 in IR1/5, but switched places around IP1-5
+if (ver_hllhc_optics > 0 && on_errors_Q4==1){
+  if (off_errors_Q4_inIP15==0){
+    call, file="errors/HL-LHC/Efcomp_MQY.madx";     ! old Q4 in IR1/5, but switched places around IP1-5
+  };
 };
-if (on_errors_MCBXF==1){
+if (ver_hllhc_optics > 0 && on_errors_MCBXF==1){
   eoption,seed=myseed+106;call, file="errors/HL-LHC/Efcomp_MCBXFAB.madx";  ! new triplet correctors in IR1/5
 };
-if (on_errors_MBH==1){
+if (ver_hllhc_optics > 0 && on_errors_MBH==1){
   ON_B2saux=on_B2s;on_B2s=0; ON_B2raux=on_B2r;on_B2r=0;
   eoption,seed=myseed+107;call, file="errors/HL-LHC/Efcomp_MBH.madx";
   on_B2s=ON_B2saux; on_B2r=ON_B2raux;
 };
-if (on_errors_MCBRD==1){
+if (ver_hllhc_optics > 0 && on_errors_MCBRD==1){
   eoption,seed=myseed+108;call, file="errors/HL-LHC/Efcomp_MCBRD.madx";
 };
 

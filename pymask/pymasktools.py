@@ -1,9 +1,23 @@
 import os
 import pickle
+import json
 
 import numpy as np
 
+import xtrack as xt
+import xpart as xp
+import xfields as xf
+
 from . import beambeam as bb
+
+class JEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif np.issubdtype(type(obj), np.integer):
+            return int(obj)
+        else:
+            return json.JSONEncoder.default(self, obj)
 
 def make_links(links_dict, force=False):
     for kk in links_dict.keys():
@@ -182,7 +196,8 @@ def check_separations_against_madvars(checks, twiss_df_b1, twiss_df_b2, variable
                 cc['plane'], target, cc['tol'])
 
 def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
-        reference_bunch_charge_sixtrack_ppb,
+        reference_num_particles_sixtrack,
+        reference_particle_charge_sixtrack,
         emitnx_sixtrack_um,
         emitny_sixtrack_um,
         sigz_sixtrack_m,
@@ -233,8 +248,11 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
         if len(sxt_df_4d) > 0:
             sxt_df_4d['h-sep [mm]'] = -sxt_df_4d['separation_x']*1e3
             sxt_df_4d['v-sep [mm]'] = -sxt_df_4d['separation_y']*1e3
-            sxt_df_4d['strength-ratio'] = (sxt_df_4d['other_charge_ppb']
-                    / reference_bunch_charge_sixtrack_ppb)
+            sxt_df_4d['strength-ratio'] = (
+                    sxt_df_4d['other_num_particles']
+                    * sxt_df_4d['other_particle_charge']
+                    / reference_num_particles_sixtrack)
+                    #/ reference_particle_charge_sixtrack)# patch for sixtrack inconsistency
             sxt_df_4d['4dSxx [mm*mm]'] = sxt_df_4d['other_Sigma_11']*1e6
             sxt_df_4d['4dSyy [mm*mm]'] = sxt_df_4d['other_Sigma_33']*1e6
             sxt_df_4d['4dSxy [mm*mm]'] = sxt_df_4d['other_Sigma_13']*1e6
@@ -256,7 +274,11 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
             sxt_df_6d['v-sep [mm]'] = -sxt_df_6d['separation_y']*1e3
             sxt_df_6d['phi [rad]'] = sxt_df_6d['phi']
             sxt_df_6d['alpha [rad]'] = sxt_df_6d['alpha']
-            sxt_df_6d['strength-ratio'] = sxt_df_6d['other_charge_ppb']/reference_bunch_charge_sixtrack_ppb
+            sxt_df_6d['strength-ratio'] = (
+                    sxt_df_6d['other_num_particles']
+                    * sxt_df_6d['other_particle_charge']
+                    / reference_num_particles_sixtrack)
+                    #/ reference_particle_charge_sixtrack) # patch for sixtrack
             sxt_df_6d['Sxx [mm*mm]'] = sxt_df_6d['other_Sigma_11'] *1e6
             sxt_df_6d['Sxxp [mm*mrad]'] = sxt_df_6d['other_Sigma_12'] *1e6
             sxt_df_6d['Sxpxp [mrad*mrad]'] = sxt_df_6d['other_Sigma_22'] *1e6
@@ -290,7 +312,7 @@ def generate_sixtrack_input(mad, seq_name, bb_df, output_folder,
                     ]), axis=1)
 
         f3_common_settings = ' '.join([
-            f"{reference_bunch_charge_sixtrack_ppb}",
+            f"{reference_num_particles_sixtrack*reference_particle_charge_sixtrack}",
             f"{emitnx_sixtrack_um}",
             f"{emitny_sixtrack_um}",
             f"{sigz_sixtrack_m}",
@@ -336,19 +358,34 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
     # Twiss and get closed-orbit
     if not skip_mad_use:
         mad.use(sequence=seq_name)
-    twiss_table = mad.twiss()
+    twiss_table = mad.twiss(rmatrix=True)
 
     if initial_bb_state is not None:
         mad.globals.on_bb_switch = initial_bb_state
 
-    beta0 = mad.sequence[seq_name].beam.beta
-    gamma0 = mad.sequence[seq_name].beam.gamma
-    p0c_eV = mad.sequence[seq_name].beam.pc*1.e9
+    mad_beam =  mad.sequence[seq_name].beam
+    assert mad_beam.deltap == 0, "Not implemented."
 
-    optics_at_start_ring = {
-            'beta': beta0,
-            'gamma' : gamma0,
-            'p0c_eV': p0c_eV,
+    particle_on_madx_co = xp.Particles(
+        p0c = mad_beam.pc*1e9,
+        q0 = mad_beam.charge,
+        mass0 = mad_beam.mass*1e9,
+        s = 0,
+        x = twiss_table.x[0],
+        px = twiss_table.px[0],
+        y = twiss_table.y[0],
+        py = twiss_table.py[0],
+        tau = twiss_table.t[0],
+        ptau = twiss_table.pt[0],
+    )
+
+    RR_madx = np.zeros([6,6])
+
+    for ii in range(6):
+        for jj in range(6):
+            RR_madx[ii, jj] = getattr(twiss_table, f're{ii+1}{jj+1}')[0]
+
+    optics_and_co_at_start_ring_from_madx = {
             'betx': twiss_table.betx[0],
             'bety': twiss_table.bety[0],
             'alfx': twiss_table.alfx[0],
@@ -357,37 +394,32 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
             'dy': twiss_table.dy[0],
             'dpx': twiss_table.dpx[0],
             'dpy': twiss_table.dpy[0],
-            'x' : twiss_table.x[0],
-            'px' : twiss_table.px[0],
-            'y' : twiss_table.y[0],
-            'py' : twiss_table.py[0],
-            't' : twiss_table.t[0],
-            'pt' : twiss_table.pt[0],
-            #convert tau, pt to sigma,delta
-            'sigma' : beta0 * twiss_table.t[0],
-            'delta' : ((twiss_table.pt[0]**2 +
-                 2.*twiss_table.pt[0]/beta0) + 1.)**0.5 - 1.
+            'RR_madx': RR_madx,
+            'particle_on_madx_co': particle_on_madx_co.to_dict()
             }
-    return optics_at_start_ring
 
-def generate_pysixtrack_line_with_bb(mad, seq_name, bb_df,
-        closed_orbit_method='from_mad', pickle_lines_in_folder=None,
-        skip_mad_use=False):
+    return optics_and_co_at_start_ring_from_madx
 
-    opt_and_CO = get_optics_and_orbit_at_start_ring(mad, seq_name,
-            with_bb_forces=False, skip_mad_use=True)
 
-    # Build pysixtrack model
-    import pysixtrack
-    pysxt_line = pysixtrack.Line.from_madx_sequence(
-        mad.sequence[seq_name])
+
+def generate_xsuite_line(mad, seq_name, bb_df,
+        optics_and_co_at_start_ring_from_madx,
+        folder_name=None, skip_mad_use=False,
+        prepare_line_for_xtrack=True,
+        steps_for_finite_diffs={'dx': 1e-8, 'dpx': 1e-11,
+            'dy': 1e-8, 'dpy': 1e-11, 'dzeta': 1e-7, 'ddelta': 1e-8}):
+
+    # Build xsuite model
+    print('Start building xtrack line...')
+    line = xt.Line.from_madx_sequence(
+        mad.sequence[seq_name], apply_madx_errors=True)
+    print('Done building xtrack.')
 
     if bb_df is not None:
-        bb.setup_beam_beam_in_line(pysxt_line, bb_df, bb_coupling=False)
+        bb.setup_beam_beam_in_line(line, bb_df, bb_coupling=False)
 
     # Temporary fix due to bug in mad loader
-    cavities, cav_names = pysxt_line.get_elements_of_type(
-            pysixtrack.elements.Cavity)
+    cavities, cav_names = line.get_elements_of_type(xt.Cavity)
     for cc, nn in zip(cavities, cav_names):
         if cc.frequency ==0.:
             ii_mad = mad.sequence[seq_name].element_names().index(nn)
@@ -395,39 +427,117 @@ def generate_pysixtrack_line_with_bb(mad, seq_name, bb_df,
             f0_mad = mad.sequence[seq_name].beam.freq0 * 1e6 # mad has it in MHz
             cc.frequency = f0_mad*cc_mad.parent.harmon
 
-    mad_CO = np.array([opt_and_CO[kk] for kk in ['x', 'px', 'y', 'py', 'sigma', 'delta']])
+    line_bb_dipole_not_cancelled_dict = line.to_dict()
+    line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
+            optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+    line_bb_dipole_not_cancelled_dict['RR_madx'] = (
+            optics_and_co_at_start_ring_from_madx['RR_madx'])
 
-    pysxt_line.disable_beambeam()
-    part_on_CO = pysxt_line.find_closed_orbit(
-        guess=mad_CO, p0c=opt_and_CO['p0c_eV'],
-        method={'from_mad': 'get_guess', 'from_tracking': 'Nelder-Mead'}[closed_orbit_method])
-    pysxt_line.enable_beambeam()
+    if folder_name is not None:
+        os.makedirs(folder_name, exist_ok=True)
+        # Note that full separation and not strong beam position is present
+        # in bb lenses (for comparison with sixtrack input)
+        with open(folder_name + '/line_bb_dipole_not_cancelled.json', 'w') as fid:
+            json.dump(line_bb_dipole_not_cancelled_dict, fid, cls=JEncoder)
 
-    pysxt_line_bb_dipole_cancelled = pysxt_line.copy()
+    if prepare_line_for_xtrack:
+        tracker = xt.Tracker(line=line)
 
-    pysxt_line_bb_dipole_cancelled.beambeam_store_closed_orbit_and_dipolar_kicks(
-        part_on_CO,
-        separation_given_wrt_closed_orbit_4D=True,
-        separation_given_wrt_closed_orbit_6D=True)
+        _disable_beam_beam(tracker.line)
+        particle_on_tracker_co = tracker.find_closed_orbit(
+            particle_co_guess=xp.Particles(
+            **optics_and_co_at_start_ring_from_madx['particle_on_madx_co']))
+        _restore_beam_beam(tracker.line)
 
-    pysxt_dict = {
-            'line_bb_dipole_not_cancelled': pysxt_line,
-            'line_bb_dipole_cancelled': pysxt_line_bb_dipole_cancelled,
-            'particle_on_closed_orbit': part_on_CO}
+        xf.configure_orbit_dependent_parameters_for_bb(tracker,
+                           particle_on_co=particle_on_tracker_co)
 
-    if pickle_lines_in_folder is not None:
-        pysix_fol_name = pickle_lines_in_folder
-        os.makedirs(pysix_fol_name, exist_ok=True)
-
-        with open(pysix_fol_name + "/line_bb_dipole_not_cancelled.pkl", "wb") as fid:
-            pickle.dump(pysxt_line.to_dict(keepextra=True), fid)
-
-        with open(pysix_fol_name + "/line_bb_dipole_cancelled.pkl", "wb") as fid:
-            pickle.dump(pysxt_line_bb_dipole_cancelled.to_dict(keepextra=True), fid)
-
-        with open(pysix_fol_name + "/particle_on_closed_orbit.pkl", "wb") as fid:
-            pickle.dump(part_on_CO.to_dict(), fid)
-
-    return pysxt_dict
+        _disable_beam_beam(tracker.line)
+        RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
+                particle_on_tracker_co,
+                **steps_for_finite_diffs)
+        _restore_beam_beam(tracker.line)
 
 
+        (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
+                ) = xp.compute_linear_normal_form(RR_finite_diffs)
+
+        line_bb_for_tracking_dict = line.to_dict()
+        line_bb_for_tracking_dict['particle_on_tracker_co'] = (
+                                         particle_on_tracker_co.to_dict())
+        line_bb_for_tracking_dict['RR_finite_diffs'] = RR_finite_diffs
+        line_bb_for_tracking_dict['WW_finite_diffs'] = WW_finite_diffs
+        line_bb_for_tracking_dict['WWInv_finite_diffs'] = WWInv_finite_diffs
+        line_bb_for_tracking_dict['RotMat_finite_diffs'] = RotMat_finite_diffs
+
+        if folder_name is not None:
+            os.makedirs(folder_name, exist_ok=True)
+            with open(folder_name +
+                    '/line_bb_for_tracking.json', 'w') as fid:
+                json.dump(line_bb_for_tracking_dict, fid, cls=JEncoder)
+
+
+def save_mad_sequence_and_error(mad, seq_name, filename='lhc'):
+    mad.select(flag="error",clear=True)
+    mad.select(flag="error",class_="multipole")
+    mad.select(flag="error",class_="hkicker")
+    mad.select(flag="error",class_="vkicker")
+    mad.select(flag="error",class_="kicker")
+    mad.esave(file=filename + "_errors.tfs")
+    mad.select(flag="error",clear=True)
+    mad.select(flag="error",full=True)
+    mad.esave(file=filename + "_errors_all.tfs")
+    mad.save(sequence=seq_name,beam=True,file=filename + "_seq.madx")
+
+
+def _disable_beam_beam(line):
+    for ee in line.elements:
+        if ee.__class__.__name__.startswith('BeamBeam'):
+            ee._temp_q0 = ee.q0
+            ee.q0 = 0
+            if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+                ee._temp_d_px = ee.d_px
+                ee._temp_d_py = ee.d_py
+                ee.d_px = 0.
+                ee.d_py = 0.
+            elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+                ee._temp_Dx_sub = ee.Dx_sub
+                ee._temp_Dpx_sub = ee.Dpx_sub
+                ee._temp_Dy_sub = ee.Dy_sub
+                ee._temp_Dpy_sub = ee.Dpy_sub
+                ee._temp_Dsigma_sub = ee.Dsigma_sub
+                ee._temp_Ddelta_sub = ee.Ddelta_sub
+                ee.Dx_sub = 0.
+                ee.Dpx_sub = 0.
+                ee.Dy_sub = 0.
+                ee.Dpy_sub = 0.
+                ee.Dsigma_sub = 0.
+                ee.Ddelta_sub = 0.
+            else:
+                raise ValueError('What?!')
+
+def _restore_beam_beam(line):
+    for ee in line.elements:
+        if ee.__class__.__name__.startswith('BeamBeam'):
+            ee.q0 = ee._temp_q0
+            del(ee._temp_q0)
+            if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+                ee.d_px = ee._temp_d_px
+                ee.d_py = ee._temp_d_py
+                del(ee._temp_d_px)
+                del(ee._temp_d_py)
+            elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+                ee.Dx_sub = ee._temp_Dx_sub
+                ee.Dpx_sub = ee._temp_Dpx_sub
+                ee.Dy_sub = ee._temp_Dy_sub
+                ee.Dpy_sub = ee._temp_Dpy_sub
+                ee.Dsigma_sub = ee._temp_Dsigma_sub
+                ee.Ddelta_sub = ee._temp_Ddelta_sub
+                del(ee._temp_Dx_sub)
+                del(ee._temp_Dpx_sub)
+                del(ee._temp_Dy_sub)
+                del(ee._temp_Dpy_sub)
+                del(ee._temp_Dsigma_sub)
+                del(ee._temp_Ddelta_sub)
+            else:
+                raise ValueError('What?!')
