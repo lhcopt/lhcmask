@@ -93,7 +93,7 @@ for ss in mad.sequence.keys():
         npart={configuration['beam_npart']},
         sige={configuration['beam_sige']},
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
-        ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+        ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel};
     ''')
 
 # Set optics-specific knobs
