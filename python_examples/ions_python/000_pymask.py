@@ -402,7 +402,7 @@ else:
     if configuration['enable_knob_synthesis']:
         mad_track.input('exec, crossing_disable;')
         mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
-        mad_track.input('exec, crossing_restore;')
+    mad_track.input('exec, crossing_restore;')
 
 
 ##################
