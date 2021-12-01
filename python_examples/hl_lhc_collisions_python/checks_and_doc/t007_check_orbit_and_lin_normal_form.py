@@ -37,7 +37,7 @@ theta = np.linspace(0, 2*np.pi, n_part)
 x_norm = ampl_sigmas * np.sqrt(geom_emit_x) * np.cos(theta)
 px_norm = ampl_sigmas * np.sqrt(geom_emit_x) * np.sin(theta)
 
-particles_matched  = xp.build_particles(particle_ref=partCO,
+particles_matched  = xp.build_particles(particle_on_co=partCO,
                                         x_norm=x_norm, px_norm=px_norm,
                                         R_matrix=np.array(line_dict['RR_finite_diffs']))
 particles_test = particles_matched.copy()
