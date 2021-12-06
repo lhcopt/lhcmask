@@ -2,7 +2,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh -b  -p ./miniconda -f
 rm Miniconda3-latest-Linux-x86_64.sh
 source miniconda/bin/activate
-pip install ipython jupyterlab numpy scipy pandas awkward matplotlib pyarrow cpymad 
+pip install ipython jupyterlab numpy scipy pandas awkward matplotlib pyarrow pyyaml cpymad 
 
 git clone https://gitlab.cern.ch/mihostet/pytrain.git
 pip install -e pytrain

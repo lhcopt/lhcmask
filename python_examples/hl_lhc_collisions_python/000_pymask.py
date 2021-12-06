@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-
+import yaml
 import numpy as np
 
 
@@ -9,7 +9,14 @@ import numpy as np
 # Read general configurations and setup envirnoment #
 #####################################################
 
-from config import configuration
+assert not(os.path.isfile('config.yaml') and os.path.isfile('config.py')), \
+        "Please specify only a config file (yaml or py)"
+
+try:
+    with open('config.yaml','r') as fid:
+        configuration = yaml.safe_load(fid)
+except:
+    from config import configuration
 
 mode = configuration['mode']
 tol_beta = configuration['tol_beta']
