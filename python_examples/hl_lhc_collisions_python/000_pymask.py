@@ -123,7 +123,7 @@ for ss in mad.sequence.keys():
         ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
         ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
         mass={particle_mass},
-        charge={particle_charge},
+        charge={particle_charge};
     ''')
 
 
