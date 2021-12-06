@@ -1,0 +1,116 @@
+links:
+  tracking_tools: /afs/cern.ch/eng/tracking-tools
+  modules: tracking_tools/modules
+  tools: tracking_tools/tools
+  beambeam_macros: tracking_tools/beambeam_macros
+  errors: tracking_tools/errors
+  optics_repository: /afs/cern.ch/eng/lhc/optics
+mode: b1_with_bb
+optics_file: optics_repository/runII/2018/ION/opticsfile.21
+check_betas_at_ips: true
+check_separations_at_ips: true
+save_intermediate_twiss: true
+tol_beta:
+- 0.1
+- 0.1
+- 0.1
+- 0.2
+tol_sep:
+- 1.0e-06
+- 1.0e-06
+- 1.0e-06
+- 1.0e-06
+tol_co_flatness: 1.0e-06
+beam_norm_emit_x: 1.65
+beam_norm_emit_y: 1.65
+beam_sigt: 0.0824
+beam_sige: 0.000102
+beam_npart: 180000000.0
+beam_energy_tot: 7000.0
+particle_mass: 193.6872729
+particle_charge: 82
+qx0: 62.31
+qy0: 60.32
+chromaticity_x: 10
+chromaticity_y: 10
+vrf_total: 14.0
+oct_current: 250
+enable_lumi_control: true
+sep_plane_ip1: x
+sep_plane_ip2: x
+sep_plane_ip5: y
+sep_plane_ip8: y
+lumi_ip8: 1.0e+27
+lumi_ip1: 6.4e+27
+lumi_ip2: 6.4e+27
+lumi_ip5: 6.4e+27
+nco_IP1: 1088
+nco_IP2: 1088
+nco_IP5: 1088
+nco_IP8: 398
+beambeam_config:
+  numberOfLRPerIRSide:
+  - 25
+  - 20
+  - 25
+  - 20
+  bunch_spacing_buckets: 10
+  numberOfHOSlices: 11
+  bunch_num_particles: null
+  bunch_particle_charge: null
+  sigmaz_m: null
+  z_crab_twiss: 0.0
+  filling_scheme_json: filling.json
+  bunch_to_track: 488
+match_q_dq_with_bb: false
+enable_crabs: false
+N_iter_coupling: 2
+delta_cmr: 0.0
+delta_cmi: 0.0
+verbose_mad_parts: true
+knob_names:
+  sepknob_ip2_mm: on_sep2
+  sepknob_ip8_mm: on_sep8
+  sepknob_ip1_mm: on_sep1
+  sepknob_ip5_mm: on_sep5
+  qknob_1:
+    lhcb1: dQx.b1_sq
+    lhcb2: dQx.b2_sq
+  qknob_2:
+    lhcb1: dQy.b1_sq
+    lhcb2: dQy.b2_sq
+  chromknob_1:
+    lhcb1: dQpx.b1_sq
+    lhcb2: dQpx.b2_sq
+  chromknob_2:
+    lhcb1: dQpy.b1_sq
+    lhcb2: dQpy.b2_sq
+  cmrknob:
+    lhcb1: CMRS.b1_sq
+    lhcb2: CMRS.b2_sq
+  cmiknob:
+    lhcb1: CMIS.b1_sq
+    lhcb2: CMIS.b2_sq
+knob_settings:
+  on_x1: 170
+  on_sep1: 1.0e-08
+  on_x2: 170
+  on_sep2: 1.0e-08
+  on_x5: 170
+  on_sep5: 1.0e-08
+  on_x8: -170
+  on_sep8: 1.0e-08
+  on_ov2: 0.0
+  on_ov5: 0.0
+  on_disp: 0
+  on_alice_normalized: -1
+  on_lhcb_normalized: -1
+  on_sol_atlas: 0
+  on_sol_cms: 0
+  on_sol_alice: 0
+enable_imperfections: false
+enable_knob_synthesis: false
+pars_for_imperfections: {}
+pars_for_legacy_bb_macros:
+  par_b_t_dist: 50.0
+  par_n_inside_D1: 5

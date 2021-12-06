@@ -15,6 +15,6 @@ rm *.tfs
 rm -r xline 
 rm -r temp
 rm -r __pycache__ 
-
+rm -r xsuite_lines
 # Remove all links
 find -type l -exec rm {} \;
