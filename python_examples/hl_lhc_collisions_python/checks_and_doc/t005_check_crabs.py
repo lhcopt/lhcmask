@@ -140,7 +140,7 @@ with open('../optics_orbit_at_start_ring_from_madx.json', 'r') as fid:
     ddd = json.load(fid)
 partco = xp.Particles.from_dict(ddd['particle_on_madx_co'])
 z_slices = s_rel * 2.0
-partco = xp.build_particles(particle_ref=partco, zeta=z_slices)
+partco = xp.build_particles(particle_on_co=partco, mode='shift', zeta=z_slices)
 
 
 list_co = ltest.slow_track_elem_by_elem(partco)
@@ -221,7 +221,8 @@ axcby.plot(s_twiss, y_twiss)
 part = xp.Particles.from_dict(ddd['particle_on_madx_co'])
 
 z_test = np.array([0, z_crab_track])
-part = xp.build_particles(particle_ref=part,
+part = xp.build_particles(particle_on_co=part,
+        mode='shift',
         zeta = z_test,
         x = 0*z_test + np.array([0, x_twiss[0]]),
         y = 0*z_test + np.array([0, y_twiss[0]]),
