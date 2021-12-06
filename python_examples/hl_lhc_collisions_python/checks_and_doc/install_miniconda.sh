@@ -24,3 +24,6 @@ pip install -e xfields
 
 git clone https://github.com/sixtrack/sixtracktools
 pip install -e sixtracktools
+
+git clone https://github.com/PyCOMPLETE/FillingPatterns.git
+pip install -e FillingPatterns
