@@ -37,7 +37,7 @@ knob_names = configuration['knob_names']
 # Make links
 if links['tracking_tools'] == 'auto':
     import pymask as pm
-        links['tracking_tools'] = str(
+    links['tracking_tools'] = str(
             pm._pkg_root.parent.parent.absolute())
 
 for kk in links.keys():
