@@ -5,25 +5,30 @@ import pymask as pm
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
 
-def build_sequence(mad, beam):
+def build_sequence(mad, beam, configuration):
+
+    optics_version = configuration['optics_version']
 
     # Select beam
     mad.input(f'mylhcbeam = {beam}')
 
     # Make link to optics toolkit
-    pm.make_links({'optics_toolkit': 'optics_repository/HLLHCV1.4/toolkit'},
-        force=True)
+    pm.make_links({'optics_toolkit':
+                f'optics_repository/HLLHCV{optics_version}/toolkit'},
+                force=True)
 
     mad.input('''
 
         ! Specify machine version
         ver_lhc_run = 0;
-        ver_hllhc_optics = 1.4;
-
+        '''
+        f'''ver_hllhc_optics = {optics_version};'''
+        f'''
         ! Get the toolkit
-        call, file="optics_repository/HLLHCV1.4/toolkit/macro.madx";
-
-
+        call,file=
+          "optics_repository/HLLHCV{optics_version}/toolkit/macro.madx";
+        '''
+        '''
         ! Build sequence
         option, -echo,-warn,-info;
         if (mylhcbeam==4){
@@ -32,11 +37,13 @@ def build_sequence(mad, beam):
           call,file="optics_repository/runIII/lhc.seq";
         };
         option, -echo, warn,-info;
-
+        '''
+        f'''
         !Install HL-LHC
-        call, file="optics_repository/HLLHCV1.4/hllhc_sequence.madx";
-
-
+        call, file=
+          "optics_repository/HLLHCV{optics_version}/hllhc_sequence.madx";
+        '''
+        '''
         ! Slice nominal sequence
         exec, myslice;
 
