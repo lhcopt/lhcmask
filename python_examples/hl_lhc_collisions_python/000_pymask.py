@@ -34,8 +34,12 @@ match_q_dq_with_bb = configuration['match_q_dq_with_bb']
 knob_settings = configuration['knob_settings']
 knob_names = configuration['knob_names']
 
-
 # Make links
+if links['tracking_tools'] == 'auto':
+    import pymask as pm
+        links['tracking_tools'] = str(
+            pm._pkg_root.parent.parent.absolute())
+
 for kk in links.keys():
     if os.path.exists(kk):
         os.remove(kk)
