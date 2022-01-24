@@ -455,7 +455,7 @@ def generate_xsuite_line(mad, seq_name, bb_df,
         _disable_beam_beam(tracker.line)
         RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
                 particle_on_tracker_co,
-                **steps_for_finite_diffs)
+                steps_r_matrix=steps_for_finite_diffs)
         _restore_beam_beam(tracker.line)
 
 
