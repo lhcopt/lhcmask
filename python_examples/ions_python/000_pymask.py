@@ -4,19 +4,30 @@ import json
 import yaml
 import numpy as np
 
-
 #####################################################
 # Read general configurations and setup envirnoment #
 #####################################################
 
-assert not(os.path.isfile('config.yaml') and os.path.isfile('config.py')), \
-        "Please specify only a config file (yaml or py)"
+assert not(os.path.isfile('config.yaml')
+           and os.path.isfile('config.py')), (
+    "Please specify only a config file (yaml or py)")
 
 try:
     with open('config.yaml','r') as fid:
         configuration = yaml.safe_load(fid)
 except:
     from config import configuration
+
+# Start tree_maker logging if log_file is present in config
+try:
+    import tree_maker
+    if 'log_file' not in configuration.keys():
+        tree_maker=None
+except:
+    tree_maker=None
+
+if tree_maker is not None:
+    tree_maker.tag_json.tag_it(configuration['log_file'], 'started')
 
 mode = configuration['mode']
 tol_beta = configuration['tol_beta']
@@ -34,8 +45,12 @@ match_q_dq_with_bb = configuration['match_q_dq_with_bb']
 knob_settings = configuration['knob_settings']
 knob_names = configuration['knob_names']
 
-
 # Make links
+if links['tracking_tools'] == 'auto':
+    import pymask as pm
+    links['tracking_tools'] = str(
+            pm._pkg_root.parent.parent.absolute())
+
 for kk in links.keys():
     if os.path.exists(kk):
         os.remove(kk)
@@ -84,7 +99,8 @@ mad = Madx(command_log="mad_collider.log")
 mad.globals.par_verbose = int(configuration['verbose_mad_parts'])
 
 # Build sequence (alse creates link to optics_toolkit and calls it)
-ost.build_sequence(mad, beam=beam_to_configure)
+ost.build_sequence(mad, beam=beam_to_configure,
+                  configuration=configuration)
 
 # Set twiss formats for MAD-X parts (macro from opt. toolkit)
 mad.input('exec, twiss_opt;')
@@ -566,3 +582,6 @@ sdf.to_parquet('final_summ_BBON.parquet')
 #############################
 # N.B. this erases the errors in the mad_track instance
 # pm.save_mad_sequence_and_error(mad_track, sequence_to_track, filename='final')
+
+if tree_maker is not None:
+    tree_maker.tag_json.tag_it(configuration['log_file'], 'completed')

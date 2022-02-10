@@ -5,7 +5,7 @@ import pymask as pm
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
 
-def build_sequence(mad, beam):
+def build_sequence(mad, beam, configuration):
 
     #slicefactor = 2 # For testing
     slicefactor = 8 # For production
