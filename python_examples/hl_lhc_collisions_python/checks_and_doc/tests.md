@@ -224,7 +224,7 @@ plane = 'y'
 phi_weak = Phi
 phi_c_weak = Phi_c
 ```
-## Check the matching
+## Check the matching and the tracking
 
 Select on config.yaml
 
@@ -234,7 +234,9 @@ beam: b1_without_bb
 and run 
 
 ```bash 
+python t003_fc_to_fort.py
 python t007_check_orbit_and_lin_normal_form.py
+python t008_check_against_sixtrack.py
 ```
 
 then repeat for 
@@ -253,6 +255,10 @@ and
 
 ```yaml
 beam: b4_from_b2_with_bb
+
+## Compare sixtrack and xtrack
+
+
 
 
 ## To check a mad test againt its reference

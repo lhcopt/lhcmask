@@ -39,7 +39,7 @@ particles = xp.build_particles(particle_on_co=partCO,
 tracker.track(particles, turn_by_turn_monitor=True, num_turns=num_turns)
 
 print('Xtrack')
-print(tracker.record_last_track.x)
+print(tracker.record_last_track.x.transpose())
 print('Sixtrack')
 print(x_tbt_sixtrack)
 
