@@ -21,7 +21,7 @@ for _ in range(10):
     tracker.track(particles)
 
 for nn in 'x px y py zeta delta'.split():
-    assert np.abs(getattr(particles, nn) - getattr(partCO, nn)) < 1e-11
+    assert np.abs(getattr(particles, nn) - getattr(partCO, nn)) < 2e-11
 
 WW = np.array(line_dict['WW_finite_diffs'])
 WWinv = np.array(line_dict['WWInv_finite_diffs'])

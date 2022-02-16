@@ -224,7 +224,8 @@ plane = 'y'
 phi_weak = Phi
 phi_c_weak = Phi_c
 ```
-## Check the matching and the tracking
+
+## Test 7 and 8 - Check the matching and the tracking
 
 Select on config.yaml
 
@@ -255,9 +256,7 @@ and
 
 ```yaml
 beam: b4_from_b2_with_bb
-
-## Compare sixtrack and xtrack
-
+```
 
 
 
