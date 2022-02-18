@@ -16,9 +16,9 @@ We setup the python version:
 cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-In config.py we select:
-```python
-mode : 'b1_with_bb_legacy_macros'
+In config.yaml we select:
+```yaml
+mode : b1_with_bb_legacy_macros
 ```
 We run the python version:
 ```
@@ -36,9 +36,9 @@ diff fc.34 ../../examples/hl_lhc_collision/fc.34
 
 
 ## Test 2 - b1 with new bb tools
-In config.py we select:
-```python
-'mode' : 'b1_with_bb',
+In config.yaml we select:
+```yaml
+mode : b1_with_bb
 ```
 
 We exeute the python version:
@@ -121,10 +121,12 @@ We setup the python version:
 cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-In config.py we select:
-```python
-'mode' : 'b4_without_bb',
-force_leveling : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
+In config.yaml we select:
+```yaml
+mode: b4_without_bb,
+force_leveling:
+  on_sep8: -0.03425547139366354
+  on_sep2: 0.14471680504084292
 ```
 (the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
 
@@ -155,10 +157,12 @@ We setup the python version:
 cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-In config.py we select:
-```python
-'mode' : 'b4_from_b2_without_bb',
-'force_leveling' : {'on_sep8': -0.03425547139366354, 'on_sep2': 0.14471680504084292}
+In config.yaml we select:
+```yaml
+mode: b4_from_b2_without_bb
+force_leveling: 
+  on_sep8: -0.03425547139366354
+  on_sep2: 0.14471680504084292
 ```
 (the separations are forced in order to be consitent with the mad-x test case for which the same values are impored, as the legacy leveling macro does not work in this case).
 
@@ -183,10 +187,9 @@ We setup the python version:
 cd ../../python_examples/hl_lhc_collisions_python
 
 ```
-In config.py we select:
+In config.yaml we select:
 ```python
-'mode' : 'b4_from_b2_with_bb',
-
+mode: b4_from_b2_with_bb,
 ```
 We run the python version:
 ```
@@ -221,6 +224,41 @@ plane = 'y'
 phi_weak = Phi
 phi_c_weak = Phi_c
 ```
+
+## Test 7 and 8 - Check the matching and the tracking
+
+Select on config.yaml
+
+```yaml
+beam: b1_without_bb
+```
+and run 
+
+```bash 
+python t003_fc_to_fort.py
+python t007_check_orbit_and_lin_normal_form.py
+python t008_check_against_sixtrack.py
+```
+
+then repeat for 
+
+```yaml
+beam: b1_with_bb
+```
+
+and
+
+```yaml
+beam: b4_from_b2_without_bb
+```
+
+and
+
+```yaml
+beam: b4_from_b2_with_bb
+```
+
+
 
 ## To check a mad test againt its reference
 

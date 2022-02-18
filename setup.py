@@ -26,6 +26,7 @@ setup(
     packages=find_packages(exclude=('tests', 'docs', 'examples')),
     install_requires=[
         'numpy',
+        'cpymad',
         'pandas',
     ],
 )

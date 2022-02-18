@@ -31,14 +31,15 @@ partCO = xp.Particles.from_dict(dict_line_xtrack['particle_on_tracker_co'])
 
 tracker = xt.Tracker(line=line)
 
-particles = xp.build_particles(particle_ref=partCO,
+particles = xp.build_particles(particle_on_co=partCO,
+        mode='shift',
         x=np.array(displace_x),
         y=np.array(displace_y))
 
 tracker.track(particles, turn_by_turn_monitor=True, num_turns=num_turns)
 
 print('Xtrack')
-print(tracker.record_last_track.x)
+print(tracker.record_last_track.x.transpose())
 print('Sixtrack')
 print(x_tbt_sixtrack)
 

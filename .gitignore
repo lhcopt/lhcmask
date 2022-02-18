@@ -148,3 +148,11 @@ examples/run3_collision/temp/sliceho.res
 examples/run3_collision/temp/surveyaux.tfs
 examples/run3_collision/temp/twiss.tfs
 examples/run3_collision/last_twiss.0.gz
+miniconda
+pytrain
+sixtracktools
+xfields
+xline
+xobjects
+xpart
+xtrack

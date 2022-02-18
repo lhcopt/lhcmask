@@ -46,6 +46,6 @@ print(x_tbt_sixtrack)
 assert np.allclose(tracker.record_last_track.x[0, :], x_tbt_sixtrack[:,0],
        rtol=1e-15, atol=9e-11)
 assert np.allclose(tracker.record_last_track.y[0, :], y_tbt_sixtrack[:,0],
-       rtol=1e-15, atol=9e-11)
+       rtol=1e-15, atol=15e-11)
 assert np.allclose(tracker.record_last_track.delta[0, :], delta_tbt_sixtrack[:,0],
        rtol=1e-15, atol=5e-11)
