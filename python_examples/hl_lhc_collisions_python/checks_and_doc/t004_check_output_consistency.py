@@ -108,7 +108,7 @@ for tt in tests:
                 if ( np.max(np.abs(ee.knl)) < 1e-20 and
                      np.max(np.abs(ee.ksl)) < 1e-20 and
                      abs(ee.voltage) < 1e-20):
-                    ll.element_dict[ll.element_names[ii]] = None
+                    ll.element_names[ii] = None
                 # # Normalize phase
                 # for kkll, pp in [[ee.knl, ee.pn],
                 #                  [ee.ksl, ee.ps]]:
