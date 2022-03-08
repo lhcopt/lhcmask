@@ -672,7 +672,7 @@ def setup_beam_beam_in_line(
             params["d_delta"] = 0
 
             newee = xf.BeamBeamBiGaussian3D(old_interface=params)
-            line.elements[ii] = newee
+            line.element_dict[eename] = newee
 
 
 
