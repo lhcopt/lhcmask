@@ -91,12 +91,12 @@ for tt in tests:
     # Load
     ltest = prepare_line(path_test, type_test)
     lref = prepare_line(path_ref, type_ref)
-
     original_length = ltest.get_length()
     assert (lref.get_length() - original_length) < 1e-6
 
     # Simplify the two machines
     for ll in (ltest, lref):
+        ll._var_management = None
         ll.remove_inactive_multipoles(inplace=True)
         ll.remove_zero_length_drifts(inplace=True)
         ll.merge_consecutive_drifts(inplace=True)
@@ -108,8 +108,7 @@ for tt in tests:
                 if ( np.max(np.abs(ee.knl)) < 1e-20 and
                      np.max(np.abs(ee.ksl)) < 1e-20 and
                      abs(ee.voltage) < 1e-20):
-                    ll.element_names[ii] = None
-                    ll.elements[ii] = None
+                    ll.element_dict[ll.element_names[ii]] = None
                 # # Normalize phase
                 # for kkll, pp in [[ee.knl, ee.pn],
                 #                  [ee.ksl, ee.ps]]:
@@ -122,8 +121,6 @@ for tt in tests:
 
         while None in ll.element_names:
             ll.element_names.remove(None)
-        while None in ll.elements:
-            ll.elements.remove(None)
 
     # Check that the two machines are identical
     assert len(ltest) == len(lref)
