@@ -153,16 +153,22 @@ for tt in tests:
             # Check if the relative error is small
             val_test = dtest[kk]
             val_ref = dref[kk]
-            try:
-                if not np.isscalar(val_ref) and len(val_ref) != len(val_test):
-                        diff_rel = 100
-                    #lmin = min(len(val_ref), len(val_test))
-                    #val_test = val_test[:lmin]
-                    #val_ref = val_ref[:lmin]
+            if not np.isscalar(val_ref):
+                if len(val_ref) != len(val_test):
+                    diff_rel = 100
                 else:
-                    diff_rel = norm(np.array(val_test) - np.array(val_ref)) / norm(val_test)
-            except ZeroDivisionError:
-                diff_rel = 100.0
+                    for iiii, (vvr, vvt) in enumerate(list(zip(val_ref, val_test))):
+                        if not np.isclose(vvr, vvt, atol=atol, rtol=rtol):
+                            print(f'Issue found on `{kk}[{iiii}]`')
+                            diff_rel = 1000
+                        else:
+                            diff_rel = 0
+            else:
+                if val_ref > 0:
+                    diff_rel = (val_test - val_ref)/val_ref
+                else:
+                    diff_rel = 100
+
             if diff_rel < rtol:
                 continue
 
@@ -209,11 +215,14 @@ for tt in tests:
                     if len(val_ref) == 0 and len(val_test) == 0:
                         continue
                     else:
-                        diff_abs = norm(np.array(val_test) - np.array(val_ref))
-                        diff_rel = diff_abs/norm(val_test)
+                        for iiii, (vvr, vvt) in enumerate(list(zip(val_ref, val_test))):
+                            if not np.isclose(vvr, vvt, atol=atol, rtol=rtol):
+                                print(f'Issue found on `{kk}[{iiii}]`')
+                                diff_rel = 1000
+                                break
+                            else:
+                                diff_rel = 0
                         if diff_rel < rtol:
-                            continue
-                        if diff_abs < atol:
                             continue
 
             # Exception: correctors involved in lumi leveling

@@ -408,13 +408,13 @@ def generate_xsuite_line(mad, seq_name, bb_df,
         folder_name=None, skip_mad_use=False,
         prepare_line_for_xtrack=True,
         steps_for_finite_diffs={'dx': 1e-8, 'dpx': 1e-11,
-            'dy': 1e-8, 'dpy': 1e-11, 'dzeta': 1e-7, 'ddelta': 1e-8}, 
+            'dy': 1e-8, 'dpy': 1e-11, 'dzeta': 1e-7, 'ddelta': 1e-8},
         deferred_expressions=True):
 
     # Build xsuite model
     print('Start building xtrack line...')
     line = xt.Line.from_madx_sequence(
-        mad.sequence[seq_name], apply_madx_errors=True, 
+        mad.sequence[seq_name], apply_madx_errors=True,
         deferred_expressions=deferred_expressions)
     print('Done building xtrack.')
 
