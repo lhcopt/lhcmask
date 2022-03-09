@@ -165,7 +165,7 @@ for tt in tests:
                             diff_rel = 0
             else:
                 if val_ref > 0:
-                    diff_rel = (val_test - val_ref)/val_ref
+                    diff_rel = np.abs(val_test - val_ref)/val_ref)
                 else:
                     diff_rel = 100
 
