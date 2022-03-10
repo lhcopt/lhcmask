@@ -142,43 +142,47 @@ partco = xp.Particles.from_dict(ddd['particle_on_madx_co'])
 z_slices = s_rel * 2.0
 partco = xp.build_particles(particle_on_co=partco, mode='shift', zeta=z_slices)
 
+tracker=xt.Tracker(line=ltest)
+tracker.track(partco, turn_by_turn_monitor='ONE_TURN_EBE')
+first_turn = tracker.record_last_track
 
-list_co = ltest.slow_track_elem_by_elem(partco)
-list_co2 = ltest.slow_track_elem_by_elem(partco)
+tracker.track(partco, turn_by_turn_monitor='ONE_TURN_EBE')
+second_turn = tracker.record_last_track
 
 plt.figure(2)
 axcox = plt.subplot(2,1,1)
 axcoy = plt.subplot(2,1,2, sharex=axcox)
 plt.suptitle('Check closed orbit 2 turns')
-axcox.plot([pp.s[iho] for pp in list_co],  [pp.x[iho] for pp in list_co])
-axcox.plot([pp.s[iho] for pp in list_co],  [pp.x[iho] for pp in list_co2])
+axcox.plot(first_turn.s[iho,:] , first_turn.x[iho,:])
+axcox.plot(second_turn.s[iho,:] , second_turn.x[iho,:])
 
-axcoy.plot([pp.s[iho] for pp in list_co],  [pp.y[iho] for pp in list_co])
-axcoy.plot([pp.s[iho] for pp in list_co],  [pp.y[iho] for pp in list_co2])
+axcoy.plot(first_turn.s[iho,:] , first_turn.y[iho,:])
+axcoy.plot(second_turn.s[iho,:] , second_turn.y[iho,:])
 
 plt.figure(20)
 axcopx = plt.subplot(2,1,1, sharex=axcox)
 axcopy = plt.subplot(2,1,2, sharex=axcox)
 plt.suptitle('Check closed orbit 2 turns')
-axcopx.plot([pp.s[iho] for pp in list_co],  [pp.px[iho] for pp in list_co])
-axcopx.plot([pp.s[iho] for pp in list_co],  [pp.px[iho] for pp in list_co2])
+axcopx.plot(first_turn.s[iho,:] , first_turn.px[iho,:])
+axcopx.plot(second_turn.s[iho,:] , second_turn.px[iho,:])
 
-axcopy.plot([pp.s[iho] for pp in list_co],  [pp.py[iho] for pp in list_co])
-axcopy.plot([pp.s[iho] for pp in list_co],  [pp.py[iho] for pp in list_co2])
+axcopy.plot(first_turn.s[iho,:] , first_turn.py[iho,:])
+axcopy.plot(second_turn.s[iho,:] , second_turn.py[iho,:])
 
 plt.figure(3)
 axcox = plt.subplot(2,1,1)
 axcoy = plt.subplot(2,1,2, sharex=axcox)
 plt.suptitle('Check crab')
 for iz, zz in enumerate(z_slices):
-    axcox.plot([pp.s[iz] for pp in list_co],  [pp.x[iz] for pp in list_co])
-    axcoy.plot([pp.s[iz] for pp in list_co],  [pp.y[iz] for pp in list_co])
+    axcox.plot(first_turn.s[iz,:] , first_turn.x[iz,:])
+    axcoy.plot(first_turn.s[iz,:] , first_turn.y[iz,:])
 
 # For each s_lens, we find the transverse position of the weak beam slice 
 # that collides with the sycnhronous particle of the strong
 r_lenses = []
 for ibb, bb in enumerate(bb_elems):
-    r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
+    #r_lenses.append(getattr(list_co[bb_index[ibb]], plane)[ibb])
+    r_lenses.append(getattr(first_turn, plane)[ibb, bb_index[ibb]])
 
 axcrab.plot(s_rel, r_lenses, 'o', color='b', alpha=.5, label= 'weak xsuite')
 Rw_crab = phi_c_weak * L_lhc / (2*np.pi*h_cc) *np.sin(2*np.pi*h_cc/L_lhc*2*s_rel)
@@ -229,9 +233,10 @@ part = xp.build_particles(particle_on_co=part,
         px = 0*z_test + np.array([0, px_twiss[0]]),
         py = 0*z_test + np.array([0, py_twiss[0]]),
         delta = 0*z_test)
-list_track = ltest.slow_track_elem_by_elem(part)
+tracker.track(part, turn_by_turn_monitor='ONE_TURN_EBE')
+mon = tracker.record_last_track
 
-axcbx.plot([pp.s[0] for pp in list_track],  [pp.x[1] - pp.x[0] for pp in list_track])
-axcby.plot([pp.s[0] for pp in list_track],  [pp.y[1] - pp.y[0] for pp in list_track])
+axcbx.plot(mon.s[0, :], mon.x[1, :] - mon.x[0, :])
+axcby.plot(mon.s[0, :], mon.y[1, :] - mon.y[0, :])
 
 plt.show()
