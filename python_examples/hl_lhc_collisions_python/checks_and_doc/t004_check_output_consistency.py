@@ -30,7 +30,7 @@ tests = [
         'path_ref': '../',
         'type_ref': 'sixtrack',
         'rtol': 4e-7,
-        'atol': 1e-100,
+        'atol': 1e-13,
         'strict': True,
     }
 ]
@@ -153,16 +153,22 @@ for tt in tests:
             # Check if the relative error is small
             val_test = dtest[kk]
             val_ref = dref[kk]
-            try:
-                if not np.isscalar(val_ref) and len(val_ref) != len(val_test):
-                        diff_rel = 100
-                    #lmin = min(len(val_ref), len(val_test))
-                    #val_test = val_test[:lmin]
-                    #val_ref = val_ref[:lmin]
+            if not np.isscalar(val_ref):
+                if len(val_ref) != len(val_test):
+                    diff_rel = 100
                 else:
-                    diff_rel = norm(np.array(val_test) - np.array(val_ref)) / norm(val_test)
-            except ZeroDivisionError:
-                diff_rel = 100.0
+                    for iiii, (vvr, vvt) in enumerate(list(zip(val_ref, val_test))):
+                        if not np.isclose(vvr, vvt, atol=atol, rtol=rtol):
+                            print(f'Issue found on `{kk}[{iiii}]`')
+                            diff_rel = 1000
+                        else:
+                            diff_rel = 0
+            else:
+                if val_ref > 0:
+                    diff_rel = np.abs((val_test - val_ref)/val_ref)
+                else:
+                    diff_rel = 100
+
             if diff_rel < rtol:
                 continue
 
@@ -209,11 +215,14 @@ for tt in tests:
                     if len(val_ref) == 0 and len(val_test) == 0:
                         continue
                     else:
-                        diff_abs = norm(np.array(val_test) - np.array(val_ref))
-                        diff_rel = diff_abs/norm(val_test)
+                        for iiii, (vvr, vvt) in enumerate(list(zip(val_ref, val_test))):
+                            if not np.isclose(vvr, vvt, atol=atol, rtol=rtol):
+                                print(f'Issue found on `{kk}[{iiii}]`')
+                                diff_rel = 1000
+                                break
+                            else:
+                                diff_rel = 0
                         if diff_rel < rtol:
-                            continue
-                        if diff_abs < atol:
                             continue
 
             # Exception: correctors involved in lumi leveling
@@ -229,9 +238,13 @@ for tt in tests:
                 'mcbch.5r2.b2', 'mcbch.a5r2.b2', 'mcbyh.4r2.b2', 'mcbxh.3r2',
                 'mcbyh.a4l2.b2', 'mcbyh.5l2.b2', 'mcbyv.5r8.b2', 'mcbyv.a4r8.b2',
                 'mcbxv.3r8', 'mcbyv.4l8.b2', 'mcbcv.b5l8.b2']:
-                if nn_corr in nn_test and diff_rel < 1e-2:
-                    passed_corr = True
-                    break
+                if nn_corr in nn_test and kk in ['knl','ksl','bal']:
+                    assert len(val_ref)<=2
+                    assert len(val_test)<=2
+                    diff_rel = norm(val_test-val_ref)/norm(val_ref)
+                    passed_corr = (diff_rel < 1e-2)
+                    if passed_corr:
+                        break
             if not(strict) and  passed_corr:
                 continue
 
@@ -276,7 +289,14 @@ for tt in tests:
                 if kk == "px_co" or kk == 'py_co':
                     if diff_abs <30e-9:
                         continue
-
+            if isinstance(ee_test, xt.XYShift):
+                if kk in ['dx','dy']:
+                    if diff_abs <1e-9:
+                        continue
+            if isinstance(ee_test, xt.SRotation):
+                if kk in ['sin_z', 'cos_z', 'angle']:
+                    if diff_abs <1e-9:
+                        continue
             # If it got here it means that no condition above is met
             raise ValueError("Too large discrepancy!")
     print(

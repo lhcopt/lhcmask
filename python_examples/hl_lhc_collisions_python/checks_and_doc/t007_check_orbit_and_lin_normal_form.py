@@ -21,7 +21,7 @@ for _ in range(10):
     tracker.track(particles)
 
 for nn in 'x px y py zeta delta'.split():
-    assert np.abs(getattr(particles, nn) - getattr(partCO, nn)) < 2e-11
+    assert np.abs(getattr(particles, nn) - getattr(partCO, nn)) < 3e-11
 
 WW = np.array(line_dict['WW_finite_diffs'])
 WWinv = np.array(line_dict['WWInv_finite_diffs'])
@@ -39,13 +39,14 @@ px_norm = ampl_sigmas * np.sqrt(geom_emit_x) * np.sin(theta)
 
 particles_matched  = xp.build_particles(particle_on_co=partCO,
                                         x_norm=x_norm, px_norm=px_norm,
-                                        R_matrix=np.array(line_dict['RR_finite_diffs']))
+                                        R_matrix=np.array(line_dict['RR_finite_diffs']),
+                                        symplectify=True)
 particles_test = particles_matched.copy()
 tracker.track(particles_test, num_turns=10)
 
 i_matched = np.argmax(particles_matched.x)
 i_test = np.argmax(particles_test.x)
-assert np.abs(particles_test.x[i_test] - particles_matched.x[i_matched]) < 1e-6
+assert np.abs(particles_test.x[i_test] - particles_matched.x[i_matched]) < 2e-6
 assert np.abs(particles_test.px[i_test] - particles_matched.px[i_matched]) < 1e-7
 
 
