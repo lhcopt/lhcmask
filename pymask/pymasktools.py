@@ -478,7 +478,7 @@ def generate_xsuite_line(mad, seq_name, bb_df,
             with open(folder_name +
                     '/line_bb_for_tracking.json', 'w') as fid:
                 json.dump(line_bb_for_tracking_dict, fid, cls=JEncoder)
-
+        return tracker, line_bb_for_tracking_dict 
 
 def save_mad_sequence_and_error(mad, seq_name, filename='lhc'):
     mad.select(flag="error",clear=True)
