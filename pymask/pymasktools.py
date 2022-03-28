@@ -375,7 +375,8 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
         px = twiss_table.px[0],
         y = twiss_table.y[0],
         py = twiss_table.py[0],
-        psigma = twiss_table.pt[0]/mad_beam.beta,
+        ptau = twiss_table.pt[0],
+        zeta = twiss_table.t[0] * mad_beam.beta
     )
     particle_on_madx_co.zeta = (twiss_table.t[0]
                                 *particle_on_madx_co.beta0
