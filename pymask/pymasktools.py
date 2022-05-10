@@ -548,13 +548,14 @@ def _restore_beam_beam(line):
 
 
 
-def seqedit(mad,seq_name,editing):
+def seqedit(mad,seq_name,editing,madInput = True):
     """Wrapper for MADX seqedit function
 
     -> editing: dict or pd.DataFrame,
         "mode" needs to be specified for each element {install, remove, replace, skip}
         other columns need to be specified depending on the chosen mode, based on the parameters from the MADX user guide.
-    
+    -> madInput: bool,
+        used to skip the mad.input() call and simply return the string
     """
     
     # Converting to pd.DataFrame
@@ -596,6 +597,7 @@ def seqedit(mad,seq_name,editing):
     '''
 
     
-    # Sending input to mad and returning it for debugging
-    mad.input(output)
+    # Sending input to mad and returning it as a string
+    if madInput:
+        mad.input(output)
     return output
