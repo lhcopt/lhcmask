@@ -3,6 +3,7 @@ import pickle
 import json
 
 import numpy as np
+import pandas as pd
 
 import xtrack as xt
 import xpart as xp
@@ -544,3 +545,57 @@ def _restore_beam_beam(line):
                 del(ee._temp_Ddelta_sub)
             else:
                 raise ValueError('What?!')
+
+
+
+def seqedit(mad,seq_name,editing):
+    """Wrapper for MADX seqedit function
+
+    -> editing: dict or pd.DataFrame,
+        "mode" needs to be specified for each element {install, remove, replace, skip}
+        other columns need to be specified depending on the chosen mode, based on the parameters from the MADX user guide.
+    
+    """
+    
+    # Converting to pd.DataFrame
+    if type(editing) is dict:
+        editing = pd.DataFrame(editing)
+    
+    # SORTING prior to the installation
+    if 'at' in list(editing.columns):
+        editing.sort_values('at',inplace=True)
+    
+    
+    # ELEMENTS
+    def installStr(row):
+        return f'{row["mode"]},element = {row["name"]},class={row["class"]},at = {row["at"]},from = {row["from"]};'
+
+    def removeStr(row):
+        return f'{row["mode"]},element = {row["name"]};' 
+    
+    def replaceStr(row):
+        return f'{row["mode"]},element = {row["element"]},by = {row["by"]};' 
+    
+    def skipStr(row):
+        return ''
+
+    entryStr = {'install':installStr,'remove':removeStr,'replace':replaceStr,'skip':skipStr}
+    elementsEntry = '\n'.join(filter(None, [entryStr[row['mode']](row) for _,row in editing.iterrows()]))
+    
+    
+    # Generating MADX call
+    output = f'''
+        use, sequence = {seq_name};
+        SEQEDIT, SEQUENCE={seq_name};
+            FLATTEN;
+            {elementsEntry}
+            FLATTEN;
+        ENDEDIT;
+
+        use, sequence = {seq_name};
+    '''
+
+    
+    # Sending input to mad and returning it for debugging
+    mad.input(output)
+    return output
