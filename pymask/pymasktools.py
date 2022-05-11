@@ -569,10 +569,10 @@ def seqedit(mad,seq_name,editing,madInput = True):
     
     # ELEMENTS
     def installStr(row):
-        return f'{row["mode"]},element = {row["name"]},class={row["class"]},at = {row["at"]},from = {row["from"]};'
+        return f'{row["mode"]},element = {row["element"]},class={row["class"]},at = {row["at"]},from = {row["from"]};'
 
     def removeStr(row):
-        return f'{row["mode"]},element = {row["name"]};' 
+        return f'{row["mode"]},element = {row["element"]};' 
     
     def replaceStr(row):
         return f'{row["mode"]},element = {row["element"]},by = {row["by"]};' 
