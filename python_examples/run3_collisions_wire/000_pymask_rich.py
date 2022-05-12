@@ -4,6 +4,8 @@ import json
 import yaml
 import numpy as np
 
+# For Progress Bar
+from rich.progress import Progress, BarColumn, TextColumn,TimeElapsedColumn,SpinnerColumn
 import bbcw as bbcw
 
 #####################################################
@@ -31,13 +33,28 @@ except:
 if tree_maker is not None:
     tree_maker.tag_json.tag_it(configuration['log_file'], 'started')
 
+#######################################################
+# Creating Progress bar
+#######################################################
+
+
+progress = Progress(
+    "{task.description}",
+    SpinnerColumn(),
+    BarColumn(bar_width=40),
+    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),TimeElapsedColumn ())
+
+progress.start()
+progress.live._disable_redirect_io()
+
+progress_global = progress.add_task("[blue]Processing\n", total=18)
 
 
 #######################################################
 # Configuration
 #######################################################
 
-
+progress_step = progress.add_task(f"[cyan]    Load Configuration",total=1)
 
 
 mode = configuration['mode']
@@ -84,6 +101,9 @@ import optics_specific_tools as ost
 ######################################
 # Check parameters and activate mode #
 ######################################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Select Mode",total=1)
 
 # Define configuration
 (beam_to_configure, sequences_to_check, sequence_to_track, generate_b4_from_b2,
@@ -101,6 +121,9 @@ if not(enable_crabs):
 ########################
 # Build MAD-X instance #
 ########################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Build MAD-X Sequence",total=1)
 
 
 # Start mad
@@ -118,9 +141,15 @@ ost.build_sequence(mad, beam=beam_to_configure,
 mad.input('exec, twiss_opt;')
 
 # Apply optics
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Apply Optics",total=1)
 ost.apply_optics(mad, optics_file=optics_file)
 
 # Attach beam to sequences
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Setup Beams",total=1)
 
 mad.globals.nrj = configuration['beam_energy_tot']
 particle_type = 'proton'
@@ -164,6 +193,9 @@ for ss in mad.sequence.keys():
 
 
 # Test machine before any change
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Twiss Checks",total=1)
 
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         tol_beta=tol_beta, tol_sep=tol_sep,
@@ -176,6 +208,9 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 mad.input("call, file='modules/submodule_01c_phase.madx';")
 
 # Set optics-specific knobs
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Optics-specific Knobs",total=1)
 
 ost.set_optics_specific_knobs(mad, knob_settings, mode)
 
@@ -187,6 +222,9 @@ mad.input("call, file='modules/submodule_01e_final.madx';")
 #################################
 # Check bahavior of orbit knobs #
 #################################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Flatness Checks",total=1)
 
 
 # Check flat machine
@@ -215,6 +253,9 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
 #################################
 # Set luminosity in IP2 and IP8 #
 #################################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Luminosity Control",total=1)
 
 if len(sequences_to_check) == 2:
     print('Luminosities before leveling (crab cavities are not considered):')
@@ -276,11 +317,15 @@ else:
 ####################################
 # WIRE HERE
 ####################################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
 
 if configuration['install_wires']:
+    progress_step = progress.add_task(f"[orchid]    -> Aligning wires <-",total=1)
     bbcw.make_QFF_links(mad,configuration)
     bbcw.align_wires(mad,seq_name = sequence_to_track,_twiss=None)
-
+else:
+    progress_step = progress.add_task(f"[cyan] Skipping wires",total=1)
 
     
 #####################
@@ -294,6 +339,10 @@ mad.globals.on_disp = 0.
 ###################################
 # Compute beam-beam configuration #
 ###################################
+
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Generate Beam-Beam",total=1)
 
 # Prepare bb dataframes
 if enable_bb_python:
@@ -315,6 +364,9 @@ if enable_bb_python:
 ###################
 # Generate beam 4 #
 ###################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Beam 4 config",total=1)
 
 if generate_b4_from_b2:
     mad_b4 = Madx(command_log="mad_b4.log")
@@ -370,6 +422,9 @@ twiss_dfs, other_data = ost.twiss_and_check(mad_track, sequences_to_check,
 #####################
 # Install bb lenses #
 #####################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Install BB and Crabs",total=1)
 
 # Python approach
 if enable_bb_python:
@@ -441,6 +496,9 @@ mad_track.use = None
 ##############################
 # Install and correct errors #
 ##############################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Correct Errors",total=1)
 
 if enable_imperfections:
     mad_track.set_variables_from_dict(
@@ -458,6 +516,9 @@ else:
 ##################
 # Machine tuning #
 ##################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Machine Tuning",total=1)
 
 # Enable bb for matchings
 if match_q_dq_with_bb:
@@ -537,64 +598,80 @@ if enable_crabs:
 #####################
 # Generate sixtrack #
 #####################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
 
 
-
-if enable_bb_legacy:
-    mad_track.input("call, file='modules/module_06_generate.madx'")
+if False:
+    progress_step = progress.add_task(f"[cyan]    Skipping -Generate SixTrack-",total=1)
+    pass
 else:
-    pm.generate_sixtrack_input(mad_track,
-        seq_name=sequence_to_track,
-        bb_df=bb_df_track,
-        output_folder='./',
-        reference_num_particles_sixtrack=(
-            mad_track.sequence[sequence_to_track].beam.npart),
-        reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge,
-        emitnx_sixtrack_um=(
-            mad_track.sequence[sequence_to_track].beam.exn),
-        emitny_sixtrack_um=(
-            mad_track.sequence[sequence_to_track].beam.eyn),
-        sigz_sixtrack_m=(
-            mad_track.sequence[sequence_to_track].beam.sigt),
-        sige_sixtrack=(
-            mad_track.sequence[sequence_to_track].beam.sige),
-        ibeco_sixtrack=1,
-        ibtyp_sixtrack=0,
-        lhc_sixtrack=2,
-        ibbc_sixtrack=0,
-        radius_sixtrack_multip_conversion_mad=0.017,
-        skip_mad_use=True)
+    progress_step = progress.add_task(f"[cyan]    Generate SixTrack-",total=1)
+    if enable_bb_legacy:
+        mad_track.input("call, file='modules/module_06_generate.madx'")
+    else:
+        pm.generate_sixtrack_input(mad_track,
+            seq_name=sequence_to_track,
+            bb_df=bb_df_track,
+            output_folder='./',
+            reference_num_particles_sixtrack=(
+                mad_track.sequence[sequence_to_track].beam.npart),
+            reference_particle_charge_sixtrack=mad_track.sequence[sequence_to_track].beam.charge,
+            emitnx_sixtrack_um=(
+                mad_track.sequence[sequence_to_track].beam.exn),
+            emitny_sixtrack_um=(
+                mad_track.sequence[sequence_to_track].beam.eyn),
+            sigz_sixtrack_m=(
+                mad_track.sequence[sequence_to_track].beam.sigt),
+            sige_sixtrack=(
+                mad_track.sequence[sequence_to_track].beam.sige),
+            ibeco_sixtrack=1,
+            ibtyp_sixtrack=0,
+            lhc_sixtrack=2,
+            ibbc_sixtrack=0,
+            radius_sixtrack_multip_conversion_mad=0.017,
+            skip_mad_use=True)
 
 
 
 ########################
 # Generate xtrack line #
 ########################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
 
 
-#######################################
-# Save optics and orbit at start ring #
-#######################################
-
-optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
-        mad_track, sequence_to_track, skip_mad_use=True)
-with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
-    json.dump(optics_and_co_at_start_ring_from_madx, fid, cls=pm.JEncoder)
-
-
-if enable_bb_legacy:
-    print('xtrack line is not generated with bb legacy macros')
+if False:
+    progress_step = progress.add_task(f"[cyan]    Skipping -Generate Xtrack-",total=1)
+    pass
 else:
-    #import pdb; pdb.set_trace()
-    pm.generate_xsuite_line(mad_track, sequence_to_track, bb_df_track,
-                    optics_and_co_at_start_ring_from_madx,
-                    folder_name = './xsuite_lines',
-                    skip_mad_use=True,
-                    prepare_line_for_xtrack=True)
+    progress_step = progress.add_task(f"[cyan]    Generate Xtrack-",total=1)
+    #######################################
+    # Save optics and orbit at start ring #
+    #######################################
+
+    optics_and_co_at_start_ring_from_madx = pm.get_optics_and_orbit_at_start_ring(
+            mad_track, sequence_to_track, skip_mad_use=True)
+    with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
+        json.dump(optics_and_co_at_start_ring_from_madx, fid, cls=pm.JEncoder)
+
+    
+    if enable_bb_legacy:
+        print('xtrack line is not generated with bb legacy macros')
+    else:
+        #import pdb; pdb.set_trace()
+        pm.generate_xsuite_line(mad_track, sequence_to_track, bb_df_track,
+                        optics_and_co_at_start_ring_from_madx,
+                        folder_name = './xsuite_lines',
+                        skip_mad_use=True,
+                        prepare_line_for_xtrack=True)
 
 ###################################
 #         Save final twiss        #
 ###################################
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress_step = progress.add_task(f"[cyan]    Save Final Twiss",total=1)
 
 mad_track.globals.on_bb_charge = 0
 mad_track.twiss()
@@ -620,3 +697,11 @@ sdf.to_parquet('final_summ_BBON.parquet')
 if tree_maker is not None:
     tree_maker.tag_json.tag_it(configuration['log_file'], 'completed')
 
+
+# Closing progress bar
+
+progress.update(progress_global, advance=1,update=True)
+progress.update(progress_step, advance=1,update=True)
+progress.refresh()
+progress.stop()
+progress.console.clear_live()
