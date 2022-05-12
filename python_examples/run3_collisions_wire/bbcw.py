@@ -82,8 +82,8 @@ ALIGN_RECIPE = {'b1':  {'bbcwe': """{xma} :=      {x_b}+{rw} ; {yma} := {y_b}   
 def install_wires(mad,configuration,seq_name):
     
     # installing monitors if not in seq_name:
-    if WIRE_MARKERS[seq_name[-2:]][0] not in mad.elements:
-        to_install = pd.DataFrame(WIRE_INSTALL_FALLBACK[seq_name[-2:]],columns=['name','at','from'])
+    if configuration['wires_at_fallback']:
+        to_install = pd.DataFrame(WIRE_INSTALL_FALLBACK[seq_name[-2:]],columns=['element','at','from'])
         to_install.insert(0,'mode','install')
         to_install.insert(2,'class','monitor')
         
@@ -132,18 +132,20 @@ def install_wires(mad,configuration,seq_name):
                                             'by'        : [_def.split(':')[0] for _def in wires_def]})
     mad.input(madInput)
     
+    # Creating single knobs for the wires in each IP:
+    make_knobs(mad)
+#============================================================    
 
 def remove_duplicates(myList):
     return list(set(myList))
 
-
-def make_QFF_links(mad,configuration):
-    mad.input(f"enable_QFF = {int(configuration['enable_QFF'])};")
+#============================================================
+def make_knobs(mad):
     
-        # Extracting wire information
+    # Extracting wire information for both beams
     wires = [tuple(wire.split('.')) for wire in WIRE_MARKERS['b1'] + WIRE_MARKERS['b2']]
-
-
+    
+    
     # Defining single current knob for the wires in each IP and single rw knob
     entries_current = []
     entries_rw      = []
@@ -162,13 +164,27 @@ def make_QFF_links(mad,configuration):
 
     madCall   = '\n'.join(remove_duplicates(entries_current) + ['',''])
     madCall  += '\n'.join(entries_rw)
-    new_knobs = remove_duplicates(new_knobs)
+    
+    mad.input(madCall)
+#============================================================
+    
+#============================================================
+def make_QFF_links(mad,configuration):
+    mad.input(f"enable_QFF = {int(configuration['enable_QFF'])};")
+    
+    # Extracting wire information for both beams
+    wires = [tuple(wire.split('.')) for wire in WIRE_MARKERS['b1'] + WIRE_MARKERS['b2']]
+
+    all_knobs = []
+    for w_type,loc,s,beam in wires:  
+            all_knobs.append((f'bbcw_I_ip{loc[-1]}.{beam}',f'bbcw_rw_ip{loc[-1]}.{beam}'))
+    all_knobs = remove_duplicates(all_knobs)
 
 
 
     # Linking kq4 values to wires for QFF!
     entries = []
-    for _I,_rw in new_knobs:
+    for _I,_rw in all_knobs:
         info = _I.split('_')[-1]
         ip,beam = info.split('.')
 
@@ -177,10 +193,10 @@ def make_QFF_links(mad,configuration):
 
         entries+= initialize + recipe.split('\n') + ['']
 
-    madCall += '\n\n' + '\n'.join(entries)
+    madCall = '\n'.join(entries)
     
     mad.input(madCall)
-
+#============================================================
 
 #============================================================
 def align_wires(mad,seq_name,_twiss=None):
@@ -201,7 +217,6 @@ def align_wires(mad,seq_name,_twiss=None):
                                                         rw  = f'bbcw_rw_ip{loc[-1]}.{beam}',
                                                         x_b = wire_twiss.x,
                                                         y_b = wire_twiss.y))
-        print('HERE',entries[-1])
         
     madCall  = '\n'.join(entries)
     mad.input(madCall)
