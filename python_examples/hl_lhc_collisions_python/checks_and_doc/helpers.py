@@ -154,7 +154,7 @@ def track_particle_sixtrack(
         px_tbt[:, i_part] = sixdump_part.px
         y_tbt[:, i_part] = sixdump_part.y
         py_tbt[:, i_part] = sixdump_part.py
-        zeta_tbt[:, i_part] = sixdump_part.zeta
+        zeta_tbt[:, i_part] = sixdump_part.tau * sixdump_part.beta0
         delta_tbt[:, i_part] = sixdump_part.delta
 
     extra = {}
