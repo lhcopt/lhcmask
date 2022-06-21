@@ -7,7 +7,8 @@ pip install cpymad
 pip install xsuite                                                                 
 git clone git@github.com:lhcopt/lhcerrors.git                                      
 git clone git@github.com:lhcopt/lhctoolkit.git                                     
-git clone git@github.com:lhcopt/lhcmask.git                                        
+git clone git@github.com:lhcopt/lhcmask.git   
+git clone git@github.com:lhcopt/beambeam_macros.git                                        
 cd lhcmask                                                                         
 git checkout release/v1.3.1                                                        
 pip install -e .                                                                   
