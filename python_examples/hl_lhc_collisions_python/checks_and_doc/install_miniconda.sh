@@ -8,12 +8,15 @@ pip install xsuite
 git clone git@github.com:lhcopt/lhcerrors.git                                      
 git clone git@github.com:lhcopt/lhctoolkit.git                                     
 git clone git@github.com:lhcopt/lhcmask.git   
-git clone git@github.com:lhcopt/beambeam_macros.git                                        
+git clone git@github.com:lhcopt/beambeam_macros.git
+cd beambeam_macros
+gfortran headonslice.f -o  headonslice
+cd ..
 cd lhcmask                                                                         
 git checkout release/v1.3.1                                                        
 pip install -e .                                                                   
 cd ../                                                                             
 git clone https://github.com/PyCOMPLETE/FillingPatterns.git                        
 pip install ./FillingPatterns                                                      
-python -m pip install sixtracktools                                                
-python -m pip install NAFFlib 
+python -m pip install sixtracktools            
+python -m pip install NAFFlib
