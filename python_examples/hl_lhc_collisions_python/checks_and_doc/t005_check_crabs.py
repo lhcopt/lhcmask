@@ -21,26 +21,26 @@ plane = 'y'
 phi_weak = Phi
 phi_c_weak = Phi_c
 
-# # B1 ip1
-# beam_track = 'b1'
-# ip_choice = 1
-# plane = 'x'
-# phi_weak = Phi
-# phi_c_weak = Phi_c
+# B1 ip1
+beam_track = 'b1'
+ip_choice = 1
+plane = 'x'
+phi_weak = Phi
+phi_c_weak = Phi_c
 
-# # B4 ip5
-# beam_track = 'b4'
-# ip_choice = 5
-# plane = 'y'
-# phi_weak = Phi
-# phi_c_weak = Phi_c
+# B4 ip5
+beam_track = 'b4'
+ip_choice = 5
+plane = 'y'
+phi_weak = Phi
+phi_c_weak = Phi_c
 
-# # B4 ip1
-# beam_track = 'b4'
-# ip_choice = 1
-# plane = 'x'
-# phi_weak = -Phi
-# phi_c_weak = -Phi_c
+# B4 ip1
+beam_track = 'b4'
+ip_choice = 1
+plane = 'x'
+phi_weak = -Phi
+phi_c_weak = -Phi_c
 
 phi_strong = -phi_weak
 phi_c_strong = -phi_c_weak
@@ -60,7 +60,7 @@ def prepare_line(path, input_type):
     elif input_type == 'sixtrack':
         print('Build xsuite from sixtrack input:')
         sixinput_test = sixtracktools.sixinput.SixInput(path)
-        ltest = xt.Line.from_sixinput(sixinput_test)
+        ltest = sixinput_test.generate_xtrack_line()
         print('Done')
     else:
         raise ValueError('What?!')
