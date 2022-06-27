@@ -3,6 +3,7 @@ import pickle
 import json
 
 import numpy as np
+import pandas as pd
 
 import xtrack as xt
 import xpart as xp
@@ -375,7 +376,8 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
         px = twiss_table.px[0],
         y = twiss_table.y[0],
         py = twiss_table.py[0],
-        psigma = twiss_table.pt[0]/mad_beam.beta,
+        ptau = twiss_table.pt[0],
+        zeta = twiss_table.t[0] * mad_beam.beta
     )
     particle_on_madx_co.zeta = (twiss_table.t[0]
                                 *particle_on_madx_co.beta0
@@ -544,3 +546,59 @@ def _restore_beam_beam(line):
                 del(ee._temp_Ddelta_sub)
             else:
                 raise ValueError('What?!')
+
+
+
+def seqedit(mad,seq_name,editing,madInput = True):
+    """Wrapper for MADX seqedit function
+
+    -> editing: dict or pd.DataFrame,
+        "mode" needs to be specified for each element {install, remove, replace, skip}
+        other columns need to be specified depending on the chosen mode, based on the parameters from the MADX user guide.
+    -> madInput: bool,
+        used to skip the mad.input() call and simply return the string
+    """
+    
+    # Converting to pd.DataFrame
+    if type(editing) is dict:
+        editing = pd.DataFrame(editing)
+    
+    # SORTING prior to the installation
+    if 'at' in list(editing.columns):
+        editing.sort_values('at',inplace=True)
+    
+    
+    # ELEMENTS
+    def installStr(row):
+        return f'{row["mode"]},element = {row["element"]},class={row["class"]},at = {row["at"]},from = {row["from"]};'
+
+    def removeStr(row):
+        return f'{row["mode"]},element = {row["element"]};' 
+    
+    def replaceStr(row):
+        return f'{row["mode"]},element = {row["element"]},by = {row["by"]};' 
+    
+    def skipStr(row):
+        return ''
+
+    entryStr = {'install':installStr,'remove':removeStr,'replace':replaceStr,'skip':skipStr}
+    elementsEntry = '\n'.join(filter(None, [entryStr[row['mode']](row) for _,row in editing.iterrows()]))
+    
+    
+    # Generating MADX call
+    output = f'''
+        use, sequence = {seq_name};
+        SEQEDIT, SEQUENCE={seq_name};
+            FLATTEN;
+            {elementsEntry}
+            FLATTEN;
+        ENDEDIT;
+
+        use, sequence = {seq_name};
+    '''
+
+    
+    # Sending input to mad and returning it as a string
+    if madInput:
+        mad.input(output)
+    return output
