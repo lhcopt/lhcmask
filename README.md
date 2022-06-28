@@ -30,7 +30,7 @@ git clone git@github.com:lhcopt/lhcmask.git
 # needed only if you are not using the legacy bb macros
 git clone git@github.com:lhcopt/beambeam_macros.git                                                                                               
                                      
-python -m pip install ./lhcmask                                                                   
+python -m pip install -e ./lhcmask                                                                   
 # depending on the optics you want to use (select the one you need)
 git clone git@github.com:lhcopt/hllhc15.git
 # used in the HL python example
@@ -42,7 +42,7 @@ git clone $(whoami)@lxplus.cern.ch:/afs/cern.ch/eng/lhc/optics/runII/2018
 
 # needed only for the ion example
 git clone https://github.com/PyCOMPLETE/FillingPatterns.git                        
-python -m pip install ./FillingPatterns               
+python -m pip install -e ./FillingPatterns               
 
 # needed for the tests                                       
 python -m pip install sixtracktools                                                
