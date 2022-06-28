@@ -12,6 +12,44 @@ D. Pellegrini
 G. Sterbini  
 F. Van Der Veken  
 
+## To install:
+It is good to be independent by `afs` by installing a local copy of input files.
+Assuming you have access to `lxplus`, a possible way is
+
+```source
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh         
+bash Miniconda3-latest-Linux-x86_64.sh -b  -p ./miniconda -f                       
+source miniconda/bin/activate                                                      
+python -m pip install ipython jupyterlab numpy scipy pandas awkward matplotlib               
+python -m pip install pyarrow pyyaml  pytest  cpymad   xsuite                                          
+                                                                
+git clone git@github.com:lhcopt/lhcerrors.git                                      
+git clone git@github.com:lhcopt/lhctoolkit.git                                     
+git clone git@github.com:lhcopt/lhcmask.git          
+
+# needed only if you are not using the legacy bb macros
+git clone git@github.com:lhcopt/beambeam_macros.git                                                                                               
+                                     
+python -m pip install ./lhcmask                                                                   
+# depending on the optics you want to use (select the one you need)
+git clone git@github.com:lhcopt/hllhc15.git
+# used in the HL python example
+git clone git@github.com:lhcopt/hllhc14.git
+# for the Run 3
+git clone $(whoami)@lxplus.cern.ch:/afs/cern.ch/eng/lhc/optics/runIII
+# for the ions example
+git clone $(whoami)@lxplus.cern.ch:/afs/cern.ch/eng/lhc/optics/runII/2018
+
+# needed only for the ion example
+git clone https://github.com/PyCOMPLETE/FillingPatterns.git                        
+python -m pip install ./FillingPatterns               
+
+# needed for the tests                                       
+python -m pip install sixtracktools                                                
+python -m pip install NAFFlib   
+```
+
+
 ## To run an example:
 ```bash
 cd examples/hl_lhc_collision/
