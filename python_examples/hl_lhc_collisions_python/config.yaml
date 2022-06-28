@@ -1,6 +1,6 @@
 # Links to be made for tools and scripts
 links:
-  tracking_tools: ../../../
+  tracking_tools: auto
   modules: tracking_tools/lhcmask
   tools: tracking_tools/lhctoolkit
   beambeam_macros: tracking_tools/beambeam_macros
