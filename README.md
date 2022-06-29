@@ -11,6 +11,7 @@ Y. Papaphilippou
 D. Pellegrini  
 G. Sterbini  
 F. Van Der Veken  
+A. Fornara
 
 ## To install:
 It is good to be independent by `afs` by installing a local copy of input files.
