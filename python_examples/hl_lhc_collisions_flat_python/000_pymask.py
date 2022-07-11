@@ -255,7 +255,7 @@ if len(sequences_to_check) == 2:
 else:
     print('Luminosity computation requires two beams')
 
-qqqqqqqqqqqqqqqqqqqq
+
 #####################
 # Force on_disp = 0 #
 #####################
