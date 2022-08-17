@@ -635,8 +635,8 @@ def setup_beam_beam_in_line(
             params = {}
             params['phi'] = bb_df.loc[eename, 'phi']
             params['alpha'] =  bb_df.loc[eename, 'alpha']
-            params['ref_shift_x'] =  bb_df.loc[eename, 'separation_x']
-            params['ref_shift_y'] =  bb_df.loc[eename, 'separation_y']
+            params['other_beam_shift_x'] =  bb_df.loc[eename, 'separation_x']
+            params['other_beam_shift_y'] =  bb_df.loc[eename, 'separation_y']
             params['slices_other_beam_num_particles'] =  [bb_df.loc[eename, 'other_num_particles']]
             params['other_beam_q0'] =  bb_df.loc[eename, 'other_particle_charge']
             params['slices_other_beam_zeta_center'] =  [0.0]
