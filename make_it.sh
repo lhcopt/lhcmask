@@ -10,5 +10,9 @@ git clone git@github.com:lhcopt/lhcerrors.git
 git clone git@github.com:lhcopt/lhctoolkit.git
 git clone git@github.com:lhcopt/hllhc15.git
 git clone git@github.com:lhcopt/hllhc14.git
+# you need gfortran
+# `sudo yum install gcc-gfortran`
+# then `cd beambeam_macros`
+# and `gfortran headonslice.f -o headonslice`
 git clone git@github.com:lhcopt/beambeam_macros.git
 git clone $(whoami)@lxplus.cern.ch:/afs/cern.ch/eng/lhc/optics/runIII

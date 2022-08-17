@@ -624,13 +624,13 @@ def setup_beam_beam_in_line(
 
     for ii, (ee, eename) in enumerate(zip(line.elements, line.element_names)):
         if isinstance(ee, xf.BeamBeamBiGaussian2D):
-            ee.n_particles=bb_df.loc[eename, 'other_num_particles']
-            ee.q0 = bb_df.loc[eename, 'other_particle_charge']
-            ee.sigma_x = np.sqrt(bb_df.loc[eename, 'other_Sigma_11'])
-            ee.sigma_y = np.sqrt(bb_df.loc[eename, 'other_Sigma_33'])
-            ee.beta0 = bb_df.loc[eename, 'other_relativistic_beta']
-            ee.mean_x = bb_df.loc[eename, 'separation_x']
-            ee.mean_y = bb_df.loc[eename, 'separation_y']
+            ee.other_beam_num_particles=bb_df.loc[eename, 'other_num_particles']
+            ee.other_beam_q0 = bb_df.loc[eename, 'other_particle_charge']
+            ee.other_beam_Sigma_11 = bb_df.loc[eename, 'other_Sigma_11']
+            ee.other_beam_Sigma_33 = bb_df.loc[eename, 'other_Sigma_33']
+            ee.other_beam_beta0 = bb_df.loc[eename, 'other_relativistic_beta']
+            ee.other_beam_shift_x = bb_df.loc[eename, 'separation_x']
+            ee.other_beam_shift_y = bb_df.loc[eename, 'separation_y']
         if isinstance(ee, xf.BeamBeamBiGaussian3D):
             params = {}
             params['phi'] = bb_df.loc[eename, 'phi']
