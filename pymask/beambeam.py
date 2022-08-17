@@ -635,43 +635,29 @@ def setup_beam_beam_in_line(
             params = {}
             params['phi'] = bb_df.loc[eename, 'phi']
             params['alpha'] =  bb_df.loc[eename, 'alpha']
-            params['x_bb_co'] =  bb_df.loc[eename, 'separation_x']
-            params['y_bb_co'] =  bb_df.loc[eename, 'separation_y']
-            # TODO update xtrack interface to separate charge and b. population
-            params['charge_slices'] =  [(bb_df.loc[eename, 'other_num_particles']
-                                 * bb_df.loc[eename, 'other_particle_charge'])]
-            params['zeta_slices'] =  [0.0]
-            params['sigma_11'] =  bb_df.loc[eename, 'other_Sigma_11']
-            params['sigma_12'] =  bb_df.loc[eename, 'other_Sigma_12']
-            params['sigma_13'] =  bb_df.loc[eename, 'other_Sigma_13']
-            params['sigma_14'] =  bb_df.loc[eename, 'other_Sigma_14']
-            params['sigma_22'] =  bb_df.loc[eename, 'other_Sigma_22']
-            params['sigma_23'] =  bb_df.loc[eename, 'other_Sigma_23']
-            params['sigma_24'] =  bb_df.loc[eename, 'other_Sigma_24']
-            params['sigma_33'] =  bb_df.loc[eename, 'other_Sigma_33']
-            params['sigma_34'] =  bb_df.loc[eename, 'other_Sigma_34']
-            params['sigma_44'] =  bb_df.loc[eename, 'other_Sigma_44']
+            params['ref_shift_x'] =  bb_df.loc[eename, 'separation_x']
+            params['ref_shift_y'] =  bb_df.loc[eename, 'separation_y']
+            params['slices_other_beam_num_particles'] =  [bb_df.loc[eename, 'other_num_particles']]
+            params['other_beam_q0'] =  bb_df.loc[eename, 'other_particle_charge']
+            params['slices_other_beam_zeta_center'] =  [0.0]
+            params['slices_other_beam_Sigma_11'] = [bb_df.loc[eename, 'other_Sigma_11']]
+            params['slices_other_beam_Sigma_12'] = [bb_df.loc[eename, 'other_Sigma_12']]
+            params['slices_other_beam_Sigma_13'] = [bb_df.loc[eename, 'other_Sigma_13']]
+            params['slices_other_beam_Sigma_14'] = [bb_df.loc[eename, 'other_Sigma_14']]
+            params['slices_other_beam_Sigma_22'] = [bb_df.loc[eename, 'other_Sigma_22']]
+            params['slices_other_beam_Sigma_23'] = [bb_df.loc[eename, 'other_Sigma_23']]
+            params['slices_other_beam_Sigma_24'] = [bb_df.loc[eename, 'other_Sigma_24']]
+            params['slices_other_beam_Sigma_33'] = [bb_df.loc[eename, 'other_Sigma_33']]
+            params['slices_other_beam_Sigma_34'] = [bb_df.loc[eename, 'other_Sigma_34']]
+            params['slices_other_beam_Sigma_44'] = [bb_df.loc[eename, 'other_Sigma_44']]
 
             if not (bb_coupling):
-                params['sigma_13'] =  0.0
-                params['sigma_14'] =  0.0
-                params['sigma_23'] =  0.0
-                params['sigma_24'] =  0.0
+                params['slices_other_beam_Sigma_13'] = [0.0]
+                params['slices_other_beam_Sigma_14'] = [0.0]
+                params['slices_other_beam_Sigma_23'] = [0.0]
+                params['slices_other_beam_Sigma_24'] = [0.0]
 
-            params["x_co"] = 0
-            params["px_co"] = 0
-            params["y_co"] = 0
-            params["py_co"] = 0
-            params["zeta_co"] = 0
-            params["delta_co"] = 0
-            params["d_x"] = 0
-            params["d_px"] = 0
-            params["d_y"] = 0
-            params["d_py"] = 0
-            params["d_zeta"] = 0
-            params["d_delta"] = 0
-
-            newee = xf.BeamBeamBiGaussian3D(old_interface=params)
+            newee = xf.BeamBeamBiGaussian3D(**params)
             line.element_dict[eename] = newee
 
 
