@@ -6,6 +6,7 @@ git clone -b release/v0.1.0 git@github.com:xsuite/tree_maker.git
 python -m pip install -e tree_maker
 git clone git@github.com:lhcopt/lhcmask.git -b release/v1.3.3
 python -m pip install -e lhcmask
+python -m pip install sixtracktools
 git clone git@github.com:lhcopt/lhcerrors.git
 git clone git@github.com:lhcopt/lhctoolkit.git
 git clone git@github.com:lhcopt/hllhc15.git
