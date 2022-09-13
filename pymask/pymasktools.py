@@ -457,6 +457,8 @@ def generate_xsuite_line(mad, seq_name, bb_df,
         xf.configure_orbit_dependent_parameters_for_bb(tracker,
                            particle_on_co=particle_on_tracker_co)
 
+       
+
         _disable_beam_beam(tracker.line)
         RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
                 particle_on_tracker_co,
@@ -465,7 +467,7 @@ def generate_xsuite_line(mad, seq_name, bb_df,
 
 
         (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
-                ) = xp.compute_linear_normal_form(RR_finite_diffs)
+                ) = xp.compute_linear_normal_form(RR_finite_diffs, stability_tol=0.05)
 
         line_bb_for_tracking_dict = line.to_dict()
         line_bb_for_tracking_dict['particle_on_tracker_co'] = (
@@ -498,14 +500,16 @@ def save_mad_sequence_and_error(mad, seq_name, filename='lhc'):
 def _disable_beam_beam(line):
     for ee in line.elements:
         if ee.__class__.__name__.startswith('BeamBeam'):
-            ee._temp_q0 = ee.other_beam_q0
-            ee.other_beam_q0 = 0
             if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+                ee._temp_q0 = ee.other_beam_q0
+                ee.other_beam_q0 = 0
                 ee._temp_d_px = ee.post_subtract_px
                 ee._temp_d_py = ee.post_subtract_py
                 ee.post_subtract_px = 0.
                 ee.post_subtract_py = 0.
             elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+                ee._temp_q0 = ee.other_beam_q0
+                ee.other_beam_q0 = 0
                 ee._temp_Dx_sub = ee.post_subtract_x
                 ee._temp_Dpx_sub = ee.post_subtract_px
                 ee._temp_Dy_sub = ee.post_subtract_y
@@ -520,24 +524,34 @@ def _disable_beam_beam(line):
                 ee.post_subtract_pzeta = 0.
             else:
                 raise ValueError('What?!')
+        elif ee.__class__.__name__ == 'Wire':
+            ee._temp_current = ee.current
+            ee._temp_d_px = ee.post_subtract_px
+            ee._temp_d_py = ee.post_subtract_py
+            ee.post_subtract_px = 0.
+            ee.post_subtract_py = 0.
+            ee.current = 0.
 
 def _restore_beam_beam(line):
     for ee in line.elements:
         if ee.__class__.__name__.startswith('BeamBeam'):
-            ee.other_beam_q0 = ee._temp_q0
-            del(ee._temp_q0)
+
             if ee.__class__.__name__ == 'BeamBeamBiGaussian2D':
+                ee.other_beam_q0 = ee._temp_q0
                 ee.post_subtract_px = ee._temp_d_px
                 ee.post_subtract_py = ee._temp_d_py
+                del(ee._temp_q0)
                 del(ee._temp_d_px)
                 del(ee._temp_d_py)
             elif ee.__class__.__name__ == 'BeamBeamBiGaussian3D':
+                ee.other_beam_q0 = ee._temp_q0
                 ee.post_subtract_x = ee._temp_Dx_sub
                 ee.post_subtract_px = ee._temp_Dpx_sub
                 ee.post_subtract_y = ee._temp_Dy_sub
                 ee.post_subtract_py = ee._temp_Dpy_sub
                 ee.post_subtract_zeta = ee._temp_Dzeta_sub
                 ee.post_subtract_pzeta = ee._temp_Dpzeta_sub
+                del(ee._temp_q0)
                 del(ee._temp_Dx_sub)
                 del(ee._temp_Dpx_sub)
                 del(ee._temp_Dy_sub)
@@ -546,6 +560,13 @@ def _restore_beam_beam(line):
                 del(ee._temp_Dpzeta_sub)
             else:
                 raise ValueError('What?!')
+        elif ee.__class__.__name__ == 'Wire':
+            ee.current = ee._temp_current
+            ee.post_subtract_px = ee._temp_d_px
+            ee.post_subtract_py = ee._temp_d_py
+            del(ee._temp_current)
+            del(ee._temp_d_px)
+            del(ee._temp_d_py)
 
 
 
