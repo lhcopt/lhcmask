@@ -102,6 +102,11 @@ for tt in tests:
         ll.merge_consecutive_drifts(inplace=True)
         ll.merge_consecutive_multipoles(inplace=True)
 
+        # Add marker at end if not present
+        if not (isinstance(ll[-1], xt.Drift) and ll[-1].length==0):
+            ll.append_element(element=xt.Drift(length=0),
+                              name='_end_line_marker')
+
         # Remove inactive RFMultipoles and normalize phase
         for ii, ee in enumerate(ll.elements):
             if ee.__class__.__name__ == 'RFMultipole':
