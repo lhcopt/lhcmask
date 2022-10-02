@@ -464,16 +464,16 @@ for ss in '12 23 34 45 56 67 78 81'.split():
 # mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
 # mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
 
-# Check strength limits
-if enable_imperfections:
-    mad_track.input('call, file="errors/HL-LHC/corr_limit.madx";')
+# # Check strength limits
+# if enable_imperfections:
+#     mad_track.input('call, file="errors/HL-LHC/corr_limit.madx";')
 
-# Rematch the orbit at IPs
-mad_track.input("call, file='tools/rematchCOIP.madx';")
+# # Rematch the orbit at IPs
+# mad_track.input("call, file='tools/rematchCOIP.madx';")
 
-# Rematch the CO in the arc for dispersion correction
-if mad_track.globals.on_disp != 0:
-    mad_track.input("call, file='tools/rematchCOarc.madx';")
+# # Rematch the CO in the arc for dispersion correction
+# if mad_track.globals.on_disp != 0:
+#     mad_track.input("call, file='tools/rematchCOarc.madx';")
 
 # Match tunes and chromaticities
 pm.match_tune_and_chromaticity(mad_track,

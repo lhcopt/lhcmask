@@ -295,6 +295,8 @@ if generate_b4_from_b2:
 
     pm.configure_b4_from_b2(mad_b4, mad)
 
+    mad.globals.on_disp = 1. # TEEEEEEEEEEMP
+
     twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad,
             sequences_to_check=['lhcb2'],
             tol_beta=tol_beta, tol_sep=tol_sep,

@@ -25,6 +25,9 @@ dfb2 = pd.read_parquet('../hl_lhc_collisions_001_b4_no_bb/twiss_b2_for_b4check_s
 
 tw_b2 = tw_b4.mirror()
 
+Ws = np.array(tw_b2.W_matrix)
+alfx_from_wmat_b2 = -Ws[:, 0, 0] * Ws[:, 1, 0] - Ws[:, 0, 1] * Ws[:, 1, 1]
+
 
 # tracker_b1.vars['on_x1'] = 0.0
 # tracker_b1.vars['on_x2'] = 0.0
