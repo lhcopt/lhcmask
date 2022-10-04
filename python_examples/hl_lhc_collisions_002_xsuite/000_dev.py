@@ -54,3 +54,18 @@ tracker_b1.vars['on_alice'] = 0
 tracker_b1.vars['on_lhcb'] = 0 #  This one seems not to work
 tracker_b1.vars['on_crab1'] = 0
 tracker_b1.vars['on_crab5'] = 0
+
+
+tracker_b4.vars['on_x1'] = 0.0
+tracker_b4.vars['on_x2'] = 0.0
+tracker_b4.vars['on_x5'] = 0.0
+tracker_b4.vars['on_x8'] = 0.0
+tracker_b4.vars['on_sep1'] = 0.0
+tracker_b4.vars['on_sep2'] = 0.0
+tracker_b4.vars['on_sep5'] = 0.0
+tracker_b4.vars['on_sep8'] = 0.0
+tracker_b4.vars['on_disp'] = 0.0
+tracker_b4.vars['on_alice'] = 0
+tracker_b4.vars['on_lhcb'] = 0 #  This one seems not to work
+tracker_b4.vars['on_crab1'] = 0
+tracker_b4.vars['on_crab5'] = 0
