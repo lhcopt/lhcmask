@@ -187,6 +187,7 @@ for ss in twiss_dfs.keys():
     assert np.max(np.abs(tt.x)) < flat_tol
     assert np.max(np.abs(tt.y)) < flat_tol
 
+
 # Check machine after crossing restore
 mad.input('exec, crossing_restore;')
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -295,14 +296,13 @@ if generate_b4_from_b2:
 
     pm.configure_b4_from_b2(mad_b4, mad)
 
-    mad.globals.on_disp = 1. # TEEEEEEEEEEMP
-
     twiss_dfs_b2, other_data_b2 = ost.twiss_and_check(mad,
             sequences_to_check=['lhcb2'],
             tol_beta=tol_beta, tol_sep=tol_sep,
             twiss_fname='twiss_b2_for_b4check',
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+    pm.save_mad_sequence_and_error(mad, 'lhcb2', filename='sequence_b2_for_b4check')
 
     twiss_dfs_b4, other_data_b4 = ost.twiss_and_check(mad_b4,
             sequences_to_check=['lhcb2'],
@@ -310,6 +310,7 @@ if generate_b4_from_b2:
             twiss_fname='twiss_b4_for_b4check',
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+    pm.save_mad_sequence_and_error(mad, 'lhcb2', filename='sequence_b2_for_b4check')
 
 # For B1, to be generalized for B4
 if 'filling_scheme_json' in configuration['beambeam_config'].keys():
@@ -429,7 +430,6 @@ else:
         mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
     mad_track.input('exec, crossing_restore;')
 
-
 ##################
 # Machine tuning #
 ##################
@@ -488,6 +488,7 @@ pm.match_tune_and_chromaticity(mad_track,
         chromaticity_knob1_name=knob_names['chromknob_1'][sequence_to_track],
         chromaticity_knob2_name=knob_names['chromknob_2'][sequence_to_track],
         sequence_name=sequence_to_track, skip_use=True)
+
 
 # Check strength limits
 if enable_imperfections:
@@ -579,7 +580,7 @@ sdf = mad_track.get_summ_df('summ')
 tdf.to_parquet('final_twiss_BBON.parquet')
 sdf.to_parquet('final_summ_BBON.parquet')
 
-#############################    
+#############################
 #  Save sequence and errors #
 #############################
 # N.B. this erases the errors in the mad_track instance
