@@ -577,7 +577,7 @@ sdf = mad_track.get_summ_df('summ')
 tdf.to_parquet('final_twiss_BBON.parquet')
 sdf.to_parquet('final_summ_BBON.parquet')
 
-#############################    
+#############################
 #  Save sequence and errors #
 #############################
 # N.B. this erases the errors in the mad_track instance

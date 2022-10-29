@@ -2,7 +2,9 @@ import json
 import numpy as np
 import xtrack as xt
 import xpart as xp
-from cpymad.madx import Madx
+import xfields as xf
+
+from pymask.beambeam import generate_set_of_bb_encounters_1beam
 
 with open('../hl_lhc_collisions_000_b1_no_bb/xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     dct_b1 = json.load(fid)
@@ -11,17 +13,6 @@ with open('../hl_lhc_collisions_001_b4_no_bb/xsuite_lines/line_bb_for_tracking.j
 line_b1 = xt.Line.from_dict(dct_b1)
 line_b4 = xt.Line.from_dict(dct_b4)
 
-# mad_b1 = Madx()
-# mad_b1.call('../hl_lhc_collisions_000_b1_no_bb/final_seq.madx')
-# mad_b1.use('lhcb1')
-# mad_b1.twiss()
-# mad_b4 = Madx()
-# mad_b4.call('../hl_lhc_collisions_001_b4_no_bb/final_seq.madx')
-# mad_b4.use('lhcb2')
-# mad_b4.twiss()
-#line_b1 = xt.Line.from_madx_sequence(mad_b1.sequence.lhcb1, deferred_expressions=True)
-#line_b4 = xt.Line.from_madx_sequence(mad_b4.sequence.lhcb2, deferred_expressions=True)
-
 
 line_b1.particle_ref = xp.Particles(mass0=xp.PROTON_MASS_EV, p0c=7e12)
 line_b4.particle_ref = xp.Particles(mass0=xp.PROTON_MASS_EV, p0c=7e12)
@@ -29,43 +20,139 @@ line_b4.particle_ref = xp.Particles(mass0=xp.PROTON_MASS_EV, p0c=7e12)
 tracker_b1 = line_b1.build_tracker()
 tracker_b4 = line_b4.build_tracker()
 
-tw_b1 = tracker_b1.twiss()
-tw_b4 = tracker_b4.twiss()
-
-import pandas as pd
-dfb2 = pd.read_parquet('../hl_lhc_collisions_001_b4_no_bb/twiss_b2_for_b4check_seq_lhcb2.parquet')
-
-tw_b2 = tw_b4.mirror()
-
-Ws = np.array(tw_b2.W_matrix)
-alfx_from_wmat_b2 = -Ws[:, 0, 0] * Ws[:, 1, 0] - Ws[:, 0, 1] * Ws[:, 1, 1]
-
-# Go to flat machine in xtrack
-tracker_b1.vars['on_x1'] = 0.0
-tracker_b1.vars['on_x2'] = 0.0
-tracker_b1.vars['on_x5'] = 0.0
-tracker_b1.vars['on_x8'] = 0.0
-tracker_b1.vars['on_sep1'] = 0.0
-tracker_b1.vars['on_sep2'] = 0.0
-tracker_b1.vars['on_sep5'] = 0.0
-tracker_b1.vars['on_sep8'] = 0.0
-tracker_b1.vars['on_disp'] = 0.0
-tracker_b1.vars['on_alice'] = 0
-tracker_b1.vars['on_lhcb'] = 0 #  This one seems not to work
-tracker_b1.vars['on_crab1'] = 0
-tracker_b1.vars['on_crab5'] = 0
+line_b1_w_bb = line_b1.copy()
+line_b4_w_bb = line_b4.copy()
 
 
-tracker_b4.vars['on_x1'] = 0.0
-tracker_b4.vars['on_x2'] = 0.0
-tracker_b4.vars['on_x5'] = 0.0
-tracker_b4.vars['on_x8'] = 0.0
-tracker_b4.vars['on_sep1'] = 0.0
-tracker_b4.vars['on_sep2'] = 0.0
-tracker_b4.vars['on_sep5'] = 0.0
-tracker_b4.vars['on_sep8'] = 0.0
-tracker_b4.vars['on_disp'] = 0.0
-tracker_b4.vars['on_alice'] = 0
-tracker_b4.vars['on_lhcb'] = 0 #  This one seems not to work
-tracker_b4.vars['on_crab1'] = 0
-tracker_b4.vars['on_crab5'] = 0
+
+ip_names=['ip1', 'ip2', 'ip5', 'ip8']
+numberOfLRPerIRSide=[25, 20, 25, 20]
+harmonic_number=35640
+bunch_spacing_buckets=10
+numberOfHOSlices=11
+bunch_num_particles=1e11
+sigmaz_m=9e-2
+
+
+
+
+circumference = line_b1.get_length()
+
+
+# TODO: use keyword arguments
+# TODO: what happens if bunch length is different for the two beams
+bb_df_b1 = generate_set_of_bb_encounters_1beam(
+    circumference, harmonic_number,
+    bunch_spacing_buckets,
+    numberOfHOSlices,
+    bunch_num_particles, line_b1.particle_ref.q0,
+    sigmaz_m, line_b1.particle_ref.beta0[0], ip_names, numberOfLRPerIRSide,
+    beam_name = 'b1',
+    other_beam_name = 'b2')
+
+
+bb_df_b2 = generate_set_of_bb_encounters_1beam(
+    circumference, harmonic_number,
+    bunch_spacing_buckets,
+    numberOfHOSlices,
+    bunch_num_particles, line_b4.particle_ref.q0,
+    sigmaz_m,
+    line_b4.particle_ref.beta0[0], ip_names, numberOfLRPerIRSide,
+    beam_name = 'b2',
+    other_beam_name = 'b1')
+
+s_ips = {}
+for iipp in ip_names:
+    s_ips[iipp] = line_b1.get_s_position(iipp)
+
+for nn in bb_df_b1.index:
+    print(f'Insert: {nn}')
+    ll = bb_df_b1.loc[nn, 'label']
+    iipp = bb_df_b1.loc[nn, 'ip_name']
+
+    if ll == 'bb_ho':
+        new_bb = xf.BeamBeamBiGaussian3D(phi=0, alpha=0, other_beam_q0=0.,
+            slices_other_beam_num_particles=[0],
+            slices_other_beam_zeta_center=[0],
+            slices_other_beam_Sigma_11=[1],
+            slices_other_beam_Sigma_12=[0],
+            slices_other_beam_Sigma_22=[0],
+            slices_other_beam_Sigma_33=[1],
+            slices_other_beam_Sigma_34=[0],
+            slices_other_beam_Sigma_44=[0],
+            )
+    elif ll == 'bb_lr':
+        new_bb = xf.BeamBeamBiGaussian2D(
+            other_beam_beta0=1.,
+            other_beam_q0=0,
+            other_beam_num_particles=0.,
+            other_beam_Sigma_11=1,
+            other_beam_Sigma_33=1,
+        )
+    else:
+        raise ValueError('Unknown label')
+
+    line_b1_w_bb.insert_element(element=new_bb,
+                                at_s=(s_ips[bb_df_b1.loc[nn, 'ip_name']]
+                                      + bb_df_b1.loc[nn, 'atPosition']),
+                                name=nn)
+
+prrr
+
+
+# Use mad survey and twiss to get geometry and locations of all encounters
+get_geometry_and_optics_b1_b2(mad, bb_df_b1, bb_df_b2)
+
+# Get the position of the IPs in the surveys of the two beams
+ip_position_df = get_survey_ip_position_b1_b2(mad, ip_names)
+
+# Get geometry and optics at the partner encounter
+get_partner_corrected_position_and_optics(
+        bb_df_b1, bb_df_b2, ip_position_df)
+
+# Compute separation, crossing plane rotation, crossing angle and xma
+for bb_df in [bb_df_b1, bb_df_b2]:
+    compute_separations(bb_df)
+    compute_dpx_dpy(bb_df)
+    compute_local_crossing_angle_and_plane(bb_df)
+    compute_xma_yma(bb_df)
+
+# Get bb dataframe and mad model (with dummy bb) for beam 3 and 4
+bb_df_b3 = get_counter_rotating(bb_df_b1)
+bb_df_b4 = get_counter_rotating(bb_df_b2)
+generate_mad_bb_info(bb_df_b3, mode='dummy')
+generate_mad_bb_info(bb_df_b4, mode='dummy')
+
+# Generate mad info
+generate_mad_bb_info(bb_df_b1, mode='from_dataframe',
+        madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
+generate_mad_bb_info(bb_df_b2, mode='from_dataframe',
+        madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
+generate_mad_bb_info(bb_df_b3, mode='from_dataframe',
+        madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
+generate_mad_bb_info(bb_df_b4, mode='from_dataframe',
+        madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
+
+bb_dfs = {
+    'b1': bb_df_b1,
+    'b2': bb_df_b2,
+    'b3': bb_df_b3,
+    'b4': bb_df_b4}
+
+if abs(z_crab_twiss)>0:
+    crab_kicker_dict = crabbing_strong_beam(mad, bb_dfs,
+            z_crab_twiss=z_crab_twiss,
+            save_crab_twiss=True)
+else:
+    print('Crabbing of strong beam skipped!')
+
+if remove_dummy_lenses:
+    for beam in ['b1', 'b2']:
+        bbdf = bb_dfs[beam]
+        mad.input(f'seqedit, sequence={"lhc"+beam};')
+        mad.input('flatten;')
+        for nn in bbdf.elementName.values:
+            print(f'remove, element={nn}')
+            mad.input(f'remove, element={nn}')
+        mad.input('flatten;')
+        mad.input(f'endedit;')
