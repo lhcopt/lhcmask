@@ -5,6 +5,7 @@ import xpart as xp
 import xfields as xf
 
 from pymask.beambeam import generate_set_of_bb_encounters_1beam
+from pymask.beambeam import get_geometry_and_optics_b1_b2
 
 with open('../hl_lhc_collisions_000_b1_no_bb/xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     dct_b1 = json.load(fid)
@@ -17,13 +18,6 @@ line_b4 = xt.Line.from_dict(dct_b4)
 line_b1.particle_ref = xp.Particles(mass0=xp.PROTON_MASS_EV, p0c=7e12)
 line_b4.particle_ref = xp.Particles(mass0=xp.PROTON_MASS_EV, p0c=7e12)
 
-tracker_b1 = line_b1.build_tracker()
-tracker_b4 = line_b4.build_tracker()
-
-line_b1_w_bb = line_b1.copy()
-line_b4_w_bb = line_b4.copy()
-
-
 
 ip_names=['ip1', 'ip2', 'ip5', 'ip8']
 numberOfLRPerIRSide=[25, 20, 25, 20]
@@ -32,9 +26,6 @@ bunch_spacing_buckets=10
 numberOfHOSlices=11
 bunch_num_particles=1e11
 sigmaz_m=9e-2
-
-
-
 
 circumference = line_b1.get_length()
 
@@ -61,41 +52,13 @@ bb_df_b2 = generate_set_of_bb_encounters_1beam(
     beam_name = 'b2',
     other_beam_name = 'b1')
 
-s_ips = {}
-for iipp in ip_names:
-    s_ips[iipp] = line_b1.get_s_position(iipp)
+from temp_module import install_dummy_bb_lenses
 
-for nn in bb_df_b1.index:
-    print(f'Insert: {nn}')
-    ll = bb_df_b1.loc[nn, 'label']
-    iipp = bb_df_b1.loc[nn, 'ip_name']
+install_dummy_bb_lenses(bb_df=bb_df_b1, line=line_b1)
+install_dummy_bb_lenses(bb_df=bb_df_b2, line=line_b4)
 
-    if ll == 'bb_ho':
-        new_bb = xf.BeamBeamBiGaussian3D(phi=0, alpha=0, other_beam_q0=0.,
-            slices_other_beam_num_particles=[0],
-            slices_other_beam_zeta_center=[0],
-            slices_other_beam_Sigma_11=[1],
-            slices_other_beam_Sigma_12=[0],
-            slices_other_beam_Sigma_22=[0],
-            slices_other_beam_Sigma_33=[1],
-            slices_other_beam_Sigma_34=[0],
-            slices_other_beam_Sigma_44=[0],
-            )
-    elif ll == 'bb_lr':
-        new_bb = xf.BeamBeamBiGaussian2D(
-            other_beam_beta0=1.,
-            other_beam_q0=0,
-            other_beam_num_particles=0.,
-            other_beam_Sigma_11=1,
-            other_beam_Sigma_33=1,
-        )
-    else:
-        raise ValueError('Unknown label')
-
-    line_b1_w_bb.insert_element(element=new_bb,
-                                at_s=(s_ips[bb_df_b1.loc[nn, 'ip_name']]
-                                      + bb_df_b1.loc[nn, 'atPosition']),
-                                name=nn)
+tracker_b1 = line_b1.build_tracker()
+tracker_b4 = line_b4.build_tracker()
 
 prrr
 
