@@ -13,7 +13,7 @@ from pymask.beambeam import compute_dpx_dpy
 from pymask.beambeam import compute_local_crossing_angle_and_plane
 from pymask.beambeam import compute_xma_yma
 from pymask.beambeam import get_counter_rotating
-from pymask.beambeam import crabbing_strong_beam
+from pymask.beambeam import crabbing_strong_beam_xsuite
 
 with open('../hl_lhc_collisions_000_b1_no_bb/xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     dct_b1 = json.load(fid)
@@ -36,6 +36,7 @@ bunch_num_particles=2.2e11
 sigmaz_m = 0.076
 nemitt_x = 2.5e-6
 nemitt_y = 2.5e-6
+crab_strong_beam = True
 
 circumference = line_b1.get_length()
 
@@ -70,6 +71,12 @@ install_dummy_bb_lenses(bb_df=bb_df_b2, line=line_b4)
 
 tracker_b1 = line_b1.build_tracker()
 tracker_b4 = line_b4.build_tracker()
+
+freeze_vars = xp.particles.part_energy_varnames() + ['zeta']
+tracker_b1_4d = xt.Tracker(line=line_b1,
+    local_particle_src=xp.gen_local_particle_api(freeze_vars=freeze_vars))
+tracker_b4_4d = xt.Tracker(line=line_b4,
+    local_particle_src=xp.gen_local_particle_api(freeze_vars=freeze_vars))
 
 twiss_b1 = tracker_b1.twiss()
 twiss_b2 = tracker_b4.twiss(reverse=True)
@@ -132,10 +139,10 @@ bb_dfs = {
     'b3': bb_df_b3,
     'b4': bb_df_b4}
 
-if abs(z_crab_twiss)>0:
-    crab_kicker_dict = crabbing_strong_beam(mad, bb_dfs,
-            z_crab_twiss=z_crab_twiss,
-            save_crab_twiss=True)
+if crab_strong_beam:
+    crabbing_strong_beam_xsuite(bb_dfs,
+        tracker_b1, tracker_b4,
+        tracker_b1_4d, tracker_b4_4d)
 else:
     print('Crabbing of strong beam skipped!')
 

@@ -740,6 +740,61 @@ def setup_beam_beam_in_line(
             newee = xf.BeamBeamBiGaussian3D(**params)
             line.element_dict[eename] = newee
 
+def crabbing_strong_beam_xsuite(bb_dfs,
+        tracker_b1, tracker_b4,
+        tracker_b1_4d, tracker_b4_4d):
+
+    for beam, tracker, tracker_4d in (zip(['b1', 'b2'],
+                [tracker_b1, tracker_b4], [tracker_b1_4d, tracker_b4_4d])):
+        bb_df = bb_dfs[beam]
+
+        tw = tracker.twiss()
+        particle_on_co = tw.particle_on_co
+        if beam == 'b2':
+            tw = tw.reverse()
+
+        for nn in bb_df.index:
+            print(f'Crabbing {beam} at {nn}     ', end='\r', flush=True)
+            s_crab = bb_df.loc[nn, 's_crab']
+            if s_crab != 0.0:
+                particle_co_guess = particle_on_co.copy()
+                particle_co_guess.zeta += 2 * s_crab
+                tw4d_crab = tracker_4d.twiss(reverse=(beam == 'b2'),
+                                        method='4d',
+                                        particle_co_guess=particle_co_guess,
+                                        delta0 = particle_co_guess.delta[0],
+                                        )
+
+                ii = tw.name.index(nn)
+
+                for coord in ['x', 'px', 'y', 'py']:
+                    bb_df[f'self_{coord}_crab'] = (
+                        tw4d_crab[coord][ii] - tw[coord][ii])
+            else:
+                for coord in ['x', 'px', 'y', 'py']:
+                    bb_df[f'self_{coord}_crab'] = 0.0
+
+    for coord in ['x', 'px', 'y', 'py']:
+        bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'].loc[
+                bb_dfs['b2']['other_elementName'], f'self_{coord}_crab'].values
+        bb_dfs['b1'][f'other_{coord}_crab'] = bb_dfs['b2'].loc[
+                bb_dfs['b1']['other_elementName'], f'self_{coord}_crab'].values
+
+    # Handle b3 and b4
+    for bcw, bacw in zip(['b1', 'b2'], ['b3', 'b4']):
+        for ww in ['self', 'other']:
+            bb_dfs[bacw][f'{ww}_x_crab'] = bb_dfs[bcw][f'{ww}_x_crab'] * (-1)
+            bb_dfs[bacw][f'{ww}_px_crab'] = bb_dfs[bcw][f'{ww}_px_crab'] * (-1) * (-1)
+            bb_dfs[bacw][f'{ww}_y_crab'] = bb_dfs[bcw][f'{ww}_y_crab']
+            bb_dfs[bacw][f'{ww}_py_crab'] = bb_dfs[bcw][f'{ww}_py_crab'] * (-1)
+
+    # Correct separation
+    for beam in ['b1', 'b2', 'b3', 'b4']:
+        bb_df = bb_dfs[beam]
+        bb_df['separation_x_no_crab'] = bb_df['separation_x']
+        bb_df['separation_y_no_crab'] = bb_df['separation_y']
+        bb_df['separation_x'] += bb_df['other_x_crab']
+        bb_df['separation_y'] += bb_df['other_y_crab']
 
 
 
