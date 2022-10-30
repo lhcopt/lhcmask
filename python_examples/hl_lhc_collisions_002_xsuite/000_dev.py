@@ -14,6 +14,7 @@ from pymask.beambeam import compute_local_crossing_angle_and_plane
 from pymask.beambeam import compute_xma_yma
 from pymask.beambeam import get_counter_rotating
 from pymask.beambeam import crabbing_strong_beam_xsuite
+from pymask.beambeam import setup_beam_beam_in_line
 
 with open('../hl_lhc_collisions_000_b1_no_bb/xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     dct_b1 = json.load(fid)
@@ -145,6 +146,9 @@ if crab_strong_beam:
         tracker_b1_4d, tracker_b4_4d)
 else:
     print('Crabbing of strong beam skipped!')
+
+setup_beam_beam_in_line(line_b1, bb_df_b1, bb_coupling=False)
+setup_beam_beam_in_line(line_b4, bb_df_b4, bb_coupling=False)
 
 #if remove_dummy_lenses:
 #    for beam in ['b1', 'b2']:
