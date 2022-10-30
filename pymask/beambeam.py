@@ -1,5 +1,4 @@
 import copy
-from typing_extensions import assert_type
 
 import pandas as pd
 import numpy as np
@@ -119,7 +118,7 @@ def get_points_twissdata_for_elements(
             )
         )
 
-        i_twiss = np.where(tw_table.name == (eename + ":1"))[0][0]
+        i_twiss = np.where(np.array(tw_table.name) == (eename))[0][0]
 
         if mad is not None:
             for sn in _sigma_names:
@@ -167,7 +166,6 @@ def get_bb_names_madpoints_sigmas(
         assert xsuite_sigmas is not None
         import xfields as xf
         ele_type = [xf.BeamBeamBiGaussian2D, xf.BeamBeamBiGaussian3D]
-
 
 
     (
@@ -617,24 +615,7 @@ def find_alpha_and_phi(dpx, dpy):
 
 
 
-def get_bb_names_madpoints_sigmas(
-    mad, seq_name, use_survey=True, use_twiss=True
-):
-    (
-        _,
-        element_names,
-        points,
-        twissdata,
-    ) = get_points_twissdata_for_element_type(
-        mad,
-        seq_name,
-        ele_type="beambeam",
-        slot_id=None,
-        use_survey=use_survey,
-        use_twiss=use_twiss,
-    )
-    sigmas = {kk: twissdata[kk] for kk in _sigma_names}
-    return element_names, points, sigmas
+
 
 
 def compute_shift_strong_beam_based_on_close_ip(

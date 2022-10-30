@@ -6,6 +6,7 @@ import xfields as xf
 
 from pymask.beambeam import generate_set_of_bb_encounters_1beam
 from pymask.beambeam import get_geometry_and_optics_b1_b2
+from pymask.beambeam import get_survey_ip_position_b1_b2
 
 with open('../hl_lhc_collisions_000_b1_no_bb/xsuite_lines/line_bb_for_tracking.json', 'r') as fid:
     dct_b1 = json.load(fid)
@@ -24,8 +25,10 @@ numberOfLRPerIRSide=[25, 20, 25, 20]
 harmonic_number=35640
 bunch_spacing_buckets=10
 numberOfHOSlices=11
-bunch_num_particles=1e11
-sigmaz_m=9e-2
+bunch_num_particles=2.2e11
+sigmaz_m = 0.076
+nemitt_x = 2.5e-6
+nemitt_y = 2.5e-6
 
 circumference = line_b1.get_length()
 
@@ -60,14 +63,34 @@ install_dummy_bb_lenses(bb_df=bb_df_b2, line=line_b4)
 tracker_b1 = line_b1.build_tracker()
 tracker_b4 = line_b4.build_tracker()
 
-prrr
+twiss_b1 = tracker_b1.twiss()
+twiss_b2 = tracker_b4.twiss(reverse=True)
 
+survey_b1 = tracker_b1.survey()
+survey_b2 = tracker_b4.survey(reverse=True)
 
-# Use mad survey and twiss to get geometry and locations of all encounters
-get_geometry_and_optics_b1_b2(mad, bb_df_b1, bb_df_b2)
+sigmas_b1 = twiss_b1.get_betatron_sigmas(nemitt_x=nemitt_x, nemitt_y=nemitt_y)
+sigmas_b2 = twiss_b2.get_betatron_sigmas(nemitt_x=nemitt_x, nemitt_y=nemitt_y)
+
+# Use survey and twiss to get geometry and locations of all encounters
+get_geometry_and_optics_b1_b2(
+    mad=None,
+    bb_df_b1=bb_df_b1,
+    bb_df_b2=bb_df_b2,
+    xsuite_line_b1=line_b1,
+    xsuite_line_b2=line_b4,
+    xsuite_twiss_b1=twiss_b1,
+    xsuite_twiss_b2=twiss_b2,
+    xsuite_survey_b1=survey_b1,
+    xsuite_survey_b2=survey_b2,
+    xsuite_sigmas_b1=sigmas_b1,
+    xsuite_sigmas_b2=sigmas_b2,
+)
 
 # Get the position of the IPs in the surveys of the two beams
 ip_position_df = get_survey_ip_position_b1_b2(mad, ip_names)
+
+prrrr
 
 # Get geometry and optics at the partner encounter
 get_partner_corrected_position_and_optics(

@@ -69,7 +69,7 @@ class MadPoint(object):
             assert xsuite_survey is not None
             assert xsuite_twiss is not None
 
-            idx = np.where(xsuite_survey['name'] == name)[0][0]
+            idx = xsuite_survey['name'].index(name)
             assert xsuite_twiss['name'][idx] == name
 
             if use_twiss:
