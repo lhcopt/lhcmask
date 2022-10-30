@@ -364,7 +364,8 @@ def get_counter_rotating(bb_df):
     c_bb_df['ip_name'] = bb_df['ip_name']
     c_bb_df['label'] = bb_df['label']
     c_bb_df['identifier'] = bb_df['identifier']
-    c_bb_df['elementClass'] = bb_df['elementClass']
+    if 'elementClass' in bb_df.columns:
+        c_bb_df['elementClass'] = bb_df['elementClass']
     c_bb_df['elementName'] = bb_df['elementName']
     c_bb_df['self_num_particles'] = bb_df['self_num_particles']
     c_bb_df['other_num_particles'] = bb_df['other_num_particles']
@@ -478,18 +479,23 @@ def get_geometry_and_optics_b1_b2(mad=None, bb_df_b1=None, bb_df_b2=None,
         for cc in temp_df.columns:
             bbdf[cc] = temp_df[cc]
 
-def get_survey_ip_position_b1_b2(mad,
-        ip_names = ['ip1', 'ip2', 'ip5', 'ip8']):
+def get_survey_ip_position_b1_b2(mad=None,
+        ip_names = ['ip1', 'ip2', 'ip5', 'ip8'],
+        xsuite_survey_b1=None, xsuite_survey_b2=None):
 
     # Get ip position in the two surveys
 
     ip_position_df = pd.DataFrame()
 
-    for beam in ['b1', 'b2']:
-        mad.use("lhc"+beam)
-        mad.survey()
+    for beam, xssv in zip(['b1', 'b2'], [xsuite_survey_b1, xsuite_survey_b2]):
+        if mad is not None:
+            mad.use("lhc"+beam)
+            mad.survey()
         for ipnn in ip_names:
-            ip_position_df.loc[ipnn, beam] = MadPoint.from_survey((ipnn + ":1").lower(), mad)
+            if mad is not None:
+                ipnn += ":1"
+            ip_position_df.loc[ipnn, beam] = MadPoint.from_survey(
+                (ipnn).lower(), mad=mad, xsuite_survey=xssv)
 
     return ip_position_df
 

@@ -2,8 +2,9 @@ import numpy as np
 
 class MadPoint(object):
     @classmethod
-    def from_survey(cls, name, mad):
-        return cls(name, mad, use_twiss=False, use_survey=True)
+    def from_survey(cls, name, mad=None, xsuite_survey=None):
+        return cls(name, mad=mad, use_twiss=False, use_survey=True,
+                   xsuite_survey=xsuite_survey)
 
     @classmethod
     def from_twiss(cls, name, mad):
@@ -34,14 +35,14 @@ class MadPoint(object):
         psi = 0.0
 
         if mad is not None:
-            assert xsuite_survey is None
-            assert xsuite_twiss is None
 
             self.name = name
             if use_twiss:
+                assert xsuite_survey is None
                 twiss = mad.table.twiss
                 names = twiss.name
             if use_survey:
+                assert xsuite_twiss is None
                 survey = mad.table.survey
                 names = survey.name
                 # patch for this issue https://github.com/hibtc/cpymad/issues/91 
@@ -66,19 +67,19 @@ class MadPoint(object):
                 phi = survey.phi[idx]
                 psi = survey.psi[idx]
         else:
-            assert xsuite_survey is not None
-            assert xsuite_twiss is not None
 
-            idx = xsuite_survey['name'].index(name)
-            assert xsuite_twiss['name'][idx] == name
 
             if use_twiss:
+                assert xsuite_twiss is not None
+                idx = xsuite_twiss['name'].index(name)
                 self.tx = xsuite_twiss.x[idx]
                 self.ty = xsuite_twiss.y[idx]
                 self.tpx = xsuite_twiss.px[idx]
                 self.tpy = xsuite_twiss.py[idx]
 
             if use_survey:
+                assert xsuite_survey is not None
+                idx = xsuite_survey['name'].index(name)
                 self.sx = xsuite_survey.X[idx]
                 self.sy = xsuite_survey.Y[idx]
                 self.sz = xsuite_survey.Y[idx]
