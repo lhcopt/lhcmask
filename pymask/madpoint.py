@@ -9,7 +9,8 @@ class MadPoint(object):
     def from_twiss(cls, name, mad):
         return cls(name, mad, use_twiss=True, use_survey=False)
 
-    def __init__(self, name, mad, use_twiss=True, use_survey=True):
+    def __init__(self, name, mad=None, use_twiss=True, use_survey=True,
+                 xsuite_twiss=None, xsuite_survey=None):
 
         self.use_twiss = use_twiss
         self.use_survey = use_survey
@@ -19,47 +20,72 @@ class MadPoint(object):
                 "use_survey and use_twiss cannot be False at the same time"
             )
 
-        self.name = name
-        if use_twiss:
-            twiss = mad.table.twiss
-            names = twiss.name
-        if use_survey:
-            survey = mad.table.survey
-            names = survey.name
-            # patch for this issue https://github.com/hibtc/cpymad/issues/91 
-            for ii, nn in enumerate(names):
-                if not nn.endswith(':1'):
-                    names[ii] = nn+':1'
+        self.tx = None
+        self.ty = None
+        self.tpx = None
+        self.tpy = None
 
-        idx = np.where(names == name)[0][0]
+        self.sx = None
+        self.sy = None
+        self.sz = None
+        self.sp = None
+        theta = 0.0
+        phi = 0.0
+        psi = 0.0
 
-        if use_twiss:
-            self.tx = twiss.x[idx]
-            self.ty = twiss.y[idx]
-            self.tpx = twiss.px[idx]
-            self.tpy = twiss.py[idx]
+        if mad is not None:
+            assert xsuite_survey is None
+            assert xsuite_twiss is None
+
+            self.name = name
+            if use_twiss:
+                twiss = mad.table.twiss
+                names = twiss.name
+            if use_survey:
+                survey = mad.table.survey
+                names = survey.name
+                # patch for this issue https://github.com/hibtc/cpymad/issues/91 
+                for ii, nn in enumerate(names):
+                    if not nn.endswith(':1'):
+                        names[ii] = nn+':1'
+
+            idx = np.where(names == name)[0][0]
+
+            if use_twiss:
+                self.tx = twiss.x[idx]
+                self.ty = twiss.y[idx]
+                self.tpx = twiss.px[idx]
+                self.tpy = twiss.py[idx]
+
+            if use_survey:
+                self.sx = survey.x[idx]
+                self.sy = survey.y[idx]
+                self.sz = survey.z[idx]
+                self.sp = np.array([self.sx, self.sy, self.sz])
+                theta = survey.theta[idx]
+                phi = survey.phi[idx]
+                psi = survey.psi[idx]
         else:
-            self.tx = None
-            self.ty = None
-            self.tpx = None
-            self.tpy = None
+            assert xsuite_survey is not None
+            assert xsuite_twiss is not None
 
-        if use_survey:
-            self.sx = survey.x[idx]
-            self.sy = survey.y[idx]
-            self.sz = survey.z[idx]
-            self.sp = np.array([self.sx, self.sy, self.sz])
-            theta = survey.theta[idx]
-            phi = survey.phi[idx]
-            psi = survey.psi[idx]
-        else:
-            self.sx = None
-            self.sy = None
-            self.sz = None
-            self.sp = None
-            theta = 0.0
-            phi = 0.0
-            psi = 0.0
+            idx = np.where(xsuite_survey['name'] == name)[0][0]
+            assert xsuite_twiss['name'][idx] == name
+
+            if use_twiss:
+                self.tx = xsuite_twiss.x[idx]
+                self.ty = xsuite_twiss.y[idx]
+                self.tpx = xsuite_twiss.px[idx]
+                self.tpy = xsuite_twiss.py[idx]
+
+            if use_survey:
+                self.sx = xsuite_survey.X[idx]
+                self.sy = xsuite_survey.Y[idx]
+                self.sz = xsuite_survey.Y[idx]
+                self.sp = np.array([self.sx, self.sy, self.sz])
+                theta = xsuite_survey.theta[idx]
+                phi = xsuite_survey.phi[idx]
+                psi = xsuite_survey.psi[idx]
 
         thetam = np.array(
             [

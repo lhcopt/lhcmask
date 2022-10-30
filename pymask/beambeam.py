@@ -1,4 +1,5 @@
 import copy
+from typing_extensions import assert_type
 
 import pandas as pd
 import numpy as np
@@ -13,12 +14,38 @@ def norm(v):
     return np.sqrt(np.sum(v ** 2))
 
 def get_points_twissdata_for_element_type(
-    mad, seq_name, ele_type=None, slot_id=None, use_survey=True, use_twiss=True
+    mad=None, seq_name=None, ele_type=None, slot_id=None,
+    use_survey=True, use_twiss=True,
+    xsuite_line=None, xsuite_survey=None, xsuite_twiss=None, xsuite_sigmas=None
 ):
 
-    elements, element_names = get_elements(
-        seq=mad.sequence[seq_name], ele_type=ele_type, slot_id=slot_id
-    )
+    if mad is not None:
+        assert xsuite_line is None
+        assert xsuite_survey is None
+        assert xsuite_twiss is None
+        assert xsuite_sigmas is None
+        assert seq_name is not None
+        elements, element_names = get_elements(
+            seq=mad.sequence[seq_name], ele_type=ele_type, slot_id=slot_id
+        )
+    else:
+
+        if type(ele_type) is list or type(ele_type) is tuple:
+            ele_type = list(ele_type)
+        else:
+            ele_type = [ele_type]
+
+        assert xsuite_line is not None
+        assert xsuite_survey is not None
+        assert xsuite_twiss is not None
+        assert xsuite_sigmas is not None
+
+        elements = []
+        element_names = []
+        for nn, ee in xsuite_line.element_dict.items():
+            if type(ee) in ele_type:
+                elements.append(ee)
+                element_names.append(nn)
 
     points, twissdata = get_points_twissdata_for_elements(
         element_names,
@@ -26,6 +53,9 @@ def get_points_twissdata_for_element_type(
         seq_name,
         use_survey=use_survey,
         use_twiss=use_twiss,
+        xsuite_survey=xsuite_survey,
+        xsuite_twiss=xsuite_twiss,
+        xsuite_sigmas=xsuite_sigmas
     )
 
     return elements, element_names, points, twissdata
@@ -51,15 +81,18 @@ def get_elements(seq, ele_type=None, slot_id=None):
 
 
 def get_points_twissdata_for_elements(
-    ele_names, mad, seq_name, use_survey=True, use_twiss=True
+    ele_names, mad=None, seq_name=None, use_survey=True, use_twiss=True,
+    xsuite_twiss=None, xsuite_survey=None, xsuite_sigmas=None
 ):
 
-    mad.use(sequence=seq_name)
-
-    mad.twiss()
-
-    if use_survey:
-        mad.survey()
+    if mad is not None:
+        assert seq_name is not None
+        assert xsuite_survey is None
+        assert xsuite_twiss is None
+        mad.use(sequence=seq_name)
+        mad.twiss()
+        if use_survey:
+            mad.survey()
 
     bb_xyz_points = []
     bb_twissdata = {
@@ -68,37 +101,75 @@ def get_points_twissdata_for_elements(
         + _beta_names
         + "dispersion_x dispersion_y x y".split()
     }
+
+    if mad is not None:
+        eename = eename + ':1'
+        tw_table = mad.twiss.table
+        gamma = mad.table.twiss.summary.gamma
+    else:
+        tw_table = xsuite_twiss
+        gamma = xsuite_twiss.particle_on_co.gamma0[0]
+    beta = np.sqrt(1.0 - 1.0 / (gamma * gamma))
+
     for eename in ele_names:
         bb_xyz_points.append(
             MadPoint(
-                eename + ":1", mad, use_twiss=use_twiss, use_survey=use_survey
+                eename, mad, use_twiss=use_twiss, use_survey=use_survey,
+                xsuite_survey=xsuite_survey, xsuite_twiss=xsuite_twiss
             )
         )
 
-        i_twiss = np.where(mad.table.twiss.name == (eename + ":1"))[0][0]
+        i_twiss = np.where(tw_table.name == (eename + ":1"))[0][0]
 
-        for sn in _sigma_names:
-            bb_twissdata[sn].append(
-                getattr(mad.table.twiss, "sig%d" % sn)[i_twiss]
-            )
+        if mad is not None:
+            for sn in _sigma_names:
+                bb_twissdata[sn].append(
+                    getattr(mad.table.twiss, "sig%d" % sn)[i_twiss]
+                )
+        else:
+            for sn in _sigma_names:
+                bb_twissdata[sn].append(
+                    xsuite_sigmas[f"Sigma{sn}"][i_twiss]
+                )
 
         for kk in ["betx", "bety"]:
-            bb_twissdata[kk].append(mad.table.twiss[kk][i_twiss])
-        gamma = mad.table.twiss.summary.gamma
-        beta = np.sqrt(1.0 - 1.0 / (gamma * gamma))
+            bb_twissdata[kk].append(tw_table[kk][i_twiss])
         for pp in ["x", "y"]:
             bb_twissdata["dispersion_" + pp].append(
-                mad.table.twiss["d" + pp][i_twiss] * beta
+                tw_table["d" + pp][i_twiss]
             )
-            bb_twissdata[pp].append(mad.table.twiss[pp][i_twiss])
-        # , 'dx', 'dy']:
+            bb_twissdata[pp].append(tw_table[pp][i_twiss])
+
+        if mad is not None:
+            bb_twissdata.dispersion_x *= beta
+            bb_twissdata.dispersion_y *= beta
 
     return bb_xyz_points, bb_twissdata
 
 
 def get_bb_names_madpoints_sigmas(
-    mad, seq_name, use_survey=True, use_twiss=True
+    mad=None, seq_name=None, use_survey=True, use_twiss=True,
+    xsuite_line=None, xsuite_survey=None, xsuite_twiss=None, xsuite_sigmas=None
 ):
+
+    if mad is not None:
+        assert xsuite_line is None
+        assert xsuite_survey is None
+        assert xsuite_twiss is None
+        assert xsuite_sigmas is None
+        assert seq_name is not None
+
+        ele_type="beambeam"
+    else:
+        assert xsuite_line is not None
+        assert xsuite_survey is not None
+        assert xsuite_twiss is not None
+        assert xsuite_sigmas is not None
+        import xfields as xf
+        ele_type = [xf.BeamBeamBiGaussian2D, xf.BeamBeamBiGaussian3D]
+
+
+
     (
         _,
         element_names,
@@ -107,15 +178,19 @@ def get_bb_names_madpoints_sigmas(
     ) = get_points_twissdata_for_element_type(
         mad,
         seq_name,
-        ele_type="beambeam",
+        ele_type=ele_type,
         slot_id=None,
         use_survey=use_survey,
         use_twiss=use_twiss,
+        xsuite_line=xsuite_line,
+        xsuite_survey=xsuite_survey,
+        xsuite_twiss=xsuite_twiss,
+        xsuite_sigmas=xsuite_sigmas,
     )
     sigmas = {kk: twissdata[kk] for kk in _sigma_names}
     return element_names, points, sigmas
 
-# %% From https://github.com/giadarol/WeakStrong/blob/master/slicing.py
+# From https://github.com/giadarol/WeakStrong/blob/master/slicing.py
 def constant_charge_slicing_gaussian(N_part_tot, sigmaz, N_slices):
     if N_slices>1:
         # working with intensity 1. and rescling at the end
@@ -360,20 +435,38 @@ def install_lenses_in_sequence(mad, bb_df, sequence_name,
 
     mad.input(bb_df['elementDefinition'].str.cat(sep='\n'))
 
-    # %% seqedit
+    # seqedit
     mad.input(f'seqedit, sequence={sequence_name};')
     mad.input('flatten;')
     mad.input(bb_df['elementInstallation'].str.cat(sep='\n'))
     mad.input('flatten;')
     mad.input(f'endedit;')
 
-def get_geometry_and_optics_b1_b2(mad, bb_df_b1, bb_df_b2):
+def get_geometry_and_optics_b1_b2(mad=None, bb_df_b1=None, bb_df_b2=None,
+        xsuite_line_b1=None, xsuite_line_b2=None,
+        xsuite_twiss_b1=None, xsuite_twiss_b2=None,
+        xsuite_survey_b1=None, xsuite_survey_b2=None,
+        xsuite_sigmas_b1=None, xsuite_sigmas_b2=None,):
 
     for beam, bbdf in zip(['b1', 'b2'], [bb_df_b1, bb_df_b2]):
         # Get positions of the bb encounters (absolute from survey), closed orbit
         # and orientation of the local reference system (MadPoint objects)
+
+        if beam == 'b1':
+            xsuite_survey = xsuite_survey_b1
+            xsuite_twiss = xsuite_twiss_b1
+            xsuite_line = xsuite_line_b1
+            xsuite_sigmas = xsuite_sigmas_b1
+        else:
+            xsuite_survey = xsuite_survey_b2
+            xsuite_twiss = xsuite_twiss_b2
+            xsuite_line = xsuite_line_b2
+            xsuite_sigmas = xsuite_sigmas_b2
+
         names, positions, sigmas = get_bb_names_madpoints_sigmas(
-            mad, seq_name="lhc"+beam
+            mad, seq_name="lhc"+beam,
+            xsuite_line=xsuite_line, xsuite_survey=xsuite_survey,
+            xsuite_twiss=xsuite_twiss, xsuite_sigmas=xsuite_sigmas,
         )
 
         temp_df = pd.DataFrame()
