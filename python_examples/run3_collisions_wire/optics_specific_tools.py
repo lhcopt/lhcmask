@@ -15,10 +15,6 @@ def build_sequence(mad, beam, configuration):
     #slicefactor = 2 # For testing
     slicefactor = 8 # For production
 
-    pm.make_links(force=True, links_dict={
-        'optics_runII': '/afs/cern.ch/eng/lhc/optics/runII',
-        'optics_runIII': '/afs/cern.ch/eng/lhc/optics/runIII',})
-
     mylhcbeam = int(beam)
 
     mad.input('ver_lhc_run = 3')
@@ -27,7 +23,7 @@ def build_sequence(mad, beam, configuration):
     mad.input('option, -echo,warn, -info;')
 
     # optics dependent macros (for splitting)
-    mad.call('optics_runII/2018/toolkit/macro.madx')
+    mad.call('tracking_tools/macro.madx')
 
     # Redefine macros
     _redefine_crossing_save_disable_restore(mad)
@@ -37,23 +33,20 @@ def build_sequence(mad, beam, configuration):
 
     assert mylhcbeam in [1, 2, 4], "Invalid mylhcbeam (it should be in [1, 2, 4])"
 
-#    if mylhcbeam in [1, 2]:
-#        mad.call('/afs/cern.ch/eng/acc-models/lhc/current/lhc.seq')
-#    else:
-#        mad.call('/afs/cern.ch/eng/acc-models/lhc/current/lhcb4.seq')
+
     if mylhcbeam in [1, 2]:
-        mad.call('optics_runII/2018/lhc_as-built.seq')
+        mad.call('tracking_tools/../../Sequences/lhc.seq')
     else:
-        mad.call('optics_runII/2018/lhcb4_as-built.seq')
+        mad.call('tracking_tools/../../Sequences/lhcb4.seq')
 
     # New IR7 MQW layout and cabling
-    mad.call('optics_runIII/RunIII_dev/IR7-Run3seqedit.madx')
+    mad.call('tracking_tools/IR7-Run3seqedit.madx')
 
     # Makethin part
     if slicefactor > 0:
         # the variable in the macro is slicefactor
         mad.input(f'slicefactor={slicefactor};')
-        mad.call('optics_runII/2018/toolkit/myslice.madx')
+        mad.call('tracking_tools/myslice.madx')
         mad.beam()
         for my_sequence in ['lhcb1','lhcb2']:
             if my_sequence in list(mad.sequence):
@@ -71,7 +64,7 @@ def build_sequence(mad, beam, configuration):
     # Installing wires in collimators
     if configuration['install_wires']:
         for my_sequence in ['lhcb1','lhcb2']:
-            bbcw.install_wires(mad,configuration,seq_name=my_sequence)
+            bbcw.install_wires(mad,mylhcbeam,configuration,seq_name=my_sequence)
         
         
 

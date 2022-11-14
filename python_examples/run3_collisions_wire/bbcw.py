@@ -47,6 +47,15 @@ WIRE_INSTALL_FALLBACK['b2'] = [('bbcwb.a4r1.d.b2','145.35+(0-ip1ofs.b2)*ds'  ,'i
                                ('bbcwe.4r5.d.b2' ,'147.35+(308-ip5ofs.b2)*ds','ip5'),
                                ('bbcwi.4r5.d.b2' ,'147.35+(308-ip5ofs.b2)*ds','ip5')]
 
+WIRE_INSTALL_FALLBACK['b4'] = [('bbcwb.a4r1.d.b2','-145.35+(0-ip1ofs.b2)*ds'  ,'ip1'),
+                               ('bbcwt.a4r1.d.b2','-145.35+(0-ip1ofs.b2)*ds'  ,'ip1'),
+                               ('bbcwb.a4r1.u.b2','-146.54+(0-ip1ofs.b2)*ds'  ,'ip1'),
+                               ('bbcwt.a4r1.u.b2','-146.54+(0-ip1ofs.b2)*ds'  ,'ip1'),                              
+                               ('bbcwe.4r5.u.b2' ,'-148.54+(308-ip5ofs.b2)*ds','ip5'),
+                               ('bbcwi.4r5.u.b2' ,'-148.54+(308-ip5ofs.b2)*ds','ip5'),
+                               ('bbcwe.4r5.d.b2' ,'-147.35+(308-ip5ofs.b2)*ds','ip5'),
+                               ('bbcwi.4r5.d.b2' ,'-147.35+(308-ip5ofs.b2)*ds','ip5')]
+
 
 
 
@@ -79,14 +88,19 @@ ALIGN_RECIPE = {'b1':  {'bbcwe': """{xma} :=      {x_b}+{rw} ; {yma} := {y_b}   
 
 # Utilities
 #=====================================================
-def install_wires(mad,configuration,seq_name):
+def install_wires(mad,mylhcbeam,configuration,seq_name):
     
     # installing monitors if not in seq_name:
     if configuration['wires_at_fallback']:
-        to_install = pd.DataFrame(WIRE_INSTALL_FALLBACK[seq_name[-2:]],columns=['element','at','from'])
+        # Remove first
+        to_remove = pd.DataFrame(WIRE_INSTALL_FALLBACK[f'b{mylhcbeam}'],columns=['element','at','from'])
+        to_remove.insert(0,'mode','remove')
+        pmTools.seqedit(mad,seq_name=seq_name,editing = to_remove)
+
+        # Then install
+        to_install = pd.DataFrame(WIRE_INSTALL_FALLBACK[f'b{mylhcbeam}'],columns=['element','at','from'])
         to_install.insert(0,'mode','install')
         to_install.insert(2,'class','monitor')
-        
         pmTools.seqedit(mad,seq_name=seq_name,editing = to_install)
     
     
