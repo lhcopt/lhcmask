@@ -194,7 +194,7 @@ for tt in tests:
                 if kk == "length":
                     if np.abs(ee_test.hxl) + np.abs(ee_test.hyl) == 0.0:
                         continue
-                if kk == "order":
+                if kk == "order" or kk == "inv_factorial_order":
                     # Checked through bal
                     continue
                 if kk == 'knl' or kk == 'ksl' or kk == 'bal':
@@ -250,43 +250,46 @@ for tt in tests:
 
             # Exceptions BB4D (separations are recalculated)
             if not(strict) and isinstance(ee_test, xf.BeamBeamBiGaussian2D):
-                if kk == "x_bb":
-                    if diff_abs / dtest["sigma_x"] < 0.01: # This is neede to accommodate different leveling routines (1% difference)
+                if kk == "other_beam_shift_x":
+                    if diff_abs / np.sqrt(dtest["other_beam_Sigma_11"]) < 0.01: # This is neede to accommodate different leveling routines (1% difference)
                         continue
-                if kk == "y_bb":
-                    if diff_abs / dtest["sigma_y"] < 0.01:
+                if kk == "other_beam_shift_y":
+                    if diff_abs / np.sqrt(dtest["other_beam_Sigma_33"]) < 0.01:
                         continue
-                if kk == "sigma_x":
-                    if diff_rel < 1e-5:
+                if kk == "other_beam_Sigma_11":
+                    if diff_rel < (1e-5)**2:
                         continue
-                if kk == "sigma_y":
-                    if diff_rel < 1e-5:
+                if kk == "other_beam_Sigma_33":
+                    if diff_rel < (1e-5)**2:
                         continue
             if isinstance(ee_test, xf.BeamBeamBiGaussian2D):
-                if kk == 'q0' or kk == 'n_particles':
+                if kk == 'other_beam_q0' or kk == 'other_beam_num_particles':
                     # ambiguity due to old interface
-                    if np.abs(ee_test.n_particles*ee_test.q0 -
-                            ee_six.n_particles*ee_six.q0 ) < 1.: # charges
+                    if np.abs(ee_test.other_beam_num_particles*ee_test.other_beam_q0 -
+                            ee_six.other_beam_num_particles*ee_six.other_beam_q0 ) < 1.: # charges
                         continue
 
             # Exceptions BB6D (angles and separations are recalculated)
             if not(strict) and isinstance(ee_test, xf.BeamBeamBiGaussian3D):
-                if kk == "alpha":
+                if kk == "_cos_alpha":
                     if diff_abs < 10e-6:
                         continue
-                if kk == "x_co" or kk == "x_bb_co" or kk == 'delta_x':
-                    if diff_abs / np.sqrt(dtest["sigma_11"]) < 0.015:
+                if kk == "_sin_alpha":
+                    if diff_abs < 10e-6:
                         continue
-                if kk == "y_co" or kk == "y_bb_co" or kk == 'delta_y':
-                    if diff_abs / np.sqrt(dtest["sigma_33"]) < 0.015:
+                if kk == "ref_shift_x" or kk == "other_beam_shift_x":
+                    if diff_abs / np.sqrt(dtest["slices_other_beam_Sigma_11_star"][0]) < 0.015:
                         continue
-                if kk == "zeta_co":
+                if kk == "ref_shift_y" or kk == "other_beam_shift_y":
+                    if diff_abs / np.sqrt(dtest["slices_other_beam_Sigma_33_star"][0]) < 0.015:
+                        continue
+                if kk == "ref_shift_zeta":
                     if diff_abs <1e-5:
                         continue
-                if kk == "delta_co":
+                if kk == "ref_shift_pzeta":
                     if diff_abs <1e-5:
                         continue
-                if kk == "px_co" or kk == 'py_co':
+                if kk == "ref_shift_px" or kk == 'ref_shift_py':
                     if diff_abs <30e-9:
                         continue
             if isinstance(ee_test, xt.XYShift):

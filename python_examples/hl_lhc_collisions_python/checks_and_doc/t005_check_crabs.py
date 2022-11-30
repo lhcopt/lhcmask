@@ -28,19 +28,19 @@ plane = 'x'
 phi_weak = Phi
 phi_c_weak = Phi_c
 
-# B4 ip5
-beam_track = 'b4'
-ip_choice = 5
-plane = 'y'
-phi_weak = Phi
-phi_c_weak = Phi_c
-
-# B4 ip1
-beam_track = 'b4'
-ip_choice = 1
-plane = 'x'
-phi_weak = -Phi
-phi_c_weak = -Phi_c
+## B4 ip5
+#beam_track = 'b4'
+#ip_choice = 5
+#plane = 'y'
+#phi_weak = Phi
+#phi_c_weak = Phi_c
+#
+## B4 ip1
+#beam_track = 'b4'
+#ip_choice = 1
+#plane = 'x'
+#phi_weak = -Phi
+#phi_c_weak = -Phi_c
 
 phi_strong = -phi_weak
 phi_c_strong = -phi_c_weak
@@ -105,7 +105,8 @@ R_no_crab = phi_strong * s_rel
 R1_orbit = phi_weak * s_rel
 
 axcrab.plot(s_rel, np.array(
-    [getattr(bb, f'delta_{plane}') for bb in bb_elems])+R1_orbit,
+    #[getattr(bb, f'delta_{plane}') for bb in bb_elems])+R1_orbit,
+    [getattr(bb, f'other_beam_shift_{plane}') for bb in bb_elems])+R1_orbit,
     'o', color = 'r', alpha=.5, label='strong xsuite')
 plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula')
 
@@ -125,7 +126,8 @@ plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula'
 bb_all, _ = ltest.get_elements_of_type([xf.BeamBeamBiGaussian2D,
                                         xf.BeamBeamBiGaussian3D])
 for bb in bb_all:
-    bb.q0 = 0
+    #bb.q0 = 0
+    bb.other_beam_q0 = 0
 
 # # Switch off all beam-beam lenses
 crabs, crab_names = ltest.get_elements_of_type([xt.RFMultipole])

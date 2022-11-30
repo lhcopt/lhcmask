@@ -1,11 +1,11 @@
 # Links to be made for tools and scripts
 links:
   tracking_tools: auto
-  modules: tracking_tools/modules
-  tools: tracking_tools/tools
+  modules: tracking_tools/lhcmask
+  tools: tracking_tools/lhctoolkit
   beambeam_macros: tracking_tools/beambeam_macros
-  errors: tracking_tools/errors
-  optics_repository: /afs/cern.ch/eng/lhc/optics
+  errors: tracking_tools/lhcerrors
+  optics_repository: tracking_tools/hllhc14
 
 # Mode - choose between:
 
@@ -28,7 +28,7 @@ mode: b1_with_bb
 #       on_sep2: 0.14471680504084292
 
 # Optics file
-optics_file: optics_repository/HLLHCV1.4/round/opt_round_150_1500_thin.madx
+optics_file: optics_repository/round/opt_round_150_1500_thin.madx
 # Optics version
 optics_version: '1.4'
 
