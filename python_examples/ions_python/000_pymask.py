@@ -310,7 +310,7 @@ if generate_b4_from_b2:
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
 
 # For B1, to be generalized for B4
-if 'filling_scheme_json' in configuration['beambeam_config'].keys():
+if ('filling_scheme_json') in configuration['beambeam_config'].keys() and ("with_bb" in mode):
     assert 'b4' not in mode
     filling_scheme_json = configuration['beambeam_config']['filling_scheme_json']
     bunch_to_track = configuration['beambeam_config']['bunch_to_track']
