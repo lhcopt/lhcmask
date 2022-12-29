@@ -742,11 +742,9 @@ def setup_beam_beam_in_line(
             line.element_dict[eename] = newee
 
 def crabbing_strong_beam_xsuite(bb_dfs,
-        tracker_b1, tracker_b4,
-        tracker_b1_4d, tracker_b4_4d):
+        tracker_b1, tracker_b4):
 
-    for beam, tracker, tracker_4d in (zip(['b1', 'b2'],
-                [tracker_b1, tracker_b4], [tracker_b1_4d, tracker_b4_4d])):
+    for beam, tracker in (zip(['b1', 'b2'], [tracker_b1, tracker_b4])):
         bb_df = bb_dfs[beam]
 
         tw = tracker.twiss()
@@ -760,10 +758,11 @@ def crabbing_strong_beam_xsuite(bb_dfs,
             if s_crab != 0.0:
                 particle_co_guess = particle_on_co.copy()
                 particle_co_guess.zeta += 2 * s_crab
-                tw4d_crab = tracker_4d.twiss(reverse=(beam == 'b2'),
+                tw4d_crab = tracker.twiss(reverse=(beam == 'b2'),
                                         method='4d',
                                         particle_co_guess=particle_co_guess,
                                         delta0 = particle_co_guess.delta[0],
+                                        freeze_longitudinal=True
                                         )
 
                 ii = tw.name.index(nn)

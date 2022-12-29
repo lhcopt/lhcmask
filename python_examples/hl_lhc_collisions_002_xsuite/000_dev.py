@@ -73,12 +73,6 @@ install_dummy_bb_lenses(bb_df=bb_df_b2, line=line_b4)
 tracker_b1 = line_b1.build_tracker()
 tracker_b4 = line_b4.build_tracker()
 
-freeze_vars = xp.particles.part_energy_varnames() + ['zeta']
-tracker_b1_4d = xt.Tracker(line=line_b1,
-    local_particle_src=xp.gen_local_particle_api(freeze_vars=freeze_vars))
-tracker_b4_4d = xt.Tracker(line=line_b4,
-    local_particle_src=xp.gen_local_particle_api(freeze_vars=freeze_vars))
-
 twiss_b1 = tracker_b1.twiss()
 twiss_b2 = tracker_b4.twiss(reverse=True)
 
@@ -142,14 +136,15 @@ bb_dfs = {
 
 if crab_strong_beam:
     crabbing_strong_beam_xsuite(bb_dfs,
-        tracker_b1, tracker_b4,
-        tracker_b1_4d, tracker_b4_4d)
+        tracker_b1, tracker_b4)
 else:
     print('Crabbing of strong beam skipped!')
 
 setup_beam_beam_in_line(line_b1, bb_df_b1, bb_coupling=False)
 setup_beam_beam_in_line(line_b4, bb_df_b4, bb_coupling=False)
 
+xf.configure_orbit_dependent_parameters_for_bb(tracker=tracker_b1,
+                    particle_on_co=twiss_b1.particle_on_co)
 
 
 #if remove_dummy_lenses:
