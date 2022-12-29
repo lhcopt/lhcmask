@@ -150,6 +150,8 @@ else:
 setup_beam_beam_in_line(line_b1, bb_df_b1, bb_coupling=False)
 setup_beam_beam_in_line(line_b4, bb_df_b4, bb_coupling=False)
 
+
+
 #if remove_dummy_lenses:
 #    for beam in ['b1', 'b2']:
 #        bbdf = bb_dfs[beam]

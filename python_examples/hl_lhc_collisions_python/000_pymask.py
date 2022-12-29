@@ -448,21 +448,22 @@ for ss in '12 23 34 45 56 67 78 81'.split():
 
 
 # Correct linear coupling
-qx_fractional, qx_integer = np.modf(configuration['qx0'])
-qy_fractional, qy_integer = np.modf(configuration['qy0'])
-coupl_corr_info = pm.coupling_correction(mad_track,
-        n_iterations=configuration['N_iter_coupling'],
-        qx_integer=qx_integer, qy_integer=qy_integer,
-        qx_fractional=qx_fractional, qy_fractional=qy_fractional,
-        tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
-        tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
-        cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
-        cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
-        sequence_name=sequence_to_track, skip_use=True)
+# Disable (knob synthesis does not work on mac)
+# qx_fractional, qx_integer = np.modf(configuration['qx0'])
+# qy_fractional, qy_integer = np.modf(configuration['qy0'])
+# coupl_corr_info = pm.coupling_correction(mad_track,
+#         n_iterations=configuration['N_iter_coupling'],
+#         qx_integer=qx_integer, qy_integer=qy_integer,
+#         qx_fractional=qx_fractional, qy_fractional=qy_fractional,
+#         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
+#         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
+#         cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
+#         cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
+#         sequence_name=sequence_to_track, skip_use=True)
 
-# Add custom values to coupling knobs
-mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
-mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
+# # Add custom values to coupling knobs
+# mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
+# mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
 
 # Check strength limits
 if enable_imperfections:
@@ -552,7 +553,8 @@ with open('./optics_orbit_at_start_ring_from_madx.json', 'w') as fid:
 if enable_bb_legacy:
     print('xtrack line is not generated with bb legacy macros')
 else:
-    pm.generate_xsuite_line(mad_track, sequence_to_track, bb_df_track,
+    tracker, line_bb_for_tracking_dict = pm.generate_xsuite_line(
+                    mad_track, sequence_to_track, bb_df_track,
                     optics_and_co_at_start_ring_from_madx,
                     folder_name = './xsuite_lines',
                     skip_mad_use=True,
@@ -577,7 +579,7 @@ sdf = mad_track.get_summ_df('summ')
 tdf.to_parquet('final_twiss_BBON.parquet')
 sdf.to_parquet('final_summ_BBON.parquet')
 
-#############################    
+#############################
 #  Save sequence and errors #
 #############################
 # N.B. this erases the errors in the mad_track instance

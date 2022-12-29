@@ -45,11 +45,12 @@ phi_c_weak = Phi_c
 phi_strong = -phi_weak
 phi_c_strong = -phi_c_weak
 
-path_test = '../'
-type_test = 'sixtrack'
+# path_test = '../'
+# type_test = 'sixtrack'
 
 #path_test = '../xsuite_lines/line_bb_dipole_not_cancelled.json'
-#type_test = 'xsuite'
+path_test = '../xsuite_lines/line_bb_for_tracking.json'
+type_test = 'xsuite'
 
 def prepare_line(path, input_type):
 
@@ -126,10 +127,8 @@ plt.plot(s_rel, R_no_crab + R_crab, '*', color='darkred', label='strong formula'
 bb_all, _ = ltest.get_elements_of_type([xf.BeamBeamBiGaussian2D,
                                         xf.BeamBeamBiGaussian3D])
 for bb in bb_all:
-    #bb.q0 = 0
-    bb.other_beam_q0 = 0
+    bb.scale_strength = 0
 
-# # Switch off all beam-beam lenses
 crabs, crab_names = ltest.get_elements_of_type([xt.RFMultipole])
 #for cc in crabs:
 #    cc.pn = [-90]

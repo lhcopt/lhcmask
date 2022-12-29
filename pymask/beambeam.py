@@ -102,8 +102,7 @@ def get_points_twissdata_for_elements(
     }
 
     if mad is not None:
-        eename = eename + ':1'
-        tw_table = mad.twiss.table
+        tw_table = mad.table.twiss
         gamma = mad.table.twiss.summary.gamma
     else:
         tw_table = xsuite_twiss
@@ -111,6 +110,8 @@ def get_points_twissdata_for_elements(
     beta = np.sqrt(1.0 - 1.0 / (gamma * gamma))
 
     for eename in ele_names:
+        if mad is not None:
+            eename = eename + ':1'
         bb_xyz_points.append(
             MadPoint(
                 eename, mad, use_twiss=use_twiss, use_survey=use_survey,
@@ -139,9 +140,9 @@ def get_points_twissdata_for_elements(
             )
             bb_twissdata[pp].append(tw_table[pp][i_twiss])
 
-        if mad is not None:
-            bb_twissdata.dispersion_x *= beta
-            bb_twissdata.dispersion_y *= beta
+        # if mad is not None:
+        #     bb_twissdata.dispersion_x *= beta
+        #     bb_twissdata.dispersion_y *= beta
 
     return bb_xyz_points, bb_twissdata
 
@@ -494,7 +495,7 @@ def get_survey_ip_position_b1_b2(mad=None,
         for ipnn in ip_names:
             if mad is not None:
                 ipnn += ":1"
-            ip_position_df.loc[ipnn, beam] = MadPoint.from_survey(
+            ip_position_df.loc[ipnn.split(':')[0], beam] = MadPoint.from_survey(
                 (ipnn).lower(), mad=mad, xsuite_survey=xssv)
 
     return ip_position_df
