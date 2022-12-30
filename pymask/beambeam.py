@@ -748,7 +748,6 @@ def crabbing_strong_beam_xsuite(bb_dfs,
         bb_df = bb_dfs[beam]
 
         tw = tracker.twiss(reverse=(beam == 'b2'))
-        import pdb; pdb.set_trace()
 
         for nn in bb_df.index:
             print(f'Crabbing {beam} at {nn}     ', end='\r', flush=True)
