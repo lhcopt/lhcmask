@@ -747,32 +747,29 @@ def crabbing_strong_beam_xsuite(bb_dfs,
     for beam, tracker in (zip(['b1', 'b2'], [tracker_b1, tracker_b4])):
         bb_df = bb_dfs[beam]
 
-        tw = tracker.twiss()
-        particle_on_co = tw.particle_on_co
-        if beam == 'b2':
-            tw = tw.reverse()
+        tw = tracker.twiss(reverse=(beam == 'b2'))
+        import pdb; pdb.set_trace()
 
         for nn in bb_df.index:
             print(f'Crabbing {beam} at {nn}     ', end='\r', flush=True)
             s_crab = bb_df.loc[nn, 's_crab']
             if s_crab != 0.0:
-                particle_co_guess = particle_on_co.copy()
-                particle_co_guess.zeta += 2 * s_crab
-                tw4d_crab = tracker.twiss(reverse=(beam == 'b2'),
-                                        method='4d',
-                                        particle_co_guess=particle_co_guess,
-                                        delta0 = particle_co_guess.delta[0],
-                                        freeze_longitudinal=True
-                                        )
+                if beam == 'b1':
+                    zeta0 = 2 * s_crab
+                else:
+                    zeta0 = -2 * s_crab
+                tw4d_crab = tracker.twiss(reverse=(beam == 'b2'), method='4d',
+                                          zeta0=zeta0,
+                                          freeze_longitudinal=True)
 
                 ii = tw.name.index(nn)
 
                 for coord in ['x', 'px', 'y', 'py']:
-                    bb_df[f'self_{coord}_crab'] = (
+                    bb_df.loc[nn, f'self_{coord}_crab'] = (
                         tw4d_crab[coord][ii] - tw[coord][ii])
             else:
                 for coord in ['x', 'px', 'y', 'py']:
-                    bb_df[f'self_{coord}_crab'] = 0.0
+                    bb_df[nn, f'self_{coord}_crab'] = 0.0
 
     for coord in ['x', 'px', 'y', 'py']:
         bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'].loc[
