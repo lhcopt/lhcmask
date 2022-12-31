@@ -110,7 +110,6 @@ def configure_beam_beam_elements(bb_df_b1, bb_df_b2, tracker_b1, tracker_b4,
             bb_df_b1, bb_df_b2, ip_position_df)
 
     # Compute separation, crossing plane rotation, crossing angle and xma
-    import pdb; pdb.set_trace()
     for bb_df in [bb_df_b1, bb_df_b2]:
         pm.compute_separations(bb_df)
         pm.compute_dpx_dpy(bb_df)

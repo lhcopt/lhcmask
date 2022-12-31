@@ -42,6 +42,7 @@ crab_strong_beam = True
 circumference = line_b1.get_length()
 
 from temp_module import install_beambeam_elements_in_lines
+from temp_module import configure_beam_beam_elements
 
 bb_df_b1_ret, bb_df_b2_ret = install_beambeam_elements_in_lines(
             line_b1, line_b4, ip_names,
@@ -57,4 +58,7 @@ keep_columns = ['beam', 'other_beam', 'ip_name', 'elementName', 'other_elementNa
                 'identifier', 's_crab']
 bb_df_b1 = bb_df_b1_ret[keep_columns].copy()
 bb_df_b2 = bb_df_b2_ret[keep_columns].copy()
+
+configure_beam_beam_elements(bb_df_b1, bb_df_b2, tracker_b1, tracker_b4,
+                                 nemitt_x, nemitt_y, crab_strong_beam, ip_names)
 
