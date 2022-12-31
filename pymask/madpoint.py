@@ -82,7 +82,7 @@ class MadPoint(object):
                 idx = xsuite_survey['name'].index(name)
                 self.sx = xsuite_survey.X[idx]
                 self.sy = xsuite_survey.Y[idx]
-                self.sz = xsuite_survey.Y[idx]
+                self.sz = xsuite_survey.Z[idx]
                 self.sp = np.array([self.sx, self.sy, self.sz])
                 theta = xsuite_survey.theta[idx]
                 phi = xsuite_survey.phi[idx]
