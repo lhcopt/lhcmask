@@ -91,6 +91,7 @@ get_partner_corrected_position_and_optics(
         bb_df_b1, bb_df_b2, ip_position_df)
 
 # Compute separation, crossing plane rotation, crossing angle and xma
+import pdb; pdb.set_trace()
 for bb_df in [bb_df_b1, bb_df_b2]:
     compute_separations(bb_df)
     compute_dpx_dpy(bb_df)

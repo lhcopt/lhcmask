@@ -772,7 +772,7 @@ def crabbing_strong_beam_xsuite(bb_dfs,
                         tw4d_crab[coord][ii] - tw[coord][ii])
             else:
                 for coord in ['x', 'px', 'y', 'py']:
-                    bb_df[nn, f'self_{coord}_crab'] = 0.0
+                    bb_df.loc[nn, f'self_{coord}_crab'] = 0.0
 
     for coord in ['x', 'px', 'y', 'py']:
         bb_dfs['b2'][f'other_{coord}_crab'] = bb_dfs['b1'].loc[
