@@ -121,15 +121,3 @@ xf.configure_orbit_dependent_parameters_for_bb(tracker=tracker_b1,
                     particle_on_co=twiss_b1.particle_on_co)
 xf.configure_orbit_dependent_parameters_for_bb(tracker=tracker_b4,
                     particle_on_co=twiss_b4.particle_on_co)
-
-
-#if remove_dummy_lenses:
-#    for beam in ['b1', 'b2']:
-#        bbdf = bb_dfs[beam]
-#        mad.input(f'seqedit, sequence={"lhc"+beam};')
-#        mad.input('flatten;')
-#        for nn in bbdf.elementName.values:
-#            print(f'remove, element={nn}')
-#            mad.input(f'remove, element={nn}')
-#        mad.input('flatten;')
-#        mad.input(f'endedit;')
