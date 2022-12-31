@@ -374,7 +374,8 @@ def get_counter_rotating(bb_df):
     c_bb_df['other_particle_charge'] = bb_df['other_particle_charge']
     c_bb_df['other_elementName'] = bb_df['other_elementName']
 
-    c_bb_df['atPosition'] = bb_df['atPosition'] * (-1.)
+    if 'atPosition' in bb_df.columns:
+        c_bb_df['atPosition'] = bb_df['atPosition'] * (-1.)
 
     c_bb_df['elementDefinition'] = np.nan
     c_bb_df['elementInstallation'] = np.nan
@@ -413,11 +414,12 @@ def get_counter_rotating(bb_df):
     c_bb_df['dpx'] = bb_df['dpx'] * (-1.) * (-1.)
     c_bb_df['dpy'] = bb_df['dpy'] * (-1.)
 
-    for ww in ['self', 'other']:
-        c_bb_df[f'{ww}_x_crab'] = bb_df[f'{ww}_x_crab'] * (-1)
-        c_bb_df[f'{ww}_px_crab'] = bb_df[f'{ww}_px_crab'] * (-1) * (-1)
-        c_bb_df[f'{ww}_y_crab'] = bb_df[f'{ww}_y_crab']
-        c_bb_df[f'{ww}_py_crab'] = bb_df[f'{ww}_py_crab'] * (-1)
+    if 'self_x_crab' in c_bb_df.columns:
+        for ww in ['self', 'other']:
+            c_bb_df[f'{ww}_x_crab'] = bb_df[f'{ww}_x_crab'] * (-1)
+            c_bb_df[f'{ww}_px_crab'] = bb_df[f'{ww}_px_crab'] * (-1) * (-1)
+            c_bb_df[f'{ww}_y_crab'] = bb_df[f'{ww}_y_crab']
+            c_bb_df[f'{ww}_py_crab'] = bb_df[f'{ww}_py_crab'] * (-1)
 
 
     # Compute phi and alpha from dpx and dpy
@@ -507,7 +509,9 @@ def get_partner_corrected_position_and_optics(bb_df_b1, bb_df_b2, ip_position_df
     for self_beam_nn in ['b1', 'b2']:
 
         self_df = dict_dfs[self_beam_nn]
-
+        self_df['other_num_particles'] = None
+        self_df['other_particle_charge'] = None
+        self_df['other_relativistic_beta'] = None
         for ee in self_df.index:
             other_beam_nn = self_df.loc[ee, 'other_beam']
             other_df = dict_dfs[other_beam_nn]

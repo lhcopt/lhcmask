@@ -43,7 +43,7 @@ circumference = line_b1.get_length()
 
 from temp_module import install_beambeam_elements_in_lines
 
-bb_df_b1, bb_df_b2 = install_beambeam_elements_in_lines(line_b1, line_b4, ip_names,
+bb_df_b1_ret, bb_df_b2_ret = install_beambeam_elements_in_lines(line_b1, line_b4, ip_names,
             circumference, harmonic_number, bunch_spacing_buckets,
             num_long_range_elems_per_side, num_slices_head_on,
             bunch_num_particles, sigmaz_m)
@@ -51,8 +51,15 @@ bb_df_b1, bb_df_b2 = install_beambeam_elements_in_lines(line_b1, line_b4, ip_nam
 tracker_b1 = line_b1.build_tracker()
 tracker_b4 = line_b4.build_tracker()
 
+keep_columns = ['beam', 'other_beam', 'ip_name', 'elementName', 'other_elementName', 'label',
+                'self_num_particles', 'self_particle_charge', 'self_relativistic_beta',
+                'identifier', 's_crab']
+bb_df_b1 = bb_df_b1_ret[keep_columns].copy()
+bb_df_b2 = bb_df_b2_ret[keep_columns].copy()
+
 twiss_b1 = tracker_b1.twiss()
-twiss_b2 = tracker_b4.twiss(reverse=True)
+twiss_b4 = tracker_b4.twiss()
+twiss_b2 = twiss_b4.reverse()
 
 survey_b1 = tracker_b1.survey()
 survey_b2 = tracker_b4.survey(reverse=True)
@@ -93,18 +100,6 @@ for bb_df in [bb_df_b1, bb_df_b2]:
 # Get bb dataframe and mad model (with dummy bb) for beam 3 and 4
 bb_df_b3 = get_counter_rotating(bb_df_b1)
 bb_df_b4 = get_counter_rotating(bb_df_b2)
-#generate_mad_bb_info(bb_df_b3, mode='dummy')
-#generate_mad_bb_info(bb_df_b4, mode='dummy')
-
-# Generate mad info
-# generate_mad_bb_info(bb_df_b1, mode='from_dataframe',
-#         madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
-# generate_mad_bb_info(bb_df_b2, mode='from_dataframe',
-#         madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
-# generate_mad_bb_info(bb_df_b3, mode='from_dataframe',
-#         madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
-# generate_mad_bb_info(bb_df_b4, mode='from_dataframe',
-#         madx_reference_bunch_num_particles=madx_reference_bunch_num_particles)
 
 bb_dfs = {
     'b1': bb_df_b1,
@@ -123,6 +118,8 @@ setup_beam_beam_in_line(line_b4, bb_df_b4, bb_coupling=False)
 
 xf.configure_orbit_dependent_parameters_for_bb(tracker=tracker_b1,
                     particle_on_co=twiss_b1.particle_on_co)
+xf.configure_orbit_dependent_parameters_for_bb(tracker=tracker_b4,
+                    particle_on_co=twiss_b4.particle_on_co)
 
 
 #if remove_dummy_lenses:
