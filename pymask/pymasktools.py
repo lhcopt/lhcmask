@@ -408,8 +408,7 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
 
 def generate_xsuite_line(mad, seq_name, bb_df=None,
         optics_and_co_at_start_ring_from_madx=None,
-        folder_name=None, skip_mad_use=False,
-        prepare_line_for_xtrack=True,
+        folder_name=None,
         steps_for_finite_diffs={'dx': 1e-8, 'dpx': 1e-11,
             'dy': 1e-8, 'dpy': 1e-11, 'dzeta': 1e-7, 'ddelta': 1e-8},
         deferred_expressions=True):
@@ -440,10 +439,11 @@ def generate_xsuite_line(mad, seq_name, bb_df=None,
             cc.frequency = f0_mad*cc_mad.parent.harmon
 
     line_bb_dipole_not_cancelled_dict = line.to_dict()
-    line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
-            optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
-    line_bb_dipole_not_cancelled_dict['RR_madx'] = (
-            optics_and_co_at_start_ring_from_madx['RR_madx'])
+    if bb_df is not None:
+        line_bb_dipole_not_cancelled_dict['particle_on_madx_co'] = (
+                optics_and_co_at_start_ring_from_madx['particle_on_madx_co'])
+        line_bb_dipole_not_cancelled_dict['RR_madx'] = (
+                optics_and_co_at_start_ring_from_madx['RR_madx'])
 
     if folder_name is not None:
         os.makedirs(folder_name, exist_ok=True)
@@ -452,9 +452,9 @@ def generate_xsuite_line(mad, seq_name, bb_df=None,
         with open(folder_name + '/line_bb_dipole_not_cancelled.json', 'w') as fid:
             json.dump(line_bb_dipole_not_cancelled_dict, fid, cls=JEncoder)
 
-    if prepare_line_for_xtrack:
-        tracker = xt.Tracker(line=line)
+    tracker = xt.Tracker(line=line)
 
+    if bb_df is not None:
         _disable_beam_beam(tracker.line)
         particle_on_tracker_co = tracker.find_closed_orbit(
             particle_co_guess=xp.Particles(
@@ -462,31 +462,31 @@ def generate_xsuite_line(mad, seq_name, bb_df=None,
         _restore_beam_beam(tracker.line)
 
         xf.configure_orbit_dependent_parameters_for_bb(tracker,
-                           particle_on_co=particle_on_tracker_co)
+                            particle_on_co=particle_on_tracker_co)
 
+    line_bb_for_tracking_dict = line.to_dict()
+
+    if bb_df is not None: # want to preserve some backw compatibility for now
         _disable_beam_beam(tracker.line)
         RR_finite_diffs = tracker.compute_one_turn_matrix_finite_differences(
                 particle_on_tracker_co,
                 steps_r_matrix=steps_for_finite_diffs)
         _restore_beam_beam(tracker.line)
-
-
         (WW_finite_diffs, WWInv_finite_diffs, RotMat_finite_diffs
                 ) = xp.compute_linear_normal_form(RR_finite_diffs)
 
-        line_bb_for_tracking_dict = line.to_dict()
         line_bb_for_tracking_dict['particle_on_tracker_co'] = (
-                                         particle_on_tracker_co.to_dict())
+                                            particle_on_tracker_co.to_dict())
         line_bb_for_tracking_dict['RR_finite_diffs'] = RR_finite_diffs
         line_bb_for_tracking_dict['WW_finite_diffs'] = WW_finite_diffs
         line_bb_for_tracking_dict['WWInv_finite_diffs'] = WWInv_finite_diffs
         line_bb_for_tracking_dict['RotMat_finite_diffs'] = RotMat_finite_diffs
 
-        if folder_name is not None:
-            os.makedirs(folder_name, exist_ok=True)
-            with open(folder_name +
-                    '/line_bb_for_tracking.json', 'w') as fid:
-                json.dump(line_bb_for_tracking_dict, fid, cls=JEncoder)
+    if folder_name is not None:
+        os.makedirs(folder_name, exist_ok=True)
+        with open(folder_name +
+                '/line_bb_for_tracking.json', 'w') as fid:
+            json.dump(line_bb_for_tracking_dict, fid, cls=JEncoder)
     return tracker, line_bb_for_tracking_dict
 
 def save_mad_sequence_and_error(mad, seq_name, filename='lhc'):
@@ -604,14 +604,13 @@ def seqedit(mad,seq_name,editing,madInput = True):
         use, sequence = {seq_name};
     '''
 
-    
     # Sending input to mad and returning it as a string
     if madInput:
         mad.input(output)
     return output
 
 
-def attach_beam_to_sequence(mad, beam_to_configure, configuration):
+def attach_beam_to_sequences(mad, beam_to_configure=1, configuration=None):
     """Attach beam to sequence
 
     Parameters

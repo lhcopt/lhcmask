@@ -15,7 +15,7 @@ if configuration['links']['tracking_tools'] == 'auto':
     configuration['links']['tracking_tools'] = str(pm._pkg_root.parent.parent.absolute())
 
 for kk in configuration['links'].keys():
-    if os.path.exists(kk): os.remove(kk)
+    os.system(f'rm {kk}')
     os.symlink(os.path.abspath(configuration['links'][kk]), kk)
 
 # Create empty temp folder
@@ -41,7 +41,7 @@ mad.input('exec, twiss_opt;')
 ost.apply_optics(mad, optics_file=configuration['optics_file'])
 
 # Attach beam to sequences
-pm.attach_beam_to_sequences(mad, beam_to_configure=1, sequences_to_check=[1,2])
+pm.attach_beam_to_sequences(mad, configuration=configuration)
 
 # Set IP1-IP5 phase and store corresponding reference
 mad.input("call, file='modules/submodule_01c_phase.madx';")
@@ -55,7 +55,7 @@ mad.input("call, file='modules/submodule_01e_final.madx';")
 
 # Check flat machine
 mad.input('exec, crossing_disable;')
-twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check=[1, 2],
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check=['lhcb1', 'lhcb2'],
         tol_beta=configuration['tol_beta'], tol_sep=configuration['tol_sep'],
         twiss_fname='twiss_no_crossing', save_twiss_files=True,
         check_betas_at_ips=configuration['check_betas_at_ips'],
@@ -69,7 +69,7 @@ for ss in twiss_dfs.keys():
 
 # Check machine after crossing restore
 mad.input('exec, crossing_restore;')
-twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check=[1, 2],
+twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check=['lhcb1', 'lhcb2'],
         tol_beta=configuration['tol_beta'], tol_sep=configuration['tol_sep'],
         twiss_fname='twiss_with_crossing', save_twiss_files=True,
         check_betas_at_ips=configuration['check_betas_at_ips'],
@@ -181,7 +181,5 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     # Generate xtrack line#
     tracker, line_bb_for_tracking_dict = pm.generate_xsuite_line(
                         mad_track, sequence_to_track,
-                        folder_name = './xsuite_lines_' + sequence_to_track,
-                        skip_mad_use=True,
-                        prepare_line_for_xtrack=True)
+                        folder_name = './xsuite_lines_' + sequence_to_track)
 
