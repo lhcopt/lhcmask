@@ -419,6 +419,12 @@ def generate_xsuite_line(mad, seq_name, bb_df=None,
     line = xt.Line.from_madx_sequence(
         mad.sequence[seq_name], apply_madx_errors=True,
         deferred_expressions=deferred_expressions)
+    mad_beam = mad.sequence[seq_name].beam
+    line.particle_ref = xp.Particles(
+        p0c = mad_beam.pc*1e9,
+        q0 = mad_beam.charge,
+        mass0 = mad_beam.mass*1e9,
+    )
     print('Done building xtrack.')
 
     if bb_df is not None:

@@ -181,7 +181,7 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     # Generate xtrack line#
     tracker, line_bb_for_tracking_dict = pm.generate_xsuite_line(
                         mad_track, sequence_to_track,
-                        folder_name = './xsuite_lines',
+                        folder_name = './xsuite_lines_' + sequence_to_track,
                         skip_mad_use=True,
                         prepare_line_for_xtrack=True)
 
