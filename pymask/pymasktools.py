@@ -406,8 +406,8 @@ def get_optics_and_orbit_at_start_ring(mad, seq_name, with_bb_forces=False,
 
 
 
-def generate_xsuite_line(mad, seq_name, bb_df,
-        optics_and_co_at_start_ring_from_madx,
+def generate_xsuite_line(mad, seq_name, bb_df=None,
+        optics_and_co_at_start_ring_from_madx=None,
         folder_name=None, skip_mad_use=False,
         prepare_line_for_xtrack=True,
         steps_for_finite_diffs={'dx': 1e-8, 'dpx': 1e-11,
@@ -603,3 +603,62 @@ def seqedit(mad,seq_name,editing,madInput = True):
     if madInput:
         mad.input(output)
     return output
+
+
+def attach_beam_to_sequence(mad, beam_to_configure, configuration):
+    """Attach beam to sequence
+
+    Parameters
+    ----------
+    mad : pymadx.madx.Madx
+        Madx object
+    beam_to_configure : int
+        Beam number to configure
+    configuration : dict
+        Beam configuration
+
+    Returns
+    -------
+    None
+
+    """
+    # beam energy
+    mad.globals.nrj = configuration['beam_energy_tot']
+    particle_type = 'proton'
+
+    if 'particle_mass' in configuration.keys():
+        particle_mass = configuration['particle_mass']
+        particle_type = 'ion'
+    else:
+        particle_mass = mad.globals.pmass # proton mass
+
+    if 'particle_charge' in configuration.keys():
+        particle_charge = configuration['particle_charge']
+        particle_type = 'ion'
+    else:
+        particle_charge = 1.
+
+    gamma_rel = (particle_charge*configuration['beam_energy_tot'])/particle_mass
+    for ss in mad.sequence.keys():
+        # bv and bv_aux flags
+        if ss == 'lhcb1':
+            ss_beam_bv, ss_bv_aux = 1, 1
+        elif ss == 'lhcb2':
+            if int(beam_to_configure) == 4:
+                ss_beam_bv, ss_bv_aux = 1, -1
+            else:
+                ss_beam_bv, ss_bv_aux = -1, 1
+
+        mad.globals['bv_aux'] = ss_bv_aux
+        mad.input(f'''
+        beam, particle={particle_type},sequence={ss},
+            energy={configuration['beam_energy_tot']*particle_charge},
+            sigt={configuration['beam_sigt']},
+            bv={ss_beam_bv},
+            npart={configuration['beam_npart']},
+            sige={configuration['beam_sige']},
+            ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+            ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+            mass={particle_mass},
+            charge={particle_charge};
+        ''')
