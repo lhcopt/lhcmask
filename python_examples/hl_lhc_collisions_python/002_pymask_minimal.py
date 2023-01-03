@@ -134,22 +134,21 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
         mad_track.input(f'kod.a{ss}{beam_str} = kmax_mo*({i_oct})/imax_mo/({brho});')
 
     # Correct linear coupling
-    # Disable (knob synthesis does not work on mac)
-    # qx_fractional, qx_integer = np.modf(configuration['qx0'])
-    # qy_fractional, qy_integer = np.modf(configuration['qy0'])
-    # coupl_corr_info = pm.coupling_correction(mad_track,
-    #         n_iterations=configuration['N_iter_coupling'],
-    #         qx_integer=qx_integer, qy_integer=qy_integer,
-    #         qx_fractional=qx_fractional, qy_fractional=qy_fractional,
-    #         tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
-    #         tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
-    #         cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
-    #         cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
-    #         sequence_name=sequence_to_track, skip_use=True)
+    qx_fractional, qx_integer = np.modf(configuration['qx0'])
+    qy_fractional, qy_integer = np.modf(configuration['qy0'])
+    coupl_corr_info = pm.coupling_correction(mad_track,
+            n_iterations=configuration['N_iter_coupling'],
+            qx_integer=qx_integer, qy_integer=qy_integer,
+            qx_fractional=qx_fractional, qy_fractional=qy_fractional,
+            tune_knob1_name=knob_names['qknob_1'][sequence_to_track],
+            tune_knob2_name=knob_names['qknob_2'][sequence_to_track],
+            cmr_knob_name=knob_names['cmrknob'][sequence_to_track],
+            cmi_knob_name=knob_names['cmiknob'][sequence_to_track],
+            sequence_name=sequence_to_track, skip_use=True)
 
-    # # Add custom values to coupling knobs
-    # mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
-    # mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
+    # Add custom values to coupling knobs
+    mad_track.globals[knob_names['cmrknob'][sequence_to_track]] += configuration['delta_cmr']
+    mad_track.globals[knob_names['cmiknob'][sequence_to_track]] += configuration['delta_cmi']
 
     # # Check strength limits
     # if enable_imperfections:
