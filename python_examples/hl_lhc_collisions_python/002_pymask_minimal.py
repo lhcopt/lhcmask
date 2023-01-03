@@ -136,6 +136,9 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     # Correct linear coupling
     qx_fractional, qx_integer = np.modf(configuration['qx0'])
     qy_fractional, qy_integer = np.modf(configuration['qy0'])
+    knob_names = configuration['knob_names']
+    mad_track.globals[knob_names['cmrknob'][sequence_to_track]] = 0.
+    mad_track.globals[knob_names['cmiknob'][sequence_to_track]] = 0.
     coupl_corr_info = pm.coupling_correction(mad_track,
             n_iterations=configuration['N_iter_coupling'],
             qx_integer=qx_integer, qy_integer=qy_integer,
