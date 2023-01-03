@@ -556,9 +556,7 @@ else:
     tracker, line_bb_for_tracking_dict = pm.generate_xsuite_line(
                     mad_track, sequence_to_track, bb_df_track,
                     optics_and_co_at_start_ring_from_madx,
-                    folder_name = './xsuite_lines',
-                    skip_mad_use=True,
-                    prepare_line_for_xtrack=True)
+                    folder_name = './xsuite_lines')
 
 ###################################
 #         Save final twiss        #
