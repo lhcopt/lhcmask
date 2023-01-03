@@ -1,7 +1,9 @@
 import os
+import json
 import yaml
 import numpy as np
 import pymask as pm
+import xobjects as xo
 
 # Import user-defined optics-specific tools
 import optics_specific_tools as ost
@@ -178,8 +180,14 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
         mad_track.globals.on_crab1 = configuration['knob_settings']['on_crab1']
         mad_track.globals.on_crab5 = configuration['knob_settings']['on_crab5']
 
-    # Generate xtrack line#
+    # Generate xtrack line
     tracker, line_bb_for_tracking_dict = pm.generate_xsuite_line(
-                        mad_track, sequence_to_track,
-                        folder_name = './xsuite_lines_' + sequence_to_track)
+                        mad_track, sequence_to_track)
 
+    # Save xtrack line to json
+    with open('xsuite_line_' + sequence_to_track.replace('b2', 'b4') + '.json', 'w') as fid:
+        json.dump(line_bb_for_tracking_dict, fid, cls=xo.JEncoder)
+
+    # Save mad sequence
+    pm.save_mad_sequence_and_error(mad_track, sequence_to_track,
+        filename=sequence_to_track.replace('b2', 'b4'))
