@@ -9,6 +9,16 @@ if (on_errors_LHC==1){
   readtable, file="errors/LHC/rotations_Q2_integral.tab";
 };
 
+if (ver_hllhc_optics == 1.4){
+  readtable, file="errors/HL-LHC/Layout_Rotations_HLLHCv1.4.tab";
+};
+if (ver_hllhc_optics == 1.5){
+  readtable, file="errors/HL-LHC/Layout_Rotations_HLLHCv1.5.tab";
+};
+if (ver_hllhc_optics == 1.6){
+  readtable, file="errors/HL-LHC/Layout_Rotations_HLLHCv1.6.tab";
+};
+
 if (ver_hllhc_optics > 0 && on_errors_IT==1){
   call, file="errors/HL-LHC/ITbody_errortable_v5"; ! target error table for the new IT
   call, file="errors/HL-LHC/ITnc_errortable_v5"; ! target error table for the new IT
