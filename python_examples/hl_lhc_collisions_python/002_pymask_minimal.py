@@ -234,8 +234,8 @@ collider = xt.Multiline(
     lines={
         'lhcb1': lines_to_track['lhcb1'],
         'lhcb2': lines_to_track['lhcb2'],
-        'lhcb1_co_ref': lines_co_ref['lhcb1'],
-        'lhcb2_co_ref': lines_co_ref['lhcb2'],
+        'lhcb1_co_ref': lines_co_ref['lhcb1_co_ref'],
+        'lhcb2_co_ref': lines_co_ref['lhcb2_co_ref'],
     })
 
 collider['lhcb1_co_ref'].particle_ref = collider['lhcb1'].particle_ref.copy()
