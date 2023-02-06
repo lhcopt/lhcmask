@@ -50,6 +50,11 @@ ost.apply_optics(mad, optics_file=configuration['optics_file'])
 # Attach beam to sequences
 pm.attach_beam_to_sequences(mad, configuration=configuration)
 
+mad.use('lhcb1')
+mad.twiss()
+mad.use('lhcb2')
+mad.twiss()
+
 # Generate beam 4
 mad_b4 = Madx(command_log="mad_b4.log")
 ost.build_sequence(mad_b4, beam=4, configuration=configuration)
