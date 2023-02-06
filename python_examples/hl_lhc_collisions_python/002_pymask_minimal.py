@@ -4,6 +4,11 @@ import yaml
 import numpy as np
 import pymask as pm
 import xobjects as xo
+import xtrack as xt
+
+from pymask.line_preparation import rename_coupling_knobs_and_coefficients
+from pymask.line_preparation import define_octupole_current_knobs
+from pymask.line_preparation import add_correction_term_to_dipole_correctors
 
 # Import user-defined optics-specific tools
 import optics_specific_tools as ost
@@ -44,6 +49,20 @@ ost.apply_optics(mad, optics_file=configuration['optics_file'])
 
 # Attach beam to sequences
 pm.attach_beam_to_sequences(mad, configuration=configuration)
+
+# Generate beam 4
+mad_b4 = Madx(command_log="mad_b4.log")
+ost.build_sequence(mad_b4, beam=4, configuration=configuration)
+pm.configure_b4_from_b2(mad_b4, mad)
+
+lines_co_ref = {}
+lines_co_ref['lhcb1_co_ref'] = xt.Line.from_madx_sequence(mad.sequence.lhcb1,
+    deferred_expressions=True,
+    expressions_for_element_types=('kicker', 'hkicker', 'vkicker'))
+lines_co_ref['lhcb2_co_ref'] = xt.Line.from_madx_sequence(mad_b4.sequence.lhcb2,
+    deferred_expressions=True,
+    expressions_for_element_types=('kicker', 'hkicker', 'vkicker'))
+
 
 # Set IP1-IP5 phase and store corresponding reference
 mad.input("call, file='modules/submodule_01c_phase.madx';")
@@ -87,10 +106,10 @@ mad.input('exec, crossing_save;')
 # Force on_disp = 0
 mad.globals.on_disp = 0. # will be restored later
 
-# Generate beam 4
-mad_b4 = Madx(command_log="mad_b4.log")
-ost.build_sequence(mad_b4, beam=4, configuration=configuration)
+# Update beam 4
 pm.configure_b4_from_b2(mad_b4, mad)
+
+lines_to_track = {}
 
 for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
 
@@ -124,6 +143,8 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
             mad_track.input('exec, crossing_disable;')
             mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
         mad_track.input('exec, crossing_restore;')
+
+    # Rename coupling knobs
 
     # Switch on octupoles
     brho = mad_track.globals.nrj*1e9/mad_track.globals.clight
@@ -186,6 +207,16 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     tracker, line_bb_for_tracking_dict = pm.generate_xsuite_line(
                         mad_track, sequence_to_track)
 
+    # Some fixes on knob definitions
+    line = tracker.line
+    rename_coupling_knobs_and_coefficients(line=line,
+                                           beamn=int(sequence_to_track[-1]))
+    define_octupole_current_knobs(line=line, beamn=int(sequence_to_track[-1]))
+    lines_to_track[sequence_to_track] = line
+    # Set octupoles
+    line.vars['i_oct_b1'] = i_oct
+    line.vars['i_oct_b2'] = i_oct
+
     # Save xtrack line to json
     with open('xsuite_line_' + sequence_to_track.replace('b2', 'b4') + '.json', 'w') as fid:
         json.dump(line_bb_for_tracking_dict, fid, cls=xo.JEncoder)
@@ -193,3 +224,19 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     # Save mad sequence
     pm.save_mad_sequence_and_error(mad_track, sequence_to_track,
         filename=sequence_to_track.replace('b2', 'b4'))
+
+collider = xt.Multiline(
+    lines={
+        'lhcb1': lines_to_track['lhcb1'],
+        'lhcb2': lines_to_track['lhcb2'],
+        'lhcb1_co_ref': lines_co_ref['lhcb1'],
+        'lhcb2_co_ref': lines_co_ref['lhcb2'],
+    })
+
+collider['lhcb1_co_ref'].particle_ref = collider['lhcb1'].particle_ref.copy()
+collider['lhcb2_co_ref'].particle_ref = collider['lhcb2'].particle_ref.copy()
+
+# Save the two lines to json
+with open('collider.json', 'w') as fid:
+    dct = collider.to_dict()
+    json.dump(dct, fid, cls=xo.JEncoder)
