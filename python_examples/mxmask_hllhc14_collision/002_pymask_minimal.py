@@ -108,7 +108,8 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     # Prepare xsuite line
     line = xt.Line.from_madx_sequence(
         mad_track.sequence[sequence_to_track], apply_madx_errors=True,
-        deferred_expressions=True)
+        deferred_expressions=True,
+        replace_in_expr={'bv_aux': 'bvaux_'+sequence_to_track})
     mad_beam = mad_track.sequence[sequence_to_track].beam
     line.particle_ref = xp.Particles(
         p0c = mad_beam.pc*1e9,
