@@ -77,34 +77,34 @@ pm.configure_b4_from_b2(mad_b4, mad)
 lines_to_track = {}
 for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
 
-    # Install crab cavities
-    if configuration['enable_crabs']:
-        mad_track.input("call, file='optics_toolkit/enable_crabcavities.madx';")
-        # They are left off, they will be swiched on at the end
-        mad_track.globals.on_crab1 = 0
-        mad_track.globals.on_crab5 = 0
+    # # Install crab cavities
+    # if configuration['enable_crabs']:
+    #     mad_track.input("call, file='optics_toolkit/enable_crabcavities.madx';")
+    #     # They are left off, they will be swiched on at the end
+    #     mad_track.globals.on_crab1 = 0
+    #     mad_track.globals.on_crab5 = 0
 
-    # Save references for tuning and corrections (does crossing restore, restores on_disp)
-    mad_track.input("call, file='modules/submodule_04_1b_save_references.madx';")
+    # # Save references for tuning and corrections (does crossing restore, restores on_disp)
+    # mad_track.input("call, file='modules/submodule_04_1b_save_references.madx';")
 
-    # Force on_disp = 0
-    mad_track.globals.on_disp = 0. # will be restored later
+    # # Force on_disp = 0
+    # mad_track.globals.on_disp = 0. # will be restored later
 
-    # Final use --> disable use
-    mad_track.use(sequence_to_track)
+    # # Final use --> disable use
+    # mad_track.use(sequence_to_track)
 
-    # Install and correct errors
-    if configuration['enable_imperfections']:
-        mad_track.set_variables_from_dict(
-                configuration['pars_for_imperfections'])
-        mad_track.input("call, file='modules/module_04_errors.madx';")
-    else:
-        # Synthesize knobs
-        mad_track.input('call, file="modules/submodule_04a_s1_prepare_nom_twiss_table.madx";')
-        if configuration['enable_knob_synthesis']:
-            mad_track.input('exec, crossing_disable;')
-            mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
-        mad_track.input('exec, crossing_restore;')
+    # # Install and correct errors
+    # if configuration['enable_imperfections']:
+    #     mad_track.set_variables_from_dict(
+    #             configuration['pars_for_imperfections'])
+    #     mad_track.input("call, file='modules/module_04_errors.madx';")
+    # else:
+    #     # Synthesize knobs
+    #     mad_track.input('call, file="modules/submodule_04a_s1_prepare_nom_twiss_table.madx";')
+    #     if configuration['enable_knob_synthesis']:
+    #         mad_track.input('exec, crossing_disable;')
+    #         mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
+    #     mad_track.input('exec, crossing_restore;')
 
     # Prepare xsuite line
     line = xt.Line.from_madx_sequence(
