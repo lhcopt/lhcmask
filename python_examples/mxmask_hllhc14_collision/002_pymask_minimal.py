@@ -106,12 +106,11 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
             mad_track.input("call, file='modules/submodule_04e_s1_synthesize_knobs.madx';")
         mad_track.input('exec, crossing_restore;')
 
-
     # Prepare xsuite line
     line = xt.Line.from_madx_sequence(
-        mad.sequence[sequence_to_track], apply_madx_errors=True,
+        mad_track.sequence[sequence_to_track], apply_madx_errors=True,
         deferred_expressions=True)
-    mad_beam = mad.sequence[sequence_to_track].beam
+    mad_beam = mad_track.sequence[sequence_to_track].beam
     line.particle_ref = xp.Particles(
         p0c = mad_beam.pc*1e9,
         q0 = mad_beam.charge,
