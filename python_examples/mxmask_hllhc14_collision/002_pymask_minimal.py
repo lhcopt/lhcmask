@@ -5,6 +5,7 @@ import numpy as np
 import pymask as pm
 import xobjects as xo
 import xtrack as xt
+import xpart as xp
 
 from pymask.line_preparation import rename_coupling_knobs_and_coefficients
 from pymask.line_preparation import define_octupole_current_knobs
@@ -110,6 +111,12 @@ for sequence_to_track, mad_track in zip(['lhcb1', 'lhcb2'], [mad, mad_b4]):
     line = xt.Line.from_madx_sequence(
         mad.sequence[sequence_to_track], apply_madx_errors=True,
         deferred_expressions=True)
+    mad_beam = mad.sequence[sequence_to_track].beam
+    line.particle_ref = xp.Particles(
+        p0c = mad_beam.pc*1e9,
+        q0 = mad_beam.charge,
+        mass0 = mad_beam.mass*1e9,
+    )
     rename_coupling_knobs_and_coefficients(line=line,
                                            beamn=int(sequence_to_track[-1]))
     define_octupole_current_knobs(line=line, beamn=int(sequence_to_track[-1]))
