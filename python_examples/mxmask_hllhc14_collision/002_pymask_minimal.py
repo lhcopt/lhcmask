@@ -153,4 +153,10 @@ mon_test = collider['lhcb2'].record_last_track
 collider['lhcb2_co_ref'].track(particles=p_test.copy(), turn_by_turn_monitor='ONE_TURN_EBE')
 mon_ref = collider['lhcb2_co_ref'].record_last_track
 
+# collider['lhcb2']['mqxfa.b3r1..1'].knl
+# is array([0.        , 0.00146466])
 
+# collider['lhcb2_co_ref']['mqxfa.b3r1..1'].knl
+# array([ 0.        , -0.00146466])
+
+# The problem is bv_aux which is present in the expression of mqxfa.b3r1..1.knl
