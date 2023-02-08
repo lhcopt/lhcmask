@@ -177,7 +177,7 @@ knob_settings:
 enable_imperfections: false
 
 # Enable knob synthesis (for coupling correction, if no imperfections)
-enable_knob_synthesis: true
+enable_knob_synthesis: false 
 
 # Parameters for machine imperfections
 pars_for_imperfections:
