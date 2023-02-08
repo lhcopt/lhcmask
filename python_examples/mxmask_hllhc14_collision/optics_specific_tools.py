@@ -59,6 +59,16 @@ def build_sequence(mad, beam, **kwargs):
           seqedit, sequence=lhcb1; flatten; cycle, start=IP3; flatten; endedit;
         };
         seqedit, sequence=lhcb2; flatten; cycle, start=IP3; flatten; endedit;
+
+        ! Install crab cavities (they are off)
+        call, file='optics_toolkit/enable_crabcavities.madx';
+        on_crab1 = 0;
+        on_crab5 = 0;
+
+        ! Set twiss formats for MAD-X parts (macro from opt. toolkit)
+        exec, twiss_opt;
+
+
         ''')
 
 def apply_optics(mad, optics_file):
