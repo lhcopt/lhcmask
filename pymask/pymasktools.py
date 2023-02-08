@@ -610,7 +610,7 @@ def seqedit(mad,seq_name,editing,madInput = True):
     return output
 
 
-def attach_beam_to_sequences(mad, beam_to_configure=1, configuration=None):
+def attach_beam_to_sequences(mad, beam_to_configure=1, beam_configuration=None):
     """Attach beam to sequence
 
     Parameters
@@ -628,22 +628,22 @@ def attach_beam_to_sequences(mad, beam_to_configure=1, configuration=None):
 
     """
     # beam energy
-    mad.globals.nrj = configuration['beam_energy_tot']
+    mad.globals.nrj = beam_configuration['beam_energy_tot']
     particle_type = 'proton'
 
-    if 'particle_mass' in configuration.keys():
-        particle_mass = configuration['particle_mass']
+    if 'particle_mass' in beam_configuration.keys():
+        particle_mass = beam_configuration['particle_mass']
         particle_type = 'ion'
     else:
         particle_mass = mad.globals.pmass # proton mass
 
-    if 'particle_charge' in configuration.keys():
-        particle_charge = configuration['particle_charge']
+    if 'particle_charge' in beam_configuration.keys():
+        particle_charge = beam_configuration['particle_charge']
         particle_type = 'ion'
     else:
         particle_charge = 1.
 
-    gamma_rel = (particle_charge*configuration['beam_energy_tot'])/particle_mass
+    gamma_rel = (particle_charge*beam_configuration['beam_energy_tot'])/particle_mass
     for ss in mad.sequence.keys():
         # bv and bv_aux flags
         if ss == 'lhcb1':
@@ -657,13 +657,13 @@ def attach_beam_to_sequences(mad, beam_to_configure=1, configuration=None):
         mad.globals['bv_aux'] = ss_bv_aux
         mad.input(f'''
         beam, particle={particle_type},sequence={ss},
-            energy={configuration['beam_energy_tot']*particle_charge},
-            sigt={configuration['beam_sigt']},
+            energy={beam_configuration['beam_energy_tot']*particle_charge},
+            sigt={beam_configuration['beam_sigt']},
             bv={ss_beam_bv},
-            npart={configuration['beam_npart']},
-            sige={configuration['beam_sige']},
-            ex={configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
-            ey={configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+            npart={beam_configuration['beam_npart']},
+            sige={beam_configuration['beam_sige']},
+            ex={beam_configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
+            ey={beam_configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
             mass={particle_mass},
             charge={particle_charge};
         ''')

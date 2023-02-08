@@ -34,7 +34,7 @@ mad = Madx(command_log="mad_collider.log")
 mad.globals.par_verbose = int(configuration['verbose_mad_parts'])
 
 # Build sequence (also creates link to optics_toolkit and calls it)
-ost.build_sequence(mad, beam=1, configuration=configuration)
+ost.build_sequence(mad, beam=1, optics_version=configuration['optics_version'])
 
 # Set twiss formats for MAD-X parts (macro from opt. toolkit)
 mad.input('exec, twiss_opt;')
@@ -43,11 +43,7 @@ mad.input('exec, twiss_opt;')
 ost.apply_optics(mad, optics_file=configuration['optics_file'])
 
 # Attach beam to sequences
-pm.attach_beam_to_sequences(mad, configuration=configuration)
-
-# Set cavity phases
-mad.globals['lagrf400.b1'] = 0.5
-mad.globals['lagrf400.b2'] = 0.
+pm.attach_beam_to_sequences(mad, beam_configuration=configuration)
 
 mad.use('lhcb1')
 mad.twiss()
@@ -56,7 +52,7 @@ mad.twiss()
 
 # Generate beam 4
 mad_b4 = Madx(command_log="mad_b4.log")
-ost.build_sequence(mad_b4, beam=4, configuration=configuration)
+ost.build_sequence(mad_b4, beam=4, optics_version=configuration['optics_version'])
 pm.configure_b4_from_b2(mad_b4, mad)
 
 lines_co_ref = {}

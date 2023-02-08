@@ -5,9 +5,10 @@ import pymask as pm
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
 
-def build_sequence(mad, beam, configuration):
+def build_sequence(mad, beam, **kwargs):
 
-    optics_version = configuration['optics_version']
+    assert 'optics_version' in kwargs.keys(), 'optics_version not specified'
+    optics_version = kwargs['optics_version']
 
     # Select beam
     mad.input(f'mylhcbeam = {beam}')

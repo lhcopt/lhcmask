@@ -48,7 +48,7 @@ mad.input('exec, twiss_opt;')
 ost.apply_optics(mad, optics_file=configuration['optics_file'])
 
 # Attach beam to sequences
-pm.attach_beam_to_sequences(mad, configuration=configuration)
+pm.attach_beam_to_sequences(mad, beam_configuration=configuration)
 
 mad.use('lhcb1')
 mad.twiss()
