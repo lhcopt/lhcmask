@@ -50,7 +50,7 @@ for kk, vv in knobs.items():
 tw1_b1 = collider['lhcb1'].twiss(method='4d')
 tw1_b2 = collider['lhcb2'].twiss(method='4d')
 
-with open('collider.json', 'r') as fid:
+with open('collider_00_from_mad.json', 'r') as fid:
     collider_ref = xt.Multiline.from_dict(json.load(fid))
 
 collider_ref.build_trackers()
