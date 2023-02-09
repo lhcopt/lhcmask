@@ -2,6 +2,7 @@ import json
 import numpy as np
 
 import xtrack as xt
+import xobjects as xo
 
 with open('collider.json', 'r') as fid:
     collider = xt.Multiline.from_dict(json.load(fid))
@@ -17,6 +18,10 @@ collider.install_beambeam_interactions(
     sigmaz=0.076)
 
 collider.build_trackers()
+
+with open('collider_01_bb_off.json', 'w') as fid:
+    dct = collider.to_dict()
+    json.dump(dct, fid, cls=xo.JEncoder)
 
 ###### Checks ######
 

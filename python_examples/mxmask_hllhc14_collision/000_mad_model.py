@@ -17,7 +17,7 @@ from pymask.line_preparation import  save_lines_for_closed_orbit_reference
 import optics_specific_tools as ost
 
 # Read config file
-with open('config.yaml','r') as fid:
+with open('config_mad.yaml','r') as fid:
     configuration = yaml.safe_load(fid)
 
 # Make mad environment
@@ -94,6 +94,6 @@ collider['lhcb2_co_ref'].particle_ref = collider['lhcb2'].particle_ref.copy()
 add_correction_term_to_dipole_correctors(collider)
 
 # Save the two lines to json
-with open('collider.json', 'w') as fid:
+with open('collider_00_from_mad.json', 'w') as fid:
     dct = collider.to_dict()
     json.dump(dct, fid, cls=xo.JEncoder)
