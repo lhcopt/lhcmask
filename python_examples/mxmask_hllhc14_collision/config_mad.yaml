@@ -18,10 +18,10 @@ beam_energy_tot: 7000           # [GeV]
 verbose_mad_parts: true
 
 # Enable machine imperfections
-enable_imperfections: false
+enable_imperfections: true
 
 # Enable knob synthesis (for coupling correction, if no imperfections)
-enable_knob_synthesis: false
+enable_knob_synthesis: true
 
 # Parameters for machine imperfections
 pars_for_imperfections:
