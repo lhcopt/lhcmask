@@ -20,6 +20,21 @@ collider.build_trackers()
 
 ###### Checks ######
 
+collider_before_save = collider
+dct = collider.to_dict()
+collider = xt.Multiline.from_dict(dct)
+collider.build_trackers()
+
+assert collider._bb_config['dataframes']['clockwise'].shape == (
+    collider_before_save._bb_config['dataframes']['clockwise'].shape)
+assert collider._bb_config['dataframes']['anticlockwise'].shape == (
+    collider_before_save._bb_config['dataframes']['anticlockwise'].shape)
+
+assert (collider._bb_config['dataframes']['clockwise']['elementName'].iloc[50]
+    == collider_before_save._bb_config['dataframes']['clockwise']['elementName'].iloc[50])
+assert (collider._bb_config['dataframes']['anticlockwise']['elementName'].iloc[50]
+    == collider_before_save._bb_config['dataframes']['anticlockwise']['elementName'].iloc[50])
+
 # Put in some orbit
 knobs = dict(on_x1=250, on_x5=-200, on_disp=1)
 
@@ -63,3 +78,6 @@ for ipn in [1, 2, 3, 4, 5, 6, 7, 8]:
 
     assert np.isclose(tw1_b1[f'ip{ipn}', 's'], tw0_b1[f'ip{ipn}', 's'], rtol=1e-10, atol=0)
     assert np.isclose(tw1_b2[f'ip{ipn}', 's'], tw0_b2[f'ip{ipn}', 's'], rtol=1e-10, atol=0)
+
+
+
