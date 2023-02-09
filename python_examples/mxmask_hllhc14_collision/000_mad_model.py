@@ -28,16 +28,13 @@ Madx = pm.Madxp
 mad = Madx(command_log="mad_collider.log")
 mad.globals.par_verbose = int(configuration['verbose_mad_parts'])
 
-# Build sequence and apply optics
+# Build sequence, load optics, define beam
 ost.build_sequence(mad, beam=1, optics_version=configuration['optics_version'])
 ost.apply_optics(mad, optics_file=configuration['optics_file'])
-
-# Attach beam to sequences
 pm.attach_beam_to_sequences(mad, beam_configuration=configuration)
 
 # Warm up :-)
-mad.use('lhcb1'); mad.twiss()
-mad.use('lhcb2'); mad.twiss()
+mad.use('lhcb1'); mad.twiss(); mad.use('lhcb2'); mad.twiss()
 
 # Generate beam 4
 mad_b4 = Madx(command_log="mad_b4.log")

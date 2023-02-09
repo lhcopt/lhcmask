@@ -627,6 +627,7 @@ def attach_beam_to_sequences(mad, beam_to_configure=1, beam_configuration=None):
     None
 
     """
+
     # beam energy
     mad.globals.nrj = beam_configuration['beam_energy_tot']
     particle_type = 'proton'
@@ -658,12 +659,12 @@ def attach_beam_to_sequences(mad, beam_to_configure=1, beam_configuration=None):
         mad.input(f'''
         beam, particle={particle_type},sequence={ss},
             energy={beam_configuration['beam_energy_tot']*particle_charge},
-            sigt={beam_configuration['beam_sigt']},
+            sigt={beam_configuration.get('beam_sigt', 0.0001)},
             bv={ss_beam_bv},
-            npart={beam_configuration['beam_npart']},
-            sige={beam_configuration['beam_sige']},
-            ex={beam_configuration['beam_norm_emit_x'] * 1e-6 / gamma_rel},
-            ey={beam_configuration['beam_norm_emit_y'] * 1e-6 / gamma_rel},
+            npart={beam_configuration.get('beam_npart', 1)},
+            sige={beam_configuration.get('beam_sige', 1e-6)},
+            ex={beam_configuration.get('beam_norm_emit_x', 1) * 1e-6 / gamma_rel},
+            ey={beam_configuration.get('beam_norm_emit_y', 1) * 1e-6 / gamma_rel},
             mass={particle_mass},
             charge={particle_charge};
         ''')
