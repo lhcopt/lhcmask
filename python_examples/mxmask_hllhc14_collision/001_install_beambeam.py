@@ -23,6 +23,7 @@ with open('collider_01_bb_off.json', 'w') as fid:
     dct = collider.to_dict()
     json.dump(dct, fid, cls=xo.JEncoder)
 
+
 ###### Checks ######
 
 collider_before_save = collider

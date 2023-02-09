@@ -11,6 +11,10 @@ with open('config_knobs_and_tuning.yaml','r') as fid:
 with open('collider_01_bb_off.json', 'r') as fid:
     collider = xt.Multiline.from_dict(json.load(fid))
 
+# Load orbit correction configuration
+with open('corr_co.json', 'r') as fid:
+    co_corr_config = json.load(fid)
+
 # Set all knobs (crossing angles, dispersion correction, rf, crab cavities,
 # experimental magnets, etc.)
 for kk, vv in configuration['knob_settings'].items():
@@ -22,6 +26,12 @@ collider.build_trackers()
 # Tunings
 for line_name in ['lhcb1', 'lhcb2']:
     knob_names = configuration['knob_names'][line_name]
+
+    # Correct closed orbit
+    print(f'Correcting closed orbit for {line_name}')
+    collider[line_name].correct_closed_orbit(
+                            reference=collider[line_name+'_co_ref'],
+                            correction_config=co_corr_config[line_name])
 
     # Match coupling
     print(f'Matching coupling for {line_name}')
@@ -47,6 +57,8 @@ for line_name in ['lhcb1', 'lhcb2']:
             xt.Target('qy', configuration['qy'], tol=1e-4),
             xt.Target('dqx', configuration['dqx'], tol=0.05),
             xt.Target('dqy', configuration['dqy'], tol=0.05)])
+
+
 
 
 # Checks
