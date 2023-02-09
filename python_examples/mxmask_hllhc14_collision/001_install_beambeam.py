@@ -4,7 +4,7 @@ import numpy as np
 import xtrack as xt
 import xobjects as xo
 
-with open('collider.json', 'r') as fid:
+with open('collider_00_from_mad.json', 'r') as fid:
     collider = xt.Multiline.from_dict(json.load(fid))
 
 collider.install_beambeam_interactions(

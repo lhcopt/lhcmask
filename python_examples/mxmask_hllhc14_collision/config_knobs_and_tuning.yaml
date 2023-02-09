@@ -33,17 +33,17 @@ knob_settings:
   # RF voltage and phases
   vrf400:       16.0            # [MV]
   lagrf400.b1:   0.5            # [rad]
-  lagrf400.b2:   0.5            # [rad]
+  lagrf400.b2:   0.             # [rad]
 
   # Octupoles
   i_oct_b1:     -235            # [A]
   i_oct_b1:     -235            # [A]
 
 # Tunes and chromaticities
-qx0: 62.31
-qy0: 60.32
-chromaticity_x: 5
-chromaticity_y: 5
+qx: 62.31
+qy: 60.32
+dqx: 5
+dqy: 5
 
 knob_names:
 
