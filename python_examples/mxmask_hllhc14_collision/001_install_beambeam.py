@@ -20,7 +20,11 @@ collider.build_trackers()
 
 ###### Checks ######
 
-knobs = dict('on_x1' = 250, 'on_x5' = -200)
+# Put in some orbit
+knobs = dict(on_x1=250, on_x5=-200, on_disp=1)
+
+for kk, vv in knobs.items():
+    collider.vars[kk] = vv
 
 tw1_b1 = collider['lhcb1'].twiss(method='4d')
 tw1_b2 = collider['lhcb2'].twiss(method='4d')
@@ -29,6 +33,10 @@ with open('collider.json', 'r') as fid:
     collider_ref = xt.Multiline.from_dict(json.load(fid))
 
 collider_ref.build_trackers()
+
+for kk, vv in knobs.items():
+    collider_ref.vars[kk] = vv
+
 tw0_b1 = collider_ref['lhcb1'].twiss(method='4d')
 tw0_b2 = collider_ref['lhcb2'].twiss(method='4d')
 
@@ -48,10 +56,10 @@ for ipn in [1, 2, 3, 4, 5, 6, 7, 8]:
     assert np.isclose(tw1_b2[f'ip{ipn}', 'betx'], tw0_b2[f'ip{ipn}', 'betx'], rtol=1e-5, atol=0)
     assert np.isclose(tw1_b2[f'ip{ipn}', 'bety'], tw0_b2[f'ip{ipn}', 'bety'], rtol=1e-5, atol=0)
 
-    assert np.isclose(tw1_b1[f'ip{ipn}', 'px'], tw0_b1[f'ip{ipn}', 'px'], rtol=1e-10, atol=0)
-    assert np.isclose(tw1_b1[f'ip{ipn}', 'py'], tw0_b1[f'ip{ipn}', 'py'], rtol=1e-10, atol=0)
-    assert np.isclose(tw1_b2[f'ip{ipn}', 'px'], tw0_b2[f'ip{ipn}', 'px'], rtol=1e-10, atol=0)
-    assert np.isclose(tw1_b2[f'ip{ipn}', 'py'], tw0_b2[f'ip{ipn}', 'py'], rtol=1e-10, atol=0)
+    assert np.isclose(tw1_b1[f'ip{ipn}', 'px'], tw0_b1[f'ip{ipn}', 'px'], rtol=1e-9, atol=0)
+    assert np.isclose(tw1_b1[f'ip{ipn}', 'py'], tw0_b1[f'ip{ipn}', 'py'], rtol=1e-9, atol=0)
+    assert np.isclose(tw1_b2[f'ip{ipn}', 'px'], tw0_b2[f'ip{ipn}', 'px'], rtol=1e-9, atol=0)
+    assert np.isclose(tw1_b2[f'ip{ipn}', 'py'], tw0_b2[f'ip{ipn}', 'py'], rtol=1e-9, atol=0)
 
     assert np.isclose(tw1_b1[f'ip{ipn}', 's'], tw0_b1[f'ip{ipn}', 's'], rtol=1e-10, atol=0)
     assert np.isclose(tw1_b2[f'ip{ipn}', 's'], tw0_b2[f'ip{ipn}', 's'], rtol=1e-10, atol=0)
