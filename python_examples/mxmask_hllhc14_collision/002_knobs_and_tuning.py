@@ -23,6 +23,10 @@ for kk, vv in configuration['knob_settings'].items():
 # Build trackers
 collider.build_trackers()
 
+# Twiss before correction
+twb1_before = collider['lhcb1'].twiss()
+twb2_before = collider['lhcb2'].twiss(reverse=True)
+
 # Tunings
 for line_name in ['lhcb1', 'lhcb2']:
     knob_names = configuration['knob_names'][line_name]
