@@ -83,10 +83,12 @@ def save_lines_for_closed_orbit_reference(mad, mad_b4):
     lines_co_ref = {}
     lines_co_ref['lhcb1_co_ref'] = xt.Line.from_madx_sequence(mad.sequence.lhcb1,
         deferred_expressions=True,
-        expressions_for_element_types=('kicker', 'hkicker', 'vkicker'))
+        expressions_for_element_types=('kicker', 'hkicker', 'vkicker'),
+        replace_in_expr={'bv_aux': 'bvaux_lhcb1'})
     lines_co_ref['lhcb2_co_ref'] = xt.Line.from_madx_sequence(mad_b4.sequence.lhcb2,
         deferred_expressions=True,
-        expressions_for_element_types=('kicker', 'hkicker', 'vkicker'))
+        expressions_for_element_types=('kicker', 'hkicker', 'vkicker'),
+        replace_in_expr={'bv_aux': 'bvaux_lhcb2'})
     return lines_co_ref
 
 def make_mad_environment(links):
